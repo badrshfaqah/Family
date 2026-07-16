@@ -1,0 +1,9 @@
+{
+  "slug": "news",
+  "name": "الأخبار",
+  "description": "نظام إدارة أخبار متكامل مع تصنيفات ووسوم وصور ومرفقات وSEO.",
+  "version": "1.0.0",
+  "core_version": ">=1.0.0",
+  "namespace": "Modules\\News",
+  "author": "النظام"
+}
