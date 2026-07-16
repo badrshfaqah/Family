@@ -14,21 +14,20 @@ final class SitemapController
         $urls = [Url::full('') => ['priority' => '1.0']];
 
         $sources = [
-            'news' => ['slug' => 'slug', 'where' => "status = 'published'"],
-            'events' => ['slug' => 'slug', 'where' => "status = 'published'"],
-            'pages' => ['slug' => 'slug', 'where' => "status = 'published'"],
-            'archive' => ['slug' => 'slug', 'where' => "status = 'published'"],
+            'news' => ['table' => 'news', 'route' => 'news', 'where' => "status = 'published'"],
+            'events' => ['table' => 'events', 'route' => 'events', 'where' => "status = 'published'"],
+            'pages' => ['table' => 'pages', 'route' => 'p', 'where' => "status = 'published'"],
+            'archive' => ['table' => 'archive_items', 'route' => 'archive', 'where' => "status = 'published'"],
+            'gallery' => ['table' => 'gallery_albums', 'route' => 'gallery', 'where' => "status = 'published'"],
         ];
 
-        $routeMap = ['news' => 'news', 'events' => 'events', 'pages' => 'p', 'archive' => 'archive'];
-
-        foreach ($sources as $table => $conf) {
-            if (!Database::tableExists($table)) {
+        foreach ($sources as $conf) {
+            if (!Database::tableExists($conf['table'])) {
                 continue;
             }
-            $rows = Database::fetchAll("SELECT slug, updated_at FROM " . Database::table($table) . " WHERE {$conf['where']} LIMIT 5000");
+            $rows = Database::fetchAll("SELECT slug, updated_at FROM " . Database::table($conf['table']) . " WHERE {$conf['where']} LIMIT 5000");
             foreach ($rows as $row) {
-                $urls[Url::full($routeMap[$table] . '/' . $row['slug'])] = ['priority' => '0.7', 'lastmod' => $row['updated_at'] ?? null];
+                $urls[Url::full($conf['route'] . '/' . $row['slug'])] = ['priority' => '0.7', 'lastmod' => $row['updated_at'] ?? null];
             }
         }
 

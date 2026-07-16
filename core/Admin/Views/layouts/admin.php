@@ -56,17 +56,17 @@ function fam_admin_active(string $url, string $current): bool
       <strong>لوحة تحكم <?= View::e(Settings::get('identity_short_name', 'الموقع')) ?></strong>
     </div>
     <nav class="admin-nav">
-      <?php foreach ($coreMenu as $item): if ($item['perm'] && !Auth::can($item['perm'])) continue; ?>
-        <a class="<?= fam_admin_active($item['url'], $currentPath) ? 'active' : '' ?>" href="<?= View::e($item['url']) ?>"><span><?= $item['icon'] ?></span><?= View::e($item['label']) ?></a>
+      <?php foreach ($coreMenu as $navItem): if ($navItem['perm'] && !Auth::can($navItem['perm'])) continue; ?>
+        <a class="<?= fam_admin_active($navItem['url'], $currentPath) ? 'active' : '' ?>" href="<?= View::e($navItem['url']) ?>"><span><?= $navItem['icon'] ?></span><?= View::e($navItem['label']) ?></a>
       <?php endforeach; ?>
 
-      <?php foreach ($moduleMenu as $item): if (!empty($item['perm']) && !Auth::can($item['perm'])) continue; ?>
-        <a class="<?= fam_admin_active($item['url'], $currentPath) ? 'active' : '' ?>" href="<?= View::e($item['url']) ?>"><span><?= $item['icon'] ?? '▫️' ?></span><?= View::e($item['label']) ?></a>
+      <?php foreach ($moduleMenu as $navItem): if (!empty($navItem['perm']) && !Auth::can($navItem['perm'])) continue; ?>
+        <a class="<?= fam_admin_active($navItem['url'], $currentPath) ? 'active' : '' ?>" href="<?= View::e($navItem['url']) ?>"><span><?= $navItem['icon'] ?? '▫️' ?></span><?= View::e($navItem['label']) ?></a>
       <?php endforeach; ?>
 
       <div class="admin-nav-sep">النظام</div>
-      <?php foreach ($systemMenu as $item): if ($item['perm'] && !Auth::can($item['perm'])) continue; ?>
-        <a class="<?= fam_admin_active($item['url'], $currentPath) ? 'active' : '' ?>" href="<?= View::e($item['url']) ?>"><span><?= $item['icon'] ?></span><?= View::e($item['label']) ?></a>
+      <?php foreach ($systemMenu as $navItem): if ($navItem['perm'] && !Auth::can($navItem['perm'])) continue; ?>
+        <a class="<?= fam_admin_active($navItem['url'], $currentPath) ? 'active' : '' ?>" href="<?= View::e($navItem['url']) ?>"><span><?= $navItem['icon'] ?></span><?= View::e($navItem['label']) ?></a>
       <?php endforeach; ?>
     </nav>
   </aside>

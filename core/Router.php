@@ -51,6 +51,11 @@ final class Router
 
         $candidates = $this->routes[$method] ?? [];
 
+        // تُرتَّب المسارات حسب مستوى التحديد (Specificity) لا حسب ترتيب التسجيل،
+        // بحيث لا يبتلع مسار عام مثل /{slug} (الصفحات الثابتة) مسارات محددة
+        // كـ /calendar أو /news تسجّلها إضافات أخرى بغض النظر عن ترتيب تركيبها.
+        usort($candidates, fn($a, $b) => $this->specificity($b['pattern']) <=> $this->specificity($a['pattern']));
+
         foreach ($candidates as $route) {
             if (preg_match($route['regex'], $path, $matches)) {
                 $params = array_filter($matches, fn($k) => !is_int($k), ARRAY_FILTER_USE_KEY);
@@ -67,6 +72,17 @@ final class Router
 
         http_response_code(404);
         echo 'الصفحة غير موجودة.';
+    }
+
+    /** يحسب درجة تحديد المسار: الأجزاء الحرفية (غير المتغيرة) أهم من أجزاء {param} */
+    private function specificity(string $pattern): int
+    {
+        $segments = array_filter(explode('/', trim($pattern, '/')), fn($s) => $s !== '');
+        $score = count($segments);
+        foreach ($segments as $segment) {
+            $score += str_starts_with($segment, '{') ? 1 : 100;
+        }
+        return $score;
     }
 
     private function call(callable|array $handler, array $params): void

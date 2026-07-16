@@ -77,8 +77,8 @@ $metaDescription = $metaDescription ?? Settings::get('seo_default_description', 
       <span><?= \Core\View::e($shortName) ?></span>
     </a>
     <nav class="nav-desktop">
-      <?php foreach ($mainMenu as $item): ?>
-        <a href="<?= \Core\View::e(fam_menu_link($item)) ?>" <?= $item['open_new_tab'] ? 'target="_blank" rel="noopener"' : '' ?>><?= \Core\View::e($item['label']) ?></a>
+      <?php foreach ($mainMenu as $navItem): ?>
+        <a href="<?= \Core\View::e(fam_menu_link($navItem)) ?>" <?= $navItem['open_new_tab'] ? 'target="_blank" rel="noopener"' : '' ?>><?= \Core\View::e($navItem['label']) ?></a>
       <?php endforeach; ?>
     </nav>
     <div class="header-actions">
@@ -91,8 +91,8 @@ $metaDescription = $metaDescription ?? Settings::get('seo_default_description', 
 <div class="mobile-nav" data-mobile-nav>
   <div class="panel">
     <button class="icon-btn close-btn" data-nav-close aria-label="إغلاق">✕</button>
-    <?php foreach ($mobileMenu as $item): ?>
-      <a href="<?= \Core\View::e(fam_menu_link($item)) ?>"><?= \Core\View::e($item['label']) ?></a>
+    <?php foreach ($mobileMenu as $navItem): ?>
+      <a href="<?= \Core\View::e(fam_menu_link($navItem)) ?>"><?= \Core\View::e($navItem['label']) ?></a>
     <?php endforeach; ?>
   </div>
 </div>
@@ -123,8 +123,8 @@ $metaDescription = $metaDescription ?? Settings::get('seo_default_description', 
       </div>
       <div>
         <h3>روابط</h3>
-        <?php foreach ($footerMenu as $item): ?>
-          <p><a href="<?= \Core\View::e(fam_menu_link($item)) ?>"><?= \Core\View::e($item['label']) ?></a></p>
+        <?php foreach ($footerMenu as $navItem): ?>
+          <p><a href="<?= \Core\View::e(fam_menu_link($navItem)) ?>"><?= \Core\View::e($navItem['label']) ?></a></p>
         <?php endforeach; ?>
       </div>
       <div>

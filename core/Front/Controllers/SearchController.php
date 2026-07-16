@@ -34,6 +34,7 @@ final class SearchController
             'events' => ['table' => 'events', 'title' => 'title', 'slug' => 'slug', 'where' => "status = 'published'", 'route' => 'events'],
             'pages' => ['table' => 'pages', 'title' => 'title', 'slug' => 'slug', 'where' => "status = 'published'", 'route' => 'p'],
             'archive' => ['table' => 'archive_items', 'title' => 'title', 'slug' => 'slug', 'where' => "status = 'published'", 'route' => 'archive'],
+            'gallery' => ['table' => 'gallery_albums', 'title' => 'title', 'slug' => 'slug', 'where' => "status = 'published'", 'route' => 'gallery'],
         ];
 
         foreach ($sources as $key => $conf) {

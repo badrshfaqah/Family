@@ -4,8 +4,8 @@
  */
 use Core\Support\Url;
 
-$typeLabels = ['news' => 'خبر', 'events' => 'مناسبة', 'pages' => 'صفحة', 'archive' => 'أرشيف'];
-$routeLabels = ['news' => 'news', 'events' => 'events', 'pages' => 'p', 'archive' => 'archive'];
+$typeLabels = ['news' => 'خبر', 'events' => 'مناسبة', 'pages' => 'صفحة', 'archive' => 'أرشيف', 'gallery' => 'ألبوم'];
+$routeLabels = ['news' => 'news', 'events' => 'events', 'pages' => 'p', 'archive' => 'archive', 'gallery' => 'gallery'];
 ?>
 <div class="container section">
   <form method="get" action="<?= Url::to('search') ?>" style="display:flex;gap:10px;margin-bottom:20px">
