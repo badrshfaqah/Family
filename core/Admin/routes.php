@@ -5,6 +5,7 @@ use Core\Admin\Controllers\BackupController;
 use Core\Admin\Controllers\BranchesController;
 use Core\Admin\Controllers\CitiesController;
 use Core\Admin\Controllers\DashboardController;
+use Core\Admin\Controllers\DemoDataController;
 use Core\Admin\Controllers\LogsController;
 use Core\Admin\Controllers\MediaController;
 use Core\Admin\Controllers\MenusController;
@@ -71,6 +72,10 @@ $router->get('/branches', [BranchesController::class, 'index']);
 $router->post('/branches/store', [BranchesController::class, 'store']);
 $router->post('/branches/{id}/update', [BranchesController::class, 'update']);
 $router->post('/branches/{id}/delete', [BranchesController::class, 'delete']);
+
+$router->get('/demo-data', [DemoDataController::class, 'index']);
+$router->post('/demo-data/seed', [DemoDataController::class, 'seed']);
+$router->post('/demo-data/purge', [DemoDataController::class, 'purge']);
 
 $router->setNotFound(function () {
     http_response_code(404);
