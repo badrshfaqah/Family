@@ -67,6 +67,7 @@ $router->post('/media/{id}/delete', [MediaController::class, 'delete']);
 $router->get('/menus', [MenusController::class, 'index']);
 $router->get('/menus/{slug}', [MenusController::class, 'index']);
 $router->post('/menus/{slug}/store', [MenusController::class, 'store']);
+$router->post('/menus/{slug}/reorder', [MenusController::class, 'reorder']);
 $router->post('/menus/{id}/update', [MenusController::class, 'update']);
 $router->post('/menus/{id}/delete', [MenusController::class, 'delete']);
 

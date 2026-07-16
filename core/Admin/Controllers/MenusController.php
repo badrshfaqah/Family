@@ -97,4 +97,29 @@ final class MenusController
         ActivityLog::record('menu_item_delete', 'حذف عنصر قائمة رقم: ' . $params['id']);
         Response::redirect(Url::admin('menus/' . Security::cleanText(Request::get('slug', 'main'))));
     }
+
+    /** يستقبل ترتيبًا جديدًا من السحب والإفلات في الواجهة ويحفظه فورًا */
+    public function reorder(array $params): void
+    {
+        Auth::requirePermission('content.pages');
+        Csrf::verifyRequestOrFail();
+
+        $slug = $params['slug'] ?? 'main';
+        $menu = Database::fetchOne('SELECT id FROM ' . Database::table('menus') . ' WHERE slug = ?', [$slug]);
+        if (!$menu) {
+            \Core\Support\Response::json(['ok' => false], 404);
+        }
+
+        $order = (array) Request::post('order', []);
+        $position = 1;
+        foreach ($order as $id) {
+            $id = (int) $id;
+            if ($id > 0) {
+                Database::update('menu_items', ['sort_order' => $position], ['id' => $id, 'menu_id' => $menu['id']]);
+                $position++;
+            }
+        }
+
+        \Core\Support\Response::json(['ok' => true]);
+    }
 }
