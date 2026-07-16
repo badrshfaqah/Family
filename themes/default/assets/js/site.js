@@ -5,6 +5,7 @@
     initMobileNav();
     initCountdowns();
     initShare();
+    initAnnouncements();
   });
 
   function initMobileNav() {
@@ -88,6 +89,58 @@
         copyLink(btn.getAttribute('data-url') || location.href, btn);
       });
     });
+  }
+
+  function initAnnouncements() {
+    var bar = document.querySelector('[data-announce-bar]');
+    if (bar) {
+      var barId = bar.getAttribute('data-id');
+      var barKey = 'fam_announce_bar_closed_' + barId;
+      if (localStorage.getItem(barKey) === '1') {
+        bar.style.display = 'none';
+      } else {
+        var closeBtn = bar.querySelector('[data-announce-close]');
+        if (closeBtn) {
+          closeBtn.addEventListener('click', function () {
+            bar.style.display = 'none';
+            localStorage.setItem(barKey, '1');
+          });
+        }
+      }
+    }
+
+    var popup = document.querySelector('[data-announce-popup]');
+    if (popup) {
+      var popupId = popup.getAttribute('data-id');
+      var frequency = popup.getAttribute('data-frequency');
+      var intervalDays = parseInt(popup.getAttribute('data-interval-days') || '0', 10);
+      var storageKey = 'fam_announce_popup_' + popupId;
+      var shouldShow = true;
+
+      if (frequency === 'once') {
+        shouldShow = !localStorage.getItem(storageKey);
+      } else if (frequency === 'interval_days' && intervalDays > 0) {
+        var last = parseInt(localStorage.getItem(storageKey) || '0', 10);
+        shouldShow = (Date.now() - last) > (intervalDays * 86400000);
+      }
+
+      if (shouldShow) {
+        popup.classList.add('open');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closePopup() {
+        popup.classList.remove('open');
+        document.body.style.overflow = '';
+        localStorage.setItem(storageKey, String(Date.now()));
+      }
+
+      var popupClose = popup.querySelector('[data-announce-close]');
+      if (popupClose) popupClose.addEventListener('click', closePopup);
+      popup.addEventListener('click', function (e) {
+        if (e.target === popup) closePopup();
+      });
+    }
   }
 
   function copyLink(url, btn) {

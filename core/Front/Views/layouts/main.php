@@ -16,6 +16,30 @@ if ($logoId) {
     }
 }
 
+$topBarAnnouncement = null;
+$popupAnnouncement = null;
+if (\Core\ModuleManager::isEnabled('announcements') && Database::tableExists('announcements')) {
+    $activeWhere = 'status = "active" AND (starts_at IS NULL OR starts_at <= NOW()) AND (ends_at IS NULL OR ends_at >= NOW())';
+    $topBarAnnouncement = Database::fetchOne(
+        'SELECT * FROM ' . Database::table('announcements') . " WHERE {$activeWhere} AND placement = 'top_bar' ORDER BY id DESC LIMIT 1"
+    );
+    $popupAnnouncement = Database::fetchOne(
+        'SELECT * FROM ' . Database::table('announcements') . " WHERE {$activeWhere} AND placement = 'popup' ORDER BY id DESC LIMIT 1"
+    );
+}
+
+function fam_announce_visibility_class(array $a): string
+{
+    $classes = [];
+    if (empty($a['show_on_desktop'])) {
+        $classes[] = 'hide-on-desktop';
+    }
+    if (empty($a['show_on_mobile'])) {
+        $classes[] = 'hide-on-mobile';
+    }
+    return implode(' ', $classes);
+}
+
 $mainMenu = [];
 $mobileMenu = [];
 $footerMenu = [];
@@ -69,6 +93,13 @@ $metaDescription = $metaDescription ?? Settings::get('seo_default_description', 
 <style>:root{--c-primary:<?= \Core\View::e($primaryColor) ?>;--c-secondary:<?= \Core\View::e($secondaryColor) ?>;}</style>
 </head>
 <body>
+
+<?php if ($topBarAnnouncement): ?>
+<div class="announce-bar <?= fam_announce_visibility_class($topBarAnnouncement) ?>" data-announce-bar data-id="<?= (int) $topBarAnnouncement['id'] ?>">
+  <span><?= \Core\View::e($topBarAnnouncement['title']) ?><?php if (!empty($topBarAnnouncement['message'])): ?> — <?= \Core\View::e($topBarAnnouncement['message']) ?><?php endif; ?></span>
+  <button type="button" class="close-btn" data-announce-close aria-label="إغلاق">✕</button>
+</div>
+<?php endif; ?>
 
 <header class="site-header">
   <div class="container bar">
@@ -136,6 +167,19 @@ $metaDescription = $metaDescription ?? Settings::get('seo_default_description', 
     <div class="copyright">© <?= date('Y') ?> <?= \Core\View::e($shortName) ?> — <?= \Core\View::e(Terms::phrase('official_site')) ?></div>
   </div>
 </footer>
+
+<?php if ($popupAnnouncement): ?>
+<div class="announce-popup-overlay <?= fam_announce_visibility_class($popupAnnouncement) ?>" data-announce-popup
+     data-id="<?= (int) $popupAnnouncement['id'] ?>"
+     data-frequency="<?= \Core\View::e($popupAnnouncement['popup_frequency'] ?? 'once') ?>"
+     data-interval-days="<?= (int) ($popupAnnouncement['popup_interval_days'] ?? 0) ?>">
+  <div class="announce-popup-box">
+    <button type="button" class="close-btn" data-announce-close aria-label="إغلاق">✕</button>
+    <h3><?= \Core\View::e($popupAnnouncement['title']) ?></h3>
+    <p><?= \Core\View::e($popupAnnouncement['message']) ?></p>
+  </div>
+</div>
+<?php endif; ?>
 
 <script src="<?= Url::theme('assets/js/site.js') ?>"></script>
 </body>
