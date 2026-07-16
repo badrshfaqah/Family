@@ -82,6 +82,15 @@ table th{background:#fafbfa;color:var(--a-muted);font-weight:700}
 .badge-gray{background:#eef1ef;color:#6b7570}
 .badge-red{background:#fdeceb;color:#a12d24}
 
+.markdown-body h2{font-size:1.15rem;margin:22px 0 10px}
+.markdown-body h3{font-size:1rem;margin:18px 0 8px;color:var(--a-primary)}
+.markdown-body h4{font-size:.92rem;margin:14px 0 6px}
+.markdown-body p{margin:6px 0;line-height:1.8}
+.markdown-body ul{margin:6px 0 14px;padding-inline-start:22px;display:flex;flex-direction:column;gap:4px}
+.markdown-body li{line-height:1.8}
+.markdown-body hr{border:none;border-top:1px solid var(--a-border);margin:20px 0}
+.markdown-body code{background:#eef1ef;padding:1px 6px;border-radius:4px;font-size:.85em}
+
 .tabs{display:flex;gap:6px;border-bottom:1px solid var(--a-border);margin-bottom:18px;flex-wrap:wrap}
 .tabs a{padding:10px 14px;font-size:.88rem;color:var(--a-muted);border-bottom:2px solid transparent}
 .tabs a.active{color:var(--a-primary);border-color:var(--a-primary);font-weight:700}
