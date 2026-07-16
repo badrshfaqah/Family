@@ -1,0 +1,21 @@
+CREATE TABLE IF NOT EXISTS `{prefix}announcements` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `title` VARCHAR(191) NOT NULL,
+  `message` TEXT NOT NULL,
+  `announcement_type` VARCHAR(100) NULL,
+  `placement` ENUM('home_card','top_bar','popup','page') NOT NULL DEFAULT 'home_card',
+  `target_page_slug` VARCHAR(191) NULL,
+  `status` ENUM('active','inactive') NOT NULL DEFAULT 'active',
+  `starts_at` DATETIME NULL,
+  `ends_at` DATETIME NULL,
+  `popup_frequency` ENUM('once','every_visit','interval_days') NOT NULL DEFAULT 'once',
+  `popup_interval_days` INT UNSIGNED NULL,
+  `show_on_desktop` TINYINT(1) NOT NULL DEFAULT 1,
+  `show_on_mobile` TINYINT(1) NOT NULL DEFAULT 1,
+  `created_by` INT UNSIGNED NULL,
+  `created_at` DATETIME NOT NULL,
+  `updated_at` DATETIME NULL,
+  PRIMARY KEY (`id`),
+  KEY `announcements_status_idx` (`status`),
+  KEY `announcements_placement_idx` (`placement`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

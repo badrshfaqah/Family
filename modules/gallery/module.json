@@ -1,0 +1,9 @@
+{
+  "slug": "gallery",
+  "name": "المعرض",
+  "description": "ألبومات صور وفيديو قابلة للتصنيف حسب السنة والمدينة والفرع، مع ربط اختياري بخبر أو مناسبة.",
+  "version": "1.0.0",
+  "core_version": ">=1.0.0",
+  "namespace": "Modules\\Gallery",
+  "author": "النظام"
+}
