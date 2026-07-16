@@ -32,6 +32,7 @@ use Core\View;
       </div>
       <button class="btn btn-primary" type="submit" style="width:100%">دخول</button>
     </form>
+    <p style="text-align:center;margin-top:14px"><a class="btn-link" href="<?= Url::admin('forgot-password') ?>">نسيت كلمة المرور؟</a></p>
   </div>
 </div>
 </body>

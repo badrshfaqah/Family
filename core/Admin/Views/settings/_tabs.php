@@ -5,7 +5,7 @@ use Core\View;
 
 $labels = [
     'identity' => 'الهوية', 'terms' => 'المصطلحات', 'homepage' => 'الصفحة الرئيسية',
-    'directory' => 'جوال العائلة', 'contact' => 'التواصل', 'files' => 'الملفات',
+    'directory' => 'جوال العائلة', 'contact' => 'التواصل', 'mail' => 'البريد', 'files' => 'الملفات',
     'seo' => 'SEO', 'maintenance' => 'الصيانة',
 ];
 ?>

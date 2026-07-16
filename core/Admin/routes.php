@@ -19,6 +19,10 @@ use Core\Admin\Controllers\UsersController;
 $router->get('/login', [AuthController::class, 'showLogin']);
 $router->post('/login', [AuthController::class, 'login']);
 $router->get('/logout', [AuthController::class, 'logout']);
+$router->get('/forgot-password', [AuthController::class, 'showForgotPassword']);
+$router->post('/forgot-password', [AuthController::class, 'sendResetLink']);
+$router->get('/reset-password/{token}', [AuthController::class, 'showResetPassword']);
+$router->post('/reset-password/{token}', [AuthController::class, 'updatePassword']);
 
 $router->get('/', [DashboardController::class, 'index']);
 
@@ -33,8 +37,11 @@ $router->post('/users/{id}/toggle', [UsersController::class, 'toggleStatus']);
 $router->post('/users/{id}/delete', [UsersController::class, 'delete']);
 
 $router->get('/roles', [RolesController::class, 'index']);
+$router->get('/roles/create', [RolesController::class, 'create']);
+$router->post('/roles/store', [RolesController::class, 'store']);
 $router->get('/roles/{id}/edit', [RolesController::class, 'edit']);
 $router->post('/roles/{id}/update', [RolesController::class, 'update']);
+$router->post('/roles/{id}/delete', [RolesController::class, 'delete']);
 
 $router->get('/modules', [ModulesController::class, 'index']);
 $router->post('/modules/upload', [ModulesController::class, 'upload']);

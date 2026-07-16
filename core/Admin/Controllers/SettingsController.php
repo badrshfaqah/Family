@@ -17,7 +17,7 @@ use Core\View;
 
 final class SettingsController
 {
-    private array $tabs = ['identity', 'terms', 'homepage', 'directory', 'contact', 'files', 'seo', 'maintenance'];
+    private array $tabs = ['identity', 'terms', 'homepage', 'directory', 'contact', 'mail', 'files', 'seo', 'maintenance'];
 
     public function index(array $params): void
     {
@@ -49,6 +49,7 @@ final class SettingsController
             'terms' => ['term_mode', 'term_custom'],
             'directory' => ['directory_consent_text', 'directory_show_public_count', 'directory_city_enabled', 'directory_prevent_duplicates', 'branches_enabled'],
             'contact' => ['contact_phone', 'contact_email', 'social_whatsapp', 'social_x', 'social_instagram', 'social_snapchat', 'social_youtube', 'social_telegram'],
+            'mail' => ['mail_from_name', 'mail_from_email', 'mail_smtp_host', 'mail_smtp_port', 'mail_smtp_user', 'mail_smtp_pass', 'mail_smtp_encryption'],
             'files' => ['media_max_size_mb', 'media_allowed_extensions'],
             'seo' => ['seo_default_title', 'seo_default_description'],
             'maintenance' => ['maintenance_mode', 'maintenance_message'],

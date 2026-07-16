@@ -75,6 +75,14 @@ final class DefaultSeeder
             'social_youtube' => '',
             'social_telegram' => '',
 
+            'mail_from_name' => '',
+            'mail_from_email' => '',
+            'mail_smtp_host' => '',
+            'mail_smtp_port' => '587',
+            'mail_smtp_user' => '',
+            'mail_smtp_pass' => '',
+            'mail_smtp_encryption' => 'tls',
+
             'theme_color_primary' => '#0f6e5e',
             'theme_color_secondary' => '#c9a24b',
             'theme_font' => 'default',
