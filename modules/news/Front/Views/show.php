@@ -16,7 +16,26 @@ function fam_news_cover($mediaId)
 
 $cover = fam_news_cover($item['cover_media_id']);
 $tags = array_filter(array_map('trim', explode(',', $item['tags'] ?? '')));
+
+$jsonLd = [
+    '@context' => 'https://schema.org',
+    '@type' => 'NewsArticle',
+    'headline' => $item['title'],
+    'datePublished' => date('c', strtotime($item['published_at'])),
+    'dateModified' => date('c', strtotime($item['updated_at'] ?? $item['published_at'])),
+    'mainEntityOfPage' => Url::current(),
+];
+if ($cover) {
+    $jsonLd['image'] = [Url::origin() . $cover];
+}
+if (!empty($item['author_name'])) {
+    $jsonLd['author'] = ['@type' => 'Organization', 'name' => $item['author_name']];
+}
+if (!empty($item['excerpt'])) {
+    $jsonLd['description'] = $item['excerpt'];
+}
 ?>
+<script type="application/ld+json"><?= str_replace('</', '<\/', json_encode($jsonLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)) ?></script>
 <div class="container section">
   <div class="breadcrumbs"><a href="<?= Url::to('') ?>">الرئيسية</a> / <a href="<?= Url::to('news') ?>"><?= View::e(Terms::phrase('news')) ?></a> / <?= View::e($item['title']) ?></div>
 

@@ -127,6 +127,8 @@ final class EventsAdminController
         $slug = $this->uniqueSlug(Request::trimmed('slug') !== '' ? Str::slug(Request::trimmed('slug'), 'event') : Str::slug($title, 'event'), $id);
         $status = $this->resolveStatus();
 
+        \Core\Redirects::recordSlugChange('events', $existing['slug'], $slug);
+
         $data = [
             'title' => $title,
             'slug' => $slug,

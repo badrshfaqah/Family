@@ -86,8 +86,7 @@ final class GalleryFrontController
         );
 
         if (!$album) {
-            http_response_code(404);
-            require CORE_PATH . '/Front/Views/404.php';
+            \Core\Front\NotFound::render();
             return;
         }
 

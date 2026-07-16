@@ -5,6 +5,7 @@ use Core\Front\Controllers\CaptchaController;
 use Core\Front\Controllers\HomeController;
 use Core\Front\Controllers\SearchController;
 use Core\Front\Controllers\SitemapController;
+use Core\Front\NotFound;
 use Core\Settings;
 use Core\Terms;
 use Core\View;
@@ -27,6 +28,5 @@ $router->get('/robots.txt', [SitemapController::class, 'robots']);
 $router->get('/captcha.png', [CaptchaController::class, 'image']);
 
 $router->setNotFound(function () {
-    http_response_code(404);
-    require CORE_PATH . '/Front/Views/404.php';
+    NotFound::render();
 });

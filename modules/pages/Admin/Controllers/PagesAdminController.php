@@ -96,9 +96,14 @@ final class PagesAdminController
         Csrf::verifyRequestOrFail();
 
         $id = (int) $params['id'];
+        $existing = Database::fetchOne('SELECT slug FROM ' . Database::table('pages') . ' WHERE id = ?', [$id]);
         $title = Security::cleanText(Request::trimmed('title'));
         $slug = Request::trimmed('slug') !== '' ? Str::slug(Request::trimmed('slug'), 'page') : Str::slug($title, 'page');
         $slug = $this->uniqueSlug($slug, $id);
+
+        if ($existing) {
+            \Core\Redirects::recordSlugChange('', $existing['slug'], $slug);
+        }
 
         Database::update('pages', [
             'title' => $title,

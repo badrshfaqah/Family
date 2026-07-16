@@ -109,9 +109,14 @@ final class NewsAdminController
         Csrf::verifyRequestOrFail();
 
         $id = (int) $params['id'];
+        $existing = Database::fetchOne('SELECT slug FROM ' . Database::table('news') . ' WHERE id = ?', [$id]);
         $title = Security::cleanText(Request::trimmed('title'));
         $slug = $this->uniqueSlug(Request::trimmed('slug') !== '' ? Str::slug(Request::trimmed('slug'), 'news') : Str::slug($title, 'news'), $id);
         $status = $this->resolveStatus();
+
+        if ($existing) {
+            \Core\Redirects::recordSlugChange('news', $existing['slug'], $slug);
+        }
 
         $data = [
             'title' => $title,

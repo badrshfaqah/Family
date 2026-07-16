@@ -107,9 +107,14 @@ final class ArchiveAdminController
         Csrf::verifyRequestOrFail();
 
         $id = (int) $params['id'];
+        $existing = Database::fetchOne('SELECT slug FROM ' . Database::table('archive_items') . ' WHERE id = ?', [$id]);
         $title = Security::cleanText(Request::trimmed('title'));
         $slug = $this->uniqueSlug(Request::trimmed('slug') !== '' ? Str::slug(Request::trimmed('slug'), 'archive') : Str::slug($title, 'archive'), $id);
         $status = $this->resolveStatus();
+
+        if ($existing) {
+            \Core\Redirects::recordSlugChange('archive', $existing['slug'], $slug);
+        }
 
         $data = [
             'title' => $title,

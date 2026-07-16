@@ -168,3 +168,11 @@ CREATE TABLE IF NOT EXISTS `{prefix}backups_log` (
   `created_at` DATETIME NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `{prefix}demo_data_log` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `table_name` VARCHAR(60) NOT NULL,
+  `record_id` INT UNSIGNED NOT NULL,
+  `created_at` DATETIME NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

@@ -27,7 +27,35 @@ $tags = array_filter(array_map('trim', explode(',', $item['tags'] ?? '')));
 $gallery = fam_event_media_list($item['gallery_media_ids'] ?? '');
 $attachments = fam_event_media_list($item['attachment_media_ids'] ?? '');
 $externalLinks = array_filter(array_map('trim', preg_split('/[\r\n,]+/', $item['external_links'] ?? '')));
+
+$jsonLd = [
+    '@context' => 'https://schema.org',
+    '@type' => 'Event',
+    'name' => $item['title'],
+    'eventStatus' => 'https://schema.org/EventScheduled',
+    'eventAttendanceMode' => 'https://schema.org/OfflineEventAttendanceMode',
+];
+if (!empty($item['starts_at'])) {
+    $jsonLd['startDate'] = date('c', strtotime($item['starts_at']));
+}
+if (!empty($item['ends_at'])) {
+    $jsonLd['endDate'] = date('c', strtotime($item['ends_at']));
+}
+if (!empty($item['venue_name']) || !empty($item['city_name'])) {
+    $jsonLd['location'] = [
+        '@type' => 'Place',
+        'name' => $item['venue_name'] ?: ($item['city_name'] ?? ''),
+        'address' => $item['city_name'] ?? '',
+    ];
+}
+if ($cover) {
+    $jsonLd['image'] = [Url::origin() . $cover];
+}
+if (!empty($item['excerpt'])) {
+    $jsonLd['description'] = $item['excerpt'];
+}
 ?>
+<script type="application/ld+json"><?= str_replace('</', '<\/', json_encode($jsonLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)) ?></script>
 <div class="container section">
   <div class="breadcrumbs"><a href="<?= Url::to('') ?>">الرئيسية</a> / <a href="<?= Url::to('events') ?>"><?= View::e(Terms::phrase('events')) ?></a> / <?= View::e($item['title']) ?></div>
 
