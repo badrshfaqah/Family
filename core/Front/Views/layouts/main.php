@@ -173,7 +173,7 @@ $metaDescription = $metaDescription ?? Settings::get('seo_default_description', 
         <?php if (Settings::get('contact_email')): ?><p><?= \Core\View::e(Settings::get('contact_email')) ?></p><?php endif; ?>
       </div>
     </div>
-    <div class="copyright">© <?= date('Y') ?> <?= \Core\View::e($shortName) ?> — <?= \Core\View::e(Terms::phrase('official_site')) ?></div>
+    <div class="copyright">© <?= date('Y') ?> <?= \Core\View::e($shortName) ?> — <?= \Core\View::e(Terms::phrase('official_site')) ?> — <a href="<?= Url::to('family') ?>">عن البرنامج</a></div>
   </div>
 </footer>
 
