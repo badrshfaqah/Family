@@ -74,6 +74,12 @@ function fam_menu_link(array $item): string
 
 $primaryColor = Settings::get('theme_color_primary', '#0f6e5e');
 $secondaryColor = Settings::get('theme_color_secondary', '#c9a24b');
+$fontStacks = [
+    'default' => "'Tajawal','Segoe UI',Tahoma,Arial,sans-serif",
+    'traditional' => "'Simplified Arabic','Traditional Arabic','Segoe UI',Tahoma,Arial,sans-serif",
+    'modern' => "'Segoe UI',Helvetica,Arial,Tahoma,sans-serif",
+];
+$fontStack = $fontStacks[Settings::get('theme_font', 'default')] ?? $fontStacks['default'];
 $pageTitle = $pageTitle ?? $officialName;
 $metaDescription = $metaDescription ?? Settings::get('seo_default_description', '');
 ?><!doctype html>
@@ -90,7 +96,7 @@ $metaDescription = $metaDescription ?? Settings::get('seo_default_description', 
 <meta property="og:type" content="website">
 <?php if ($logoUrl): ?><meta property="og:image" content="<?= \Core\View::e(Url::origin() . $logoUrl) ?>"><?php endif; ?>
 <link rel="stylesheet" href="<?= Url::theme('assets/css/site.css') ?>">
-<style>:root{--c-primary:<?= \Core\View::e($primaryColor) ?>;--c-secondary:<?= \Core\View::e($secondaryColor) ?>;}</style>
+<style>:root{--c-primary:<?= \Core\View::e($primaryColor) ?>;--c-secondary:<?= \Core\View::e($secondaryColor) ?>;--font:<?= $fontStack ?>;}</style>
 </head>
 <body>
 

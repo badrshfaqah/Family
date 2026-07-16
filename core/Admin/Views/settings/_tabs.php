@@ -4,7 +4,7 @@ use Core\Support\Url;
 use Core\View;
 
 $labels = [
-    'identity' => 'الهوية', 'terms' => 'المصطلحات', 'homepage' => 'الصفحة الرئيسية',
+    'identity' => 'الهوية', 'appearance' => 'المظهر', 'terms' => 'المصطلحات', 'homepage' => 'الصفحة الرئيسية',
     'directory' => 'جوال العائلة', 'contact' => 'التواصل', 'mail' => 'البريد', 'files' => 'الملفات',
     'seo' => 'SEO', 'maintenance' => 'الصيانة',
 ];

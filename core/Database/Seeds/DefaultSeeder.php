@@ -111,6 +111,8 @@ final class DefaultSeeder
 
             'media_max_size_mb' => '8',
             'media_allowed_extensions' => '',
+            'media_image_quality' => '85',
+            'media_max_dimension' => '2000',
 
             'seo_default_title' => $siteData['official_name'] ?? '',
             'seo_default_description' => '',

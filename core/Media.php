@@ -79,6 +79,8 @@ final class Media
         $thumbPath = null;
 
         if ($isImage) {
+            self::compressOriginal($fullPath, $ext);
+
             $info = @getimagesize($fullPath);
             if ($info) {
                 [$width, $height] = $info;
@@ -105,6 +107,55 @@ final class Media
             return (bool) @getimagesize($tmpPath);
         }
         return true;
+    }
+
+    /**
+     * يضغط الصورة الأصلية المرفوعة: يصغّر الأبعاد إذا تجاوزت الحد الأقصى المسموح
+     * في الإعدادات، ويعيد حفظها بجودة الضغط المحددة (لملفات jpg/webp/png).
+     * لا يُطبَّق على gif حتى لا تنكسر الصور المتحركة.
+     */
+    private static function compressOriginal(string $path, string $ext): void
+    {
+        if (!extension_loaded('gd') || $ext === 'gif') {
+            return;
+        }
+
+        [$width, $height] = @getimagesize($path) ?: [0, 0];
+        if (!$width || !$height) {
+            return;
+        }
+
+        $maxDim = (int) Settings::get('media_max_dimension', 2000);
+        $quality = max(10, min(100, (int) Settings::get('media_image_quality', 85)));
+
+        $needsResize = $maxDim > 0 && max($width, $height) > $maxDim;
+
+        $src = self::loadImage($path, $ext);
+        if (!$src) {
+            return;
+        }
+
+        if ($needsResize) {
+            $ratio = $maxDim / max($width, $height);
+            $newWidth = max(1, (int) round($width * $ratio));
+            $newHeight = max(1, (int) round($height * $ratio));
+
+            $resized = imagecreatetruecolor($newWidth, $newHeight);
+            imagealphablending($resized, false);
+            imagesavealpha($resized, true);
+            imagecopyresampled($resized, $src, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
+            imagedestroy($src);
+            $src = $resized;
+        }
+
+        match ($ext) {
+            'jpg', 'jpeg' => imagejpeg($src, $path, $quality),
+            'png' => imagepng($src, $path, (int) round((100 - $quality) / 10)),
+            'webp' => function_exists('imagewebp') ? imagewebp($src, $path, $quality) : null,
+            default => null,
+        };
+
+        imagedestroy($src);
     }
 
     private static function makeThumbnail(string $sourcePath, string $storedName, string $ext): ?string
