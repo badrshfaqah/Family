@@ -86,7 +86,6 @@ final class DefaultSeeder
             'theme_color_primary' => '#0f6e5e',
             'theme_color_secondary' => '#c9a24b',
             'theme_font' => 'default',
-            'theme_style_preset' => 'calm',
 
             'home_sections_order' => json_encode([
                 'hero', 'next_event', 'coming_soon', 'ticker', 'news', 'events',

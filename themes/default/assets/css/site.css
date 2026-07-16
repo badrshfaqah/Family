@@ -205,9 +205,9 @@ a{color:inherit;text-decoration:none}
 .family-module-name{font-weight:700;margin:0 0 4px}
 .family-module-desc{color:var(--c-muted);font-size:.88rem;margin:0}
 .family-module-version{color:var(--c-muted);font-size:.78rem;white-space:nowrap}
-.family-changelog h2{font-size:1.1rem;margin:22px 0 10px}
-.family-changelog h3{font-size:1rem;margin:18px 0 8px;color:var(--c-primary)}
-.family-changelog h4{font-size:.92rem;margin:14px 0 6px}
+.family-changelog h3{font-size:1.1rem;margin:22px 0 10px}
+.family-changelog h4{font-size:1rem;margin:18px 0 8px}
+.family-changelog h5{font-size:.92rem;margin:14px 0 6px;color:var(--c-primary)}
 .family-changelog p{margin:6px 0;line-height:1.8}
 .family-changelog ul{margin:6px 0 14px;padding-inline-start:22px;display:flex;flex-direction:column;gap:4px}
 .family-changelog li{line-height:1.8}
