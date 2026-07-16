@@ -3,6 +3,7 @@
 use Core\Front\Controllers\BranchFrontController;
 use Core\Front\Controllers\CaptchaController;
 use Core\Front\Controllers\HomeController;
+use Core\Front\Controllers\PwaController;
 use Core\Front\Controllers\SearchController;
 use Core\Front\Controllers\SitemapController;
 use Core\Front\NotFound;
@@ -26,6 +27,9 @@ $router->get('/search', [SearchController::class, 'index']);
 $router->get('/sitemap.xml', [SitemapController::class, 'index']);
 $router->get('/robots.txt', [SitemapController::class, 'robots']);
 $router->get('/captcha.png', [CaptchaController::class, 'image']);
+$router->get('/manifest.webmanifest', [PwaController::class, 'manifest']);
+$router->get('/sw.js', [PwaController::class, 'serviceWorker']);
+$router->get('/pwa-icon-{size}.png', [PwaController::class, 'icon']);
 
 $router->setNotFound(function () {
     NotFound::render();

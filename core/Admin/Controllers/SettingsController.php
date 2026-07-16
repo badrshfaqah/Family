@@ -82,6 +82,10 @@ final class SettingsController
                 $this->handleIdentityUpload('identity_logo', 'identity_logo_media_id');
                 $this->handleIdentityUpload('identity_cover', 'identity_cover_media_id');
             }
+
+            if ($tab === 'identity' || $tab === 'appearance') {
+                $this->clearPwaIconCache();
+            }
         }
 
         Terms::reset();
@@ -102,6 +106,16 @@ final class SettingsController
             Settings::set($settingKey, (string) $mediaId);
         } catch (\Throwable $e) {
             \Core\Support\Session::flash('error', $e->getMessage());
+        }
+    }
+
+    private function clearPwaIconCache(): void
+    {
+        foreach ([192, 512] as $size) {
+            $file = STORAGE_PATH . '/cache/pwa-icon-' . $size . '.png';
+            if (is_file($file)) {
+                @unlink($file);
+            }
         }
     }
 }
