@@ -1,5 +1,6 @@
 <?php
 
+use Core\Front\Controllers\BranchFrontController;
 use Core\Front\Controllers\CaptchaController;
 use Core\Front\Controllers\HomeController;
 use Core\Front\Controllers\SearchController;
@@ -18,6 +19,8 @@ View::share('identity', [
 
 /** @var Router $router */
 $router->get('/', [HomeController::class, 'index']);
+$router->get('/branches', [BranchFrontController::class, 'index']);
+$router->get('/branches/{id}', [BranchFrontController::class, 'show']);
 $router->get('/search', [SearchController::class, 'index']);
 $router->get('/sitemap.xml', [SitemapController::class, 'index']);
 $router->get('/robots.txt', [SitemapController::class, 'robots']);
