@@ -47,7 +47,7 @@ function fam_admin_active(string $url, string $current): bool
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title><?= View::e($pageTitle ?? 'لوحة التحكم') ?> — لوحة التحكم</title>
-<link rel="stylesheet" href="<?= Url::to('admin/assets/css/admin.css') ?>">
+<link rel="stylesheet" href="<?= Url::to('admin/assets/css/admin.css') ?>?v=<?= CORE_VERSION ?>">
 </head>
 <body>
 <div class="admin-shell">
@@ -92,6 +92,6 @@ function fam_admin_active(string $url, string $current): bool
     </div>
   </div>
 </div>
-<script src="<?= Url::to('admin/assets/js/admin.js') ?>"></script>
+<script src="<?= Url::to('admin/assets/js/admin.js') ?>?v=<?= CORE_VERSION ?>"></script>
 </body>
 </html>

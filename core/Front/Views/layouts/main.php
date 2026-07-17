@@ -95,7 +95,7 @@ $metaDescription = $metaDescription ?? Settings::get('seo_default_description', 
 <meta property="og:description" content="<?= \Core\View::e($metaDescription) ?>">
 <meta property="og:type" content="website">
 <?php if ($logoUrl): ?><meta property="og:image" content="<?= \Core\View::e(Url::origin() . $logoUrl) ?>"><?php endif; ?>
-<link rel="stylesheet" href="<?= Url::theme('assets/css/site.css') ?>">
+<link rel="stylesheet" href="<?= Url::theme('assets/css/site.css') ?>?v=<?= CORE_VERSION ?>">
 <style>:root{--c-primary:<?= \Core\View::e($primaryColor) ?>;--c-secondary:<?= \Core\View::e($secondaryColor) ?>;--font:<?= $fontStack ?>;}</style>
 <link rel="manifest" href="<?= Url::to('manifest.webmanifest') ?>">
 <meta name="theme-color" content="<?= \Core\View::e($primaryColor) ?>">
@@ -190,7 +190,7 @@ $metaDescription = $metaDescription ?? Settings::get('seo_default_description', 
 </div>
 <?php endif; ?>
 
-<script src="<?= Url::theme('assets/js/site.js') ?>"></script>
+<script src="<?= Url::theme('assets/js/site.js') ?>?v=<?= CORE_VERSION ?>"></script>
 <script>
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function () {

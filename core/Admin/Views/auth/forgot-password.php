@@ -11,7 +11,7 @@ use Core\View;
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>نسيت كلمة المرور — لوحة التحكم</title>
 <meta name="robots" content="noindex, nofollow">
-<link rel="stylesheet" href="<?= Url::to('admin/assets/css/admin.css') ?>">
+<link rel="stylesheet" href="<?= Url::to('admin/assets/css/admin.css') ?>?v=<?= CORE_VERSION ?>">
 </head>
 <body>
 <div class="login-wrap">
