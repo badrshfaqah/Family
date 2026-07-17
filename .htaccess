@@ -10,8 +10,13 @@
     RewriteCond %{REQUEST_FILENAME} -d
     RewriteRule ^ - [L]
 
+    # مسارات لوحة التحكم لها نقطة دخول مستقلة admin/index.php
+    # التوجيه بدون لاحقة PATH_INFO لضمان العمل حتى على الاستضافات التي تعطّل AcceptPathInfo،
+    # حيث يستخرج النظام المسار المطلوب من REQUEST_URI تلقائيًا.
+    RewriteRule ^admin/ admin/index.php [L]
+
     RewriteRule ^index\.php - [L]
-    RewriteRule ^(.*)$ index.php/$1 [L]
+    RewriteRule . index.php [L]
 </IfModule>
 
 # منع عرض محتويات المجلدات
