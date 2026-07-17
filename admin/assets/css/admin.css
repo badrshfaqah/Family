@@ -28,7 +28,7 @@ img{max-width:100%}
 .admin-nav a.active{background:var(--a-primary);color:#fff}
 .admin-nav-sep{font-size:.75rem;color:#7d8f87;padding:16px 12px 6px}
 
-.admin-main{flex:1;margin-inline-end:250px;display:flex;flex-direction:column;min-height:100vh}
+.admin-main{flex:1;min-width:0;margin-right:250px;display:flex;flex-direction:column;min-height:100vh}
 .admin-topbar{
   height:60px;background:var(--a-surface);border-bottom:1px solid var(--a-border);
   display:flex;align-items:center;gap:14px;padding:0 18px;position:sticky;top:0;z-index:20;
@@ -93,7 +93,7 @@ table th{background:#fafbfa;color:var(--a-muted);font-weight:700}
 @media (max-width: 900px){
   .admin-sidebar{transform:translateX(100%)}
   .admin-sidebar.open{transform:translateX(0)}
-  .admin-main{margin-inline-end:0}
+  .admin-main{margin-right:0}
   .form-row.cols-2, .form-row.cols-3{grid-template-columns:1fr}
 }
 @media (min-width: 620px){
