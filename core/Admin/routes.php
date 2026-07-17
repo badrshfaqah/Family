@@ -84,6 +84,7 @@ $router->post('/branches/{id}/delete', [BranchesController::class, 'delete']);
 $router->get('/demo-data', [DemoDataController::class, 'index']);
 $router->post('/demo-data/seed', [DemoDataController::class, 'seed']);
 $router->post('/demo-data/purge', [DemoDataController::class, 'purge']);
+$router->post('/demo-data/enable-modules', [DemoDataController::class, 'enableModules']);
 
 $router->setNotFound(function () {
     http_response_code(404);
