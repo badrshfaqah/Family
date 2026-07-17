@@ -1,0 +1,40 @@
+# نظام إدارة محتوى العوائل والقبائل
+# توجيه جميع الطلبات غير الموجودة كملفات/مجلدات فعلية إلى index.php
+# القاعدة تعمل بشكل نسبي لمكان هذا الملف، لذا تعمل تلقائيًا
+# سواء تم التركيب في الجذر أو داخل مجلد فرعي.
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+
+    # مسارات لوحة التحكم لها نقطة دخول مستقلة admin/index.php
+    # التوجيه بدون لاحقة PATH_INFO لضمان العمل حتى على الاستضافات التي تعطّل AcceptPathInfo،
+    # حيث يستخرج النظام المسار المطلوب من REQUEST_URI تلقائيًا.
+    RewriteRule ^admin/ admin/index.php [L]
+
+    RewriteRule ^index\.php - [L]
+    RewriteRule . index.php [L]
+</IfModule>
+
+# منع عرض محتويات المجلدات
+Options -Indexes
+
+# منع الوصول المباشر لملفات الإعدادات والنظام الحساسة
+<FilesMatch "^(config\.php|composer\.json|composer\.lock|\.env)$">
+    Require all denied
+</FilesMatch>
+
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# منع تنفيذ PHP داخل مجلد الرفع
+<IfModule mod_rewrite.c>
+    RewriteCond %{REQUEST_URI} ^.*/storage/uploads/.*\.php$ [NC]
+    RewriteRule ^ - [F,L]
+</IfModule>

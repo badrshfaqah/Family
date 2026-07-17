@@ -1,0 +1,9 @@
+{
+  "slug": "events",
+  "name": "المناسبات",
+  "description": "نظام إدارة صفحات المناسبات المنشورة (زواج، تخرج، حفل، وليمة...) مع معرض صور ومرفقات وSEO.",
+  "version": "1.0.0",
+  "core_version": ">=1.0.0",
+  "namespace": "Modules\\Events",
+  "author": "النظام"
+}

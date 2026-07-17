@@ -1,0 +1,22 @@
+CREATE TABLE IF NOT EXISTS `{prefix}calendar_entries` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `title` VARCHAR(191) NOT NULL,
+  `entry_type` VARCHAR(100) NOT NULL,
+  `entry_datetime` DATETIME NOT NULL,
+  `city_id` INT UNSIGNED NULL,
+  `venue_name` VARCHAR(191) NULL,
+  `maps_url` VARCHAR(255) NULL,
+  `notes` VARCHAR(500) NULL,
+  `cover_media_id` INT UNSIGNED NULL,
+  `event_id` INT UNSIGNED NULL,
+  `status` ENUM('draft','published','cancelled') NOT NULL DEFAULT 'draft',
+  `created_by` INT UNSIGNED NULL,
+  `created_at` DATETIME NOT NULL,
+  `updated_at` DATETIME NULL,
+  PRIMARY KEY (`id`),
+  KEY `calendar_entries_datetime_idx` (`entry_datetime`),
+  KEY `calendar_entries_status_idx` (`status`),
+  KEY `calendar_entries_city_idx` (`city_id`),
+  KEY `calendar_entries_type_idx` (`entry_type`),
+  KEY `calendar_entries_event_idx` (`event_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
