@@ -6,7 +6,76 @@
     initCountdowns();
     initShare();
     initAnnouncements();
+    initSliders();
   });
+
+  function initSliders() {
+    document.querySelectorAll('[data-slider]').forEach(function (slider) {
+      var track = slider.querySelector('[data-slider-track]');
+      var dotsWrap = slider.querySelector('[data-slider-dots]');
+      if (!track) return;
+
+      var slides = Array.prototype.slice.call(track.children);
+      if (slides.length < 2) {
+        if (dotsWrap) dotsWrap.style.display = 'none';
+        return;
+      }
+
+      var current = 0;
+      var timer = null;
+      var dots = [];
+
+      if (dotsWrap) {
+        slides.forEach(function (_, i) {
+          var dot = document.createElement('button');
+          dot.type = 'button';
+          dot.setAttribute('aria-label', 'الشريحة ' + (i + 1));
+          dot.addEventListener('click', function () {
+            goTo(i);
+            restartAuto();
+          });
+          dotsWrap.appendChild(dot);
+          dots.push(dot);
+        });
+      }
+
+      function setActive(i) {
+        current = i;
+        dots.forEach(function (d, j) {
+          d.classList.toggle('active', j === i);
+        });
+      }
+
+      function goTo(i) {
+        setActive(i);
+        track.scrollTo({ left: slides[i].offsetLeft, behavior: 'smooth' });
+      }
+
+      // تحديث النقطة النشطة عند سحب المستخدم يدويًا (يدعم اتجاه RTL حيث scrollLeft سالب)
+      var scrollDebounce = null;
+      track.addEventListener('scroll', function () {
+        clearTimeout(scrollDebounce);
+        scrollDebounce = setTimeout(function () {
+          var index = Math.round(Math.abs(track.scrollLeft) / track.clientWidth);
+          setActive(Math.min(index, slides.length - 1));
+        }, 80);
+      }, { passive: true });
+
+      function startAuto() {
+        timer = setInterval(function () {
+          goTo((current + 1) % slides.length);
+        }, 6000);
+      }
+      function restartAuto() {
+        clearInterval(timer);
+        startAuto();
+      }
+
+      track.addEventListener('pointerdown', restartAuto, { passive: true });
+      setActive(0);
+      startAuto();
+    });
+  }
 
   function initMobileNav() {
     var trigger = document.querySelector('[data-nav-trigger]');
