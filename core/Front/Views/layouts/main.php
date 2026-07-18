@@ -95,6 +95,9 @@ $metaDescription = $metaDescription ?? Settings::get('seo_default_description', 
 <meta property="og:description" content="<?= \Core\View::e($metaDescription) ?>">
 <meta property="og:type" content="website">
 <?php if ($logoUrl): ?><meta property="og:image" content="<?= \Core\View::e(Url::origin() . $logoUrl) ?>"><?php endif; ?>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&family=Tajawal:wght@400;500;700;800&display=swap">
 <link rel="stylesheet" href="<?= Url::theme('assets/css/site.css') ?>?v=<?= CORE_VERSION ?>">
 <style>:root{--c-primary:<?= \Core\View::e($primaryColor) ?>;--c-secondary:<?= \Core\View::e($secondaryColor) ?>;--font:<?= $fontStack ?>;}</style>
 <link rel="manifest" href="<?= Url::to('manifest.webmanifest') ?>">
@@ -112,7 +115,7 @@ $metaDescription = $metaDescription ?? Settings::get('seo_default_description', 
 
 <header class="site-header">
   <div class="container bar">
-    <a href="<?= Url::to('') ?>" class="brand">
+    <a href="<?= Url::to('') ?>" class="brand<?= $logoUrl ? ' has-logo' : '' ?>">
       <?php if ($logoUrl): ?><img src="<?= \Core\View::e($logoUrl) ?>" alt="<?= \Core\View::e($shortName) ?>"><?php endif; ?>
       <span><?= \Core\View::e($shortName) ?></span>
     </a>
@@ -127,6 +130,7 @@ $metaDescription = $metaDescription ?? Settings::get('seo_default_description', 
     </div>
   </div>
 </header>
+<div class="sadu-strip" aria-hidden="true"></div>
 
 <div class="mobile-nav" data-mobile-nav>
   <div class="panel">
@@ -140,6 +144,30 @@ $metaDescription = $metaDescription ?? Settings::get('seo_default_description', 
 <main>
 <?= $content ?>
 </main>
+
+<?php
+// شريط تنقل سفلي بأسلوب التطبيقات (للجوال)
+$basePath = rtrim((string) parse_url(Url::to(''), PHP_URL_PATH), '/');
+$currentPath = rtrim((string) parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH), '/');
+$currentRel = trim(substr($currentPath, strlen($basePath)), '/');
+$bottomNav = [
+    ['match' => '', 'url' => Url::to(''), 'icon' => '🏠', 'label' => 'الرئيسية', 'show' => true],
+    ['match' => 'news', 'url' => Url::to('news'), 'icon' => '📰', 'label' => 'الأخبار', 'show' => \Core\ModuleManager::isEnabled('news')],
+    ['match' => 'calendar', 'url' => Url::to('calendar'), 'icon' => '📅', 'label' => 'الرزنامة', 'show' => \Core\ModuleManager::isEnabled('calendar')],
+    ['match' => 'gatherings', 'url' => Url::to('gatherings'), 'icon' => '☕', 'label' => 'الجمعات', 'show' => \Core\ModuleManager::isEnabled('gatherings')],
+    ['match' => 'directory', 'url' => Url::to('directory/register'), 'icon' => '📱', 'label' => 'جوال القبيلة', 'show' => \Core\ModuleManager::isEnabled('directory')],
+];
+?>
+<nav class="bottom-nav" aria-label="التنقل السريع">
+  <?php foreach ($bottomNav as $item): if (!$item['show']) continue;
+      $isActive = $item['match'] === '' ? $currentRel === '' : str_starts_with($currentRel . '/', $item['match'] . '/');
+  ?>
+  <a href="<?= \Core\View::e($item['url']) ?>" class="<?= $isActive ? 'active' : '' ?>">
+    <span class="bn-icon"><?= $item['icon'] ?></span>
+    <span><?= \Core\View::e($item['label']) ?></span>
+  </a>
+  <?php endforeach; ?>
+</nav>
 
 <footer class="site-footer">
   <div class="container">
