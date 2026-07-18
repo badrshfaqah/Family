@@ -42,36 +42,6 @@ $heroCover = fam_media_url(Settings::get('identity_cover_media_id', ''));
 <?php foreach ($sectionsOrder as $section): if (!$visible($section)) continue; ?>
 
   <?php if ($section === 'hero'): ?>
-  <section class="hero-slider" data-slider>
-    <div class="slides" data-slider-track>
-      <div class="slide" style="<?= $heroCover ? '' : 'background:linear-gradient(135deg,var(--c-primary),var(--c-primary-dark))' ?>">
-        <?php if ($heroCover): ?><img src="<?= \Core\View::e($heroCover) ?>" alt=""><?php endif; ?>
-        <div class="slide-content container">
-          <h1><?= \Core\View::e(Terms::phrase('welcome')) ?></h1>
-          <?php if (Settings::get('identity_brief')): ?><p><?= \Core\View::e(Settings::get('identity_brief')) ?></p><?php endif; ?>
-          <div class="hero-actions">
-            <a href="<?= Url::to('directory/register') ?>" class="btn btn-primary">📱 <?= \Core\View::e(Terms::phrase('family_directory_register')) ?></a>
-            <a href="<?= Url::to('gatherings') ?>" class="btn btn-outline">الجمعات</a>
-          </div>
-        </div>
-      </div>
-      <?php foreach (($heroSlides ?? []) as $slide): ?>
-      <div class="slide">
-        <img src="<?= \Core\View::e(Media::url($slide['image'])) ?>" alt="" loading="lazy">
-        <div class="slide-content container">
-          <span class="badge slide-badge"><?= \Core\View::e($slide['badge']) ?></span>
-          <h2><?= \Core\View::e($slide['title']) ?></h2>
-          <?php if (!empty($slide['text'])): ?><p><?= \Core\View::e($slide['text']) ?></p><?php endif; ?>
-          <div class="hero-actions">
-            <a href="<?= Url::to($slide['url']) ?>" class="btn btn-primary">عرض التفاصيل</a>
-          </div>
-        </div>
-      </div>
-      <?php endforeach; ?>
-    </div>
-    <div class="slider-dots" data-slider-dots aria-label="التنقل بين الشرائح"></div>
-  </section>
-
   <section class="join-band">
     <div class="container">
       <div class="join-band-inner">

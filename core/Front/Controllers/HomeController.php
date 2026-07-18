@@ -18,7 +18,6 @@ final class HomeController
         $data = [
             'sectionsOrder' => is_array($sectionsOrder) ? $sectionsOrder : [],
             'sectionsVisible' => is_array($sectionsVisible) ? $sectionsVisible : [],
-            'heroSlides' => $this->heroSlides(),
             'news' => ModuleManager::isEnabled('news') ? $this->latestNews($itemsCount) : [],
             'nextEvent' => ModuleManager::isEnabled('calendar') ? $this->nextCalendarEntry() : null,
             'comingSoon' => ModuleManager::isEnabled('calendar') ? $this->comingSoon($itemsCount) : [],
@@ -32,52 +31,6 @@ final class HomeController
         $view = ROOT_PATH . '/themes/default/templates/home.php';
 
         echo View::renderLayout($layout, $view, $data);
-    }
-
-    /** شرائح السلايدر: أبرز الأخبار وأقرب المناسبات التي لها صورة غلاف */
-    private function heroSlides(): array
-    {
-        $slides = [];
-
-        if (ModuleManager::isEnabled('news') && Database::tableExists('news')) {
-            $rows = Database::fetchAll(
-                'SELECT n.title, n.excerpt, n.slug, m.stored_path
-                 FROM ' . Database::table('news') . ' n
-                 JOIN ' . Database::table('media') . " m ON m.id = n.cover_media_id
-                 WHERE n.status = 'published' AND n.published_at <= NOW()
-                 ORDER BY n.is_featured DESC, n.is_pinned DESC, n.published_at DESC LIMIT 3"
-            );
-            foreach ($rows as $row) {
-                $slides[] = [
-                    'badge' => 'خبر',
-                    'title' => $row['title'],
-                    'text' => $row['excerpt'],
-                    'image' => $row['stored_path'],
-                    'url' => 'news/' . $row['slug'],
-                ];
-            }
-        }
-
-        if (ModuleManager::isEnabled('events') && Database::tableExists('events')) {
-            $rows = Database::fetchAll(
-                'SELECT e.title, e.excerpt, e.slug, m.stored_path
-                 FROM ' . Database::table('events') . ' e
-                 JOIN ' . Database::table('media') . " m ON m.id = e.cover_media_id
-                 WHERE e.status = 'published' AND e.starts_at >= NOW()
-                 ORDER BY e.starts_at ASC LIMIT 2"
-            );
-            foreach ($rows as $row) {
-                $slides[] = [
-                    'badge' => 'مناسبة قادمة',
-                    'title' => $row['title'],
-                    'text' => $row['excerpt'],
-                    'image' => $row['stored_path'],
-                    'url' => 'events/' . $row['slug'],
-                ];
-            }
-        }
-
-        return $slides;
     }
 
     private function latestNews(int $limit): array
