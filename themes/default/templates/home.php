@@ -60,12 +60,14 @@ $heroCover = fam_media_url(Settings::get('identity_cover_media_id', ''));
   </section>
 
   <section class="join-band">
-    <div class="container join-band-inner">
-      <div class="join-band-text">
-        <b>📱 <?= \Core\View::e(Terms::phrase('family_directory_register')) ?></b>
-        <span>سجّل رقمك ليصلك كل جديد من أخبار ومناسبات وجمعات</span>
+    <div class="container">
+      <div class="join-band-inner">
+        <div class="join-band-text">
+          <b>📱 <?= \Core\View::e(Terms::phrase('family_directory_register')) ?></b>
+          <span>خلّك قريب من أهلك.. سجّل رقمك ويصلك كل جديد: مناسباتنا وجمعاتنا وأخبارنا أولًا بأول</span>
+        </div>
+        <a href="<?= Url::to('directory/register') ?>" class="btn btn-primary join-band-btn">سجّل الآن ✨</a>
       </div>
-      <a href="<?= Url::to('directory/register') ?>" class="btn btn-primary">سجّل الآن</a>
     </div>
   </section>
   <?php endif; ?>
@@ -80,54 +82,40 @@ $heroCover = fam_media_url(Settings::get('identity_cover_media_id', ''));
   </div>
   <?php endif; ?>
 
-  <?php if ($section === 'next_event' && $nextEvent): ?>
+  <?php if ($section === 'next_event' && !empty($comingSoon)): ?>
+  <?php
+    // رزنامة المناسبات: قائمة واضحة بالعناوين والتواريخ وكم باقي — أول ما يبحث عنه الزائر
+    $arMonths = [1 => 'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+    $arDays = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+    $todayTs = strtotime(date('Y-m-d'));
+  ?>
   <section class="section container">
-    <div class="next-event">
-      <div class="next-event-body">
-        <span class="badge"><?= \Core\View::e($nextEvent['entry_type'] ?? 'مناسبة') ?><?php if (!empty($nextEvent['city_name'])): ?> · <?= \Core\View::e($nextEvent['city_name']) ?><?php endif; ?></span>
-        <h2 style="margin:0 0 6px"><?= \Core\View::e($nextEvent['title']) ?></h2>
-        <div data-countdown="<?= \Core\View::e(date('c', strtotime($nextEvent['entry_datetime']))) ?>">
-          <div style="font-weight:700;margin-bottom:6px" data-countdown-label></div>
-          <div class="countdown">
-            <div class="cell"><b data-c-days>00</b><span>يوم</span></div>
-            <div class="cell"><b data-c-hours>00</b><span>ساعة</span></div>
-            <div class="cell"><b data-c-mins>00</b><span>دقيقة</span></div>
-            <div class="cell"><b data-c-secs>00</b><span>ثانية</span></div>
-          </div>
+    <div class="section-head"><h2>📅 رزنامة المناسبات</h2><a href="<?= Url::to('calendar') ?>">الرزنامة كاملة</a></div>
+    <div class="cal-list">
+      <?php foreach ($comingSoon as $i => $ev):
+        $ts = strtotime($ev['entry_datetime']);
+        $daysLeft = (int) floor((strtotime(date('Y-m-d', $ts)) - $todayTs) / 86400);
+        if ($daysLeft <= 0) { $leftLabel = 'اليوم'; }
+        elseif ($daysLeft === 1) { $leftLabel = 'غدًا'; }
+        elseif ($daysLeft === 2) { $leftLabel = 'باقي يومين'; }
+        elseif ($daysLeft <= 10) { $leftLabel = 'باقي ' . $daysLeft . ' أيام'; }
+        else { $leftLabel = 'باقي ' . $daysLeft . ' يوم'; }
+        $time = date('g:i', $ts) . ' ' . (date('a', $ts) === 'pm' ? 'م' : 'ص');
+      ?>
+      <a class="cal-item<?= $i === 0 ? ' cal-next' : '' ?>" href="<?= Url::to('calendar/' . $ev['id']) ?>">
+        <div class="cal-date">
+          <span><?= $arDays[(int) date('w', $ts)] ?></span>
+          <b><?= (int) date('j', $ts) ?></b>
+          <span><?= $arMonths[(int) date('n', $ts)] ?></span>
         </div>
-        <a href="<?= Url::to('calendar/' . $nextEvent['id']) ?>" class="btn btn-outline">عرض التفاصيل</a>
-      </div>
-    </div>
-  </section>
-  <?php endif; ?>
-
-  <?php if ($section === 'coming_soon' && !empty($comingSoon)): ?>
-  <section class="section container">
-    <div class="section-head"><h2>قريبًا</h2><a href="<?= Url::to('calendar') ?>">عرض الكل</a></div>
-    <div class="grid grid-3">
-      <?php foreach ($comingSoon as $ev): ?>
-      <a class="card" href="<?= Url::to('calendar/' . $ev['id']) ?>">
-        <div class="card-body">
-          <div class="card-meta"><span><?= \Core\View::e(date('Y/m/d', strtotime($ev['entry_datetime']))) ?></span><?php if (!empty($ev['city_name'])): ?><span><?= \Core\View::e($ev['city_name']) ?></span><?php endif; ?></div>
-          <p class="card-title"><?= \Core\View::e($ev['title']) ?></p>
+        <div class="cal-info">
+          <p class="cal-title"><?= \Core\View::e($ev['title']) ?></p>
+          <span class="cal-meta">
+            <span>🕗 <?= $time ?></span>
+            <?php if (!empty($ev['venue_name'])): ?><span>📍 <?= \Core\View::e($ev['venue_name']) ?><?= !empty($ev['city_name']) ? ' — ' . \Core\View::e($ev['city_name']) : '' ?></span><?php endif; ?>
+          </span>
         </div>
-      </a>
-      <?php endforeach; ?>
-    </div>
-  </section>
-  <?php endif; ?>
-
-  <?php if ($section === 'news' && !empty($news)): ?>
-  <section class="section container">
-    <div class="section-head"><h2><?= \Core\View::e(Terms::phrase('news')) ?></h2><a href="<?= Url::to('news') ?>">عرض الكل</a></div>
-    <div class="grid grid-3">
-      <?php foreach ($news as $item): ?>
-      <a class="card" href="<?= Url::to('news/' . $item['slug']) ?>">
-        <div class="card-img"><img loading="lazy" src="<?= \Core\View::e(fam_media_url($item['cover_media_id']) ?: Url::theme('assets/img/placeholder.svg')) ?>" alt=""></div>
-        <div class="card-body">
-          <p class="card-title"><?= \Core\View::e($item['title']) ?></p>
-          <div class="card-meta"><span><?= \Core\View::e(date('Y/m/d', strtotime($item['published_at']))) ?></span></div>
-        </div>
+        <span class="cal-left"><?= $leftLabel ?></span>
       </a>
       <?php endforeach; ?>
     </div>
@@ -164,24 +152,16 @@ $heroCover = fam_media_url(Settings::get('identity_cover_media_id', ''));
   </section>
   <?php endif; ?>
 
-  <?php if ($section === 'gallery' && !empty($gallery)): ?>
-  <section class="section container">
-    <div class="section-head"><h2>من المعرض</h2><a href="<?= Url::to('gallery') ?>">عرض الكل</a></div>
-    <div class="grid grid-3">
-      <?php foreach ($gallery as $photo): ?>
-        <div class="card-img" style="border-radius:var(--radius)"><img loading="lazy" src="<?= \Core\View::e(Media::thumbUrl($photo['thumb_path'], $photo['stored_path'])) ?>" alt=""></div>
-      <?php endforeach; ?>
-    </div>
-  </section>
-  <?php endif; ?>
-
   <?php if ($section === 'quick_links'): ?>
   <section class="section container">
+    <div class="section-head"><h2>استكشف الموقع</h2></div>
     <div class="quick-links">
-      <a class="quick-link" href="<?= Url::to('directory/register') ?>"><?= \Core\View::e(Terms::phrase('family_directory_register')) ?></a>
-      <a class="quick-link" href="<?= Url::to('calendar') ?>">المناسبات القادمة</a>
-      <a class="quick-link" href="<?= Url::to('tree') ?>"><?= \Core\View::e(Terms::phrase('tree')) ?></a>
-      <a class="quick-link" href="<?= Url::to('archive') ?>"><?= \Core\View::e(Terms::phrase('archive')) ?></a>
+      <a class="quick-link" href="<?= Url::to('directory/register') ?>"><span class="ql-icon">📱</span>جوال القبيلة</a>
+      <a class="quick-link" href="<?= Url::to('calendar') ?>"><span class="ql-icon">📅</span>الرزنامة</a>
+      <a class="quick-link" href="<?= Url::to('tree') ?>"><span class="ql-icon">🌳</span><?= \Core\View::e(Terms::phrase('tree')) ?></a>
+      <a class="quick-link" href="<?= Url::to('gallery') ?>"><span class="ql-icon">🖼</span>مكتبة الصور</a>
+      <a class="quick-link" href="<?= Url::to('archive') ?>"><span class="ql-icon">📜</span><?= \Core\View::e(Terms::phrase('archive')) ?></a>
+      <a class="quick-link" href="<?= Url::to('news') ?>"><span class="ql-icon">📰</span>الأخبار</a>
     </div>
   </section>
   <?php endif; ?>

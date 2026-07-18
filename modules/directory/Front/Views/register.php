@@ -15,13 +15,24 @@ use Core\View;
 ?>
 <div class="container section">
   <div class="breadcrumbs"><a href="<?= Url::to('') ?>">الرئيسية</a> / <?= View::e(Terms::phrase('family_directory_register')) ?></div>
-  <h1><?= View::e(Terms::phrase('family_directory_register')) ?></h1>
-  <p class="form-hint">تُستخدم هذه البيانات من قبل إدارة الموقع فقط لإرسال الأخبار والمناسبات، ولا تُعرض لأي زائر.</p>
 
-  <?php if ($success): ?><div class="alert alert-success"><?= View::e($success) ?></div><?php endif; ?>
-  <?php if ($error): ?><div class="alert alert-error"><?= View::e($error) ?></div><?php endif; ?>
+  <div class="reg-hero">
+    <span class="reg-icon">📱</span>
+    <h1><?= View::e(Terms::phrase('family_directory_register')) ?></h1>
+    <p>خلّك قريب من أهلك.. سجّل رقمك ويوصلك كل جديد أولًا بأول</p>
+    <div class="reg-perks">
+      <span>📅 المناسبات</span>
+      <span>☕ الجمعات</span>
+      <span>📰 الأخبار</span>
+    </div>
+  </div>
 
-  <form method="post" action="<?= Url::to('directory/register') ?>" class="card-box" style="max-width:560px">
+  <div class="reg-wrap">
+    <?php if ($success): ?><div class="alert alert-success"><?= View::e($success) ?></div><?php endif; ?>
+    <?php if ($error): ?><div class="alert alert-error"><?= View::e($error) ?></div><?php endif; ?>
+  </div>
+
+  <form method="post" action="<?= Url::to('directory/register') ?>" class="reg-card">
     <?= Csrf::field() ?>
 
     <div class="form-group">
@@ -80,10 +91,11 @@ use Core\View;
       <input class="form-control" type="text" name="captcha_answer" inputmode="numeric" autocomplete="off" required>
     </div>
 
-    <button class="btn btn-primary btn-block" type="submit">تسجيل</button>
+    <button class="btn btn-primary btn-block join-band-btn" type="submit">سجّلني ✨</button>
+    <p class="reg-privacy">🔒 بياناتك بأمان — تستخدمها إدارة الموقع فقط لإرسال الأخبار والمناسبات، ولا تُعرض لأي زائر.</p>
   </form>
 
-  <p class="form-hint" style="margin-top:16px">
+  <p class="form-hint reg-manage">
     لإلغاء الاشتراك أو تحديث حالة رقمك لاحقًا:
     <a href="<?= Url::to('directory/manage-subscription') ?>">إدارة الاشتراك</a>
   </p>
