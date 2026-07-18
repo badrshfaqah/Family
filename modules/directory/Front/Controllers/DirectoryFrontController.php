@@ -55,10 +55,12 @@ final class DirectoryFrontController
         }
 
         $phoneRaw = Request::trimmed('phone');
+        if ($phoneRaw === '') {
+            $errors[] = 'رقم الجوال مطلوب.';
+        }
+        // حقل التأكيد اختياري (غير معروض في النموذج المختصر)، ويُتحقق منه فقط إن أُرسل
         $phoneConfirmRaw = Request::trimmed('phone_confirm');
-        if ($phoneRaw === '' || $phoneConfirmRaw === '') {
-            $errors[] = 'رقم الجوال وتأكيده مطلوبان.';
-        } elseif ($phoneRaw !== $phoneConfirmRaw) {
+        if ($phoneConfirmRaw !== '' && $phoneRaw !== $phoneConfirmRaw) {
             $errors[] = 'رقم الجوال وتأكيده غير متطابقين.';
         }
 
@@ -94,9 +96,16 @@ final class DirectoryFrontController
             }
         }
 
+        // المدن: تحديد متعدد — تُحفظ الأولى في city_id للتوافق، وكامل القائمة في city_ids
         $cityId = null;
+        $cityIdsCsv = null;
         if (Settings::get('directory_city_enabled', '1') === '1') {
-            $cityId = Request::int('city_id') ?: null;
+            $cityIds = array_values(array_filter(array_map('intval', (array) ($_POST['city_ids'] ?? []))));
+            if (!$cityIds && Request::int('city_id')) {
+                $cityIds = [Request::int('city_id')];
+            }
+            $cityId = $cityIds[0] ?? null;
+            $cityIdsCsv = $cityIds ? implode(',', $cityIds) : null;
         }
 
         $branchId = null;
@@ -108,6 +117,7 @@ final class DirectoryFrontController
             'name' => $name,
             'phone' => $phone,
             'city_id' => $cityId,
+            'city_ids' => $cityIdsCsv,
             'branch_id' => $branchId,
             'email' => $email !== '' ? $email : null,
             'status' => 'active',

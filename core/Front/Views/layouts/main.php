@@ -40,29 +40,25 @@ function fam_announce_visibility_class(array $a): string
     return implode(' ', $classes);
 }
 
-$mainMenu = [];
-$mobileMenu = [];
 $footerMenu = [];
 if (Database::tableExists('menu_items')) {
-    $mainMenu = Database::fetchAll(
-        'SELECT mi.* FROM ' . Database::table('menu_items') . ' mi
-         JOIN ' . Database::table('menus') . ' m ON m.id = mi.menu_id
-         WHERE m.slug = "main" AND mi.hide_on != "desktop" ORDER BY mi.sort_order ASC'
-    );
-    $mobileMenu = Database::fetchAll(
-        'SELECT mi.* FROM ' . Database::table('menu_items') . ' mi
-         JOIN ' . Database::table('menus') . ' m ON m.id = mi.menu_id
-         WHERE m.slug = "mobile" AND mi.hide_on != "mobile" ORDER BY mi.sort_order ASC'
-    );
-    if (!$mobileMenu) {
-        $mobileMenu = $mainMenu;
-    }
     $footerMenu = Database::fetchAll(
         'SELECT mi.* FROM ' . Database::table('menu_items') . ' mi
          JOIN ' . Database::table('menus') . ' m ON m.id = mi.menu_id
          WHERE m.slug = "footer" ORDER BY mi.sort_order ASC'
     );
 }
+
+// قائمة الموقع الموحدة: أعلى الصفحة في المتصفح، وقائمة جانبية على الجوال
+$siteMenu = array_values(array_filter([
+    ['url' => Url::to('directory/register'), 'icon' => '📱', 'label' => 'جوال القبيلة', 'show' => \Core\ModuleManager::isEnabled('directory')],
+    ['url' => Url::to('calendar'), 'icon' => '📅', 'label' => 'الرزنامة', 'show' => \Core\ModuleManager::isEnabled('calendar')],
+    ['url' => Url::to('gatherings'), 'icon' => '☕', 'label' => 'الجمعات', 'show' => \Core\ModuleManager::isEnabled('gatherings')],
+    ['url' => Url::to('tree'), 'icon' => '🌳', 'label' => 'شجرة النسب', 'show' => \Core\ModuleManager::isEnabled('family-tree')],
+    ['url' => Url::to('gallery'), 'icon' => '🖼', 'label' => 'مكتبة الصور', 'show' => \Core\ModuleManager::isEnabled('gallery')],
+    ['url' => Url::to('archive'), 'icon' => '📜', 'label' => 'الأرشيف', 'show' => \Core\ModuleManager::isEnabled('archive')],
+    ['url' => Url::to('news'), 'icon' => '📰', 'label' => 'الأخبار', 'show' => \Core\ModuleManager::isEnabled('news')],
+], fn($item) => $item['show']));
 
 function fam_menu_link(array $item): string
 {
@@ -120,8 +116,8 @@ $metaDescription = $metaDescription ?? Settings::get('seo_default_description', 
       <span><?= \Core\View::e($shortName) ?></span>
     </a>
     <nav class="nav-desktop">
-      <?php foreach ($mainMenu as $navItem): ?>
-        <a href="<?= \Core\View::e(fam_menu_link($navItem)) ?>" <?= $navItem['open_new_tab'] ? 'target="_blank" rel="noopener"' : '' ?>><?= \Core\View::e($navItem['label']) ?></a>
+      <?php foreach ($siteMenu as $navItem): ?>
+        <a href="<?= \Core\View::e($navItem['url']) ?>"><span class="nav-icon"><?= $navItem['icon'] ?></span><?= \Core\View::e($navItem['label']) ?></a>
       <?php endforeach; ?>
     </nav>
     <div class="header-actions">
@@ -135,8 +131,9 @@ $metaDescription = $metaDescription ?? Settings::get('seo_default_description', 
 <div class="mobile-nav" data-mobile-nav>
   <div class="panel">
     <button class="icon-btn close-btn" data-nav-close aria-label="إغلاق">✕</button>
-    <?php foreach ($mobileMenu as $navItem): ?>
-      <a href="<?= \Core\View::e(fam_menu_link($navItem)) ?>"><?= \Core\View::e($navItem['label']) ?></a>
+    <a href="<?= Url::to('') ?>"><span class="nav-icon">🏠</span>الرئيسية</a>
+    <?php foreach ($siteMenu as $navItem): ?>
+      <a href="<?= \Core\View::e($navItem['url']) ?>"><span class="nav-icon"><?= $navItem['icon'] ?></span><?= \Core\View::e($navItem['label']) ?></a>
     <?php endforeach; ?>
   </div>
 </div>

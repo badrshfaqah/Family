@@ -3,6 +3,7 @@ CREATE TABLE IF NOT EXISTS `{prefix}directory_contacts` (
   `name` VARCHAR(150) NOT NULL,
   `phone` VARCHAR(30) NOT NULL,
   `city_id` INT UNSIGNED NULL,
+  `city_ids` VARCHAR(191) NULL,
   `branch_id` INT UNSIGNED NULL,
   `email` VARCHAR(190) NULL,
   `status` ENUM('active','excluded') NOT NULL DEFAULT 'active',

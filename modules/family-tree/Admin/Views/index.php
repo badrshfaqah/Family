@@ -20,6 +20,29 @@ foreach ($branches as $b) {
   <a class="btn btn-primary" href="<?= Url::admin('tree-nodes/create') ?>">+ إضافة عقدة</a>
 </div>
 
+<?php $treeImageId = \Core\Settings::get('tree_image_media_id', ''); ?>
+<div style="background:#fff;border:1px solid #e5e5e5;border-radius:12px;padding:16px;margin-bottom:18px">
+  <b>صورة الشجرة الجاهزة (اختياري)</b>
+  <p class="form-hint" style="margin:6px 0 12px">
+    عند رفع صورة (مخطوطة أو مخطط مصمم مسبقًا) تُعرض للزوار بدل الشجرة التفاعلية.
+    الحالة الحالية: <?= $treeImageId ? '✅ صورة مرفوعة ومعروضة للزوار' : 'العرض التفاعلي (خريطة ذهنية)' ?>
+  </p>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+    <form method="post" action="<?= Url::admin('tree-nodes/image') ?>" enctype="multipart/form-data" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <?= Csrf::field() ?>
+      <input type="file" name="tree_image" accept="image/*" required>
+      <button class="btn btn-primary btn-sm" type="submit">رفع واعتماد الصورة</button>
+    </form>
+    <?php if ($treeImageId): ?>
+    <form method="post" action="<?= Url::admin('tree-nodes/image') ?>" data-confirm="إزالة الصورة والعودة للعرض التفاعلي؟">
+      <?= Csrf::field() ?>
+      <input type="hidden" name="remove_image" value="1">
+      <button class="btn btn-danger btn-sm" type="submit">إزالة الصورة</button>
+    </form>
+    <?php endif; ?>
+  </div>
+</div>
+
 <div class="table-wrap">
   <table>
     <thead><tr><th>الاسم</th><th>الأب</th><th>الترتيب</th><th>الفرع المرتبط</th><th>الظهور</th><th></th></tr></thead>

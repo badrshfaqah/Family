@@ -125,9 +125,10 @@ a{color:inherit;text-decoration:none}
 .join-band-inner{
   position:relative;overflow:hidden;
   display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;
-  background:linear-gradient(135deg,var(--c-primary),var(--c-primary-dark));
-  color:#fff;border-radius:var(--radius);padding:20px 18px 18px;
-  box-shadow:0 10px 26px rgba(60,44,24,.22);
+  background:linear-gradient(135deg,#fdf8ec,#f6ecd4);
+  color:var(--c-text);border-radius:var(--radius);padding:20px 18px 18px;
+  border:1px solid var(--c-secondary);
+  box-shadow:0 8px 22px rgba(60,44,24,.12);
 }
 .join-band-inner::before{
   content:"";position:absolute;top:0;inset-inline:0;height:6px;
@@ -141,8 +142,8 @@ a{color:inherit;text-decoration:none}
   background:radial-gradient(circle,rgba(201,162,75,.35),transparent 65%);pointer-events:none;
 }
 .join-band-text{display:flex;flex-direction:column;gap:4px;min-width:0;position:relative}
-.join-band-text b{font-size:1.1rem;font-family:var(--font-heading)}
-.join-band-text span{font-size:.87rem;opacity:.92;line-height:1.6}
+.join-band-text b{font-size:1.1rem;font-family:var(--font-heading);color:var(--c-primary)}
+.join-band-text span{font-size:.87rem;color:var(--c-muted);line-height:1.6}
 .join-band .btn{flex:none;position:relative}
 .join-band-btn{animation:joinPulse 2.4s ease-in-out infinite;box-shadow:0 0 0 0 rgba(201,162,75,.55)}
 @keyframes joinPulse{
@@ -174,27 +175,10 @@ a{color:inherit;text-decoration:none}
 .cal-item.cal-next .cal-date{background:linear-gradient(135deg,var(--c-primary),var(--c-primary-dark))}
 .cal-item.cal-next .cal-left{background:var(--c-secondary);color:#2a220a;border-color:var(--c-secondary)}
 
-/* قائمة استكشاف بأيقونات أسفل الشعار */
-.explore-bar{background:var(--c-surface);border-bottom:1px solid var(--c-border);padding:12px 0 9px}
-.explore-scroll{
-  display:flex;gap:6px;overflow-x:auto;
-  scrollbar-width:none;-webkit-overflow-scrolling:touch;
-}
-.explore-scroll::-webkit-scrollbar{display:none}
-.explore-item{
-  flex:none;display:flex;flex-direction:column;align-items:center;gap:6px;
-  width:74px;text-align:center;font-size:.7rem;font-weight:700;color:var(--c-text);
-}
-.explore-item .ex-icon{
-  width:52px;height:52px;border-radius:17px;
-  background:linear-gradient(135deg,#f7f0df,#efe4cb);border:1px solid var(--c-border);
-  display:flex;align-items:center;justify-content:center;font-size:1.5rem;
-  box-shadow:var(--shadow);transition:transform .15s;
-}
-.explore-item:active .ex-icon{transform:scale(.92)}
-@media (min-width:960px){
-  .explore-scroll{justify-content:center;gap:26px}
-}
+/* أيقونات قائمة الموقع */
+.nav-desktop a{display:flex;align-items:center;gap:6px;font-size:.92rem}
+.nav-desktop .nav-icon{font-size:1.05rem;line-height:1}
+.mobile-nav .nav-icon{margin-inline-end:10px}
 
 /* الوسط: عمودا الرزنامة (يمين) والجمعات (يسار) */
 .home-cols{display:grid;gap:26px;grid-template-columns:1fr}
@@ -328,8 +312,112 @@ a{color:inherit;text-decoration:none}
     repeating-linear-gradient(45deg,var(--c-secondary) 0 5px,transparent 5px 10px),
     var(--c-primary-dark);
 }
+.reg-card .form-group{margin-bottom:13px}
+.reg-card .form-control{padding:11px 12px;font-size:.95rem}
+.reg-card label{font-size:.88rem;margin-bottom:5px}
 .reg-privacy{color:var(--c-muted);font-size:.78rem;text-align:center;margin:14px 0 0;line-height:1.7}
 .reg-manage{margin-top:16px;text-align:center}
+
+/* رقائق اختيار متعددة (المدن وغيرها) */
+.chip-select{display:flex;gap:8px;flex-wrap:wrap}
+.chip-select .chip{position:relative;cursor:pointer}
+.chip-select .chip input{position:absolute;opacity:0;pointer-events:none}
+.chip-select .chip span{
+  display:inline-block;padding:9px 16px;border-radius:999px;
+  border:1.5px solid var(--c-border);background:#fff;
+  font-size:.86rem;font-weight:700;color:var(--c-text);transition:all .15s;
+}
+.chip-select .chip input:checked+span{
+  background:var(--c-secondary);border-color:var(--c-secondary);color:#2a220a;
+  box-shadow:0 3px 10px rgba(201,162,75,.35);
+}
+
+/* بطاقة تغيير الرقم في صفحة التسجيل */
+.reg-alt-card{
+  max-width:560px;margin:16px auto 0;display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+  background:var(--c-surface);border:1px dashed var(--c-secondary);border-radius:var(--radius);
+  padding:14px 16px;
+}
+.reg-alt-card .reg-alt-text{flex:1;min-width:180px;display:flex;flex-direction:column;gap:2px}
+.reg-alt-card b{font-size:.95rem}
+.reg-alt-card span{color:var(--c-muted);font-size:.8rem}
+.btn-outline-dark{background:transparent;color:var(--c-primary);border:1.5px solid var(--c-primary)}
+
+/* صفحة الرزنامة */
+.calx-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
+.calx-tab{
+  padding:9px 18px;border-radius:999px;font-weight:800;font-size:.85rem;
+  background:var(--c-surface);border:1.5px solid var(--c-border);color:var(--c-muted);
+}
+.calx-tab.active{background:var(--c-primary);border-color:var(--c-primary);color:#fff}
+.calx-types{display:flex;gap:7px;overflow-x:auto;padding-bottom:6px;margin-bottom:14px;scrollbar-width:none}
+.calx-types::-webkit-scrollbar{display:none}
+.calx-type{
+  flex:none;padding:6px 14px;border-radius:999px;font-size:.8rem;font-weight:700;
+  background:#f3ead6;border:1px solid var(--c-border);color:var(--c-text);
+}
+.calx-type.active{background:var(--c-secondary);border-color:var(--c-secondary);color:#2a220a}
+.calx-month{
+  display:flex;align-items:center;gap:10px;margin:22px 0 10px;
+  font-family:var(--font-heading);font-weight:700;color:var(--c-primary);font-size:1.05rem;
+}
+.calx-month::after{content:"";flex:1;height:1px;background:var(--c-border)}
+.calx-month:first-of-type{margin-top:6px}
+.cal-past{opacity:.72}
+.cal-past .cal-date{background:var(--c-muted)}
+
+/* عرض الشهر */
+.calx-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-bottom:24px}
+.calx-grid-head{text-align:center;font-weight:800;font-size:.72rem;color:var(--c-muted);padding:4px 0}
+.calx-cell{
+  border:1px solid var(--c-border);border-radius:10px;min-height:64px;padding:4px;
+  font-size:.72rem;background:var(--c-surface);
+}
+.calx-cell.has-events{border-color:var(--c-secondary);background:#fdf8ec}
+.calx-cell .d{font-weight:800}
+.calx-cell a{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--c-primary);font-weight:700}
+.calx-nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+
+/* صفحة الجمعات: مجموعات حسب المدينة */
+.gath-city-head{
+  display:flex;align-items:center;gap:10px;margin:24px 0 10px;
+  font-family:var(--font-heading);font-weight:700;color:var(--c-primary);font-size:1.05rem;
+}
+.gath-city-head::after{content:"";flex:1;height:1px;background:var(--c-border)}
+.gath-city-head:first-of-type{margin-top:6px}
+
+/* شجرة النسب: خريطة ذهنية */
+.tree-chart-wrap{overflow-x:auto;padding:10px 4px 20px;-webkit-overflow-scrolling:touch}
+.tree-chart{display:inline-block;min-width:100%;text-align:center}
+.tree-chart ul{display:flex;justify-content:center;padding:22px 0 0;margin:0;list-style:none;position:relative}
+.tree-chart ul::before{
+  content:"";position:absolute;top:0;right:50%;width:0;height:22px;border-right:2px solid var(--c-secondary);
+}
+.tree-chart>ul::before{display:none}
+.tree-chart li{position:relative;padding:22px 8px 0;display:flex;flex-direction:column;align-items:center}
+.tree-chart li::before{
+  content:"";position:absolute;top:0;right:50%;width:0;height:22px;border-right:2px solid var(--c-secondary);
+}
+.tree-chart li::after{
+  content:"";position:absolute;top:0;right:0;left:0;height:0;border-top:2px solid var(--c-secondary);
+}
+.tree-chart li:first-child::after{right:0;left:auto;width:50%}
+.tree-chart li:last-child::after{left:0;right:auto;width:50%}
+.tree-chart li:only-child::after{display:none}
+.tree-chart li:only-child::before{height:22px}
+.tree-chart>ul>li{padding-top:0}
+.tree-chart>ul>li::before,.tree-chart>ul>li::after{display:none}
+.tree-node{
+  display:inline-block;background:var(--c-surface);border:2px solid var(--c-secondary);
+  border-radius:12px;padding:8px 16px;font-weight:800;font-size:.85rem;white-space:nowrap;
+  box-shadow:var(--shadow);color:var(--c-text);
+}
+.tree-node.tree-root{
+  background:linear-gradient(135deg,var(--c-primary),var(--c-primary-dark));
+  color:#fff;font-size:1rem;padding:10px 22px;font-family:var(--font-heading);
+}
+.tree-image{overflow:auto;border:1px solid var(--c-border);border-radius:var(--radius);background:#fff}
+.tree-image img{width:100%;height:auto}
 
 /* Breadcrumbs */
 .breadcrumbs{font-size:.85rem;color:var(--c-muted);margin-bottom:14px}

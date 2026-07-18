@@ -32,6 +32,38 @@ final class TreeAdminController
         ]);
     }
 
+    /** رفع أو إزالة صورة جاهزة تُعرض للزوار بدل الشجرة التفاعلية */
+    public function saveImage(array $params): void
+    {
+        Auth::requirePermission('content.tree');
+        Csrf::verifyRequestOrFail();
+
+        if (Request::post('remove_image')) {
+            \Core\Settings::set('tree_image_media_id', '');
+            ActivityLog::record('tree_image', 'إزالة صورة شجرة النسب والعودة للعرض التفاعلي');
+            Session::flash('success', 'تمت إزالة الصورة وعاد العرض التفاعلي للزوار.');
+            Response::redirect(Url::admin('tree-nodes'));
+        }
+
+        $file = Request::file('tree_image');
+        if (!$file) {
+            Session::flash('error', 'اختر ملف صورة أولًا.');
+            Response::redirect(Url::admin('tree-nodes'));
+        }
+
+        try {
+            $data = \Core\Media::handleUpload($file, Auth::user()['id'] ?? null);
+            $mediaId = Database::insert('media', array_merge($data, ['created_at' => date('Y-m-d H:i:s')]));
+            \Core\Settings::set('tree_image_media_id', (string) $mediaId);
+            ActivityLog::record('tree_image', 'رفع صورة لشجرة النسب');
+            Session::flash('success', 'تم اعتماد الصورة وستظهر للزوار بدل الشجرة التفاعلية.');
+        } catch (\Throwable $e) {
+            Session::flash('error', $e->getMessage());
+        }
+
+        Response::redirect(Url::admin('tree-nodes'));
+    }
+
     public function create(array $params): void
     {
         Auth::requirePermission('content.tree');

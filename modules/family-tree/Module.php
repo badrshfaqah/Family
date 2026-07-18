@@ -26,6 +26,7 @@ final class Module extends AbstractModule
     public function registerAdminRoutes(Router $router): void
     {
         $router->get('/tree-nodes', [TreeAdminController::class, 'index']);
+        $router->post('/tree-nodes/image', [TreeAdminController::class, 'saveImage']);
         $router->get('/tree-nodes/create', [TreeAdminController::class, 'create']);
         $router->post('/tree-nodes/store', [TreeAdminController::class, 'store']);
         $router->get('/tree-nodes/{id}/edit', [TreeAdminController::class, 'edit']);

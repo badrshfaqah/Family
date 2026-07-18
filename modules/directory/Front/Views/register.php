@@ -45,20 +45,17 @@ use Core\View;
       <input class="form-control" dir="ltr" type="tel" name="phone" placeholder="05xxxxxxxx" required>
     </div>
 
-    <div class="form-group">
-      <label>تأكيد رقم الجوال</label>
-      <input class="form-control" dir="ltr" type="tel" name="phone_confirm" placeholder="05xxxxxxxx" required>
-    </div>
-
     <?php if ($cityEnabled && !empty($cities)): ?>
     <div class="form-group">
-      <label>المدينة (اختياري)</label>
-      <select class="form-control" name="city_id">
-        <option value="">— اختر —</option>
+      <label>مدينتك (يمكن اختيار أكثر من مدينة)</label>
+      <div class="chip-select">
         <?php foreach ($cities as $c): ?>
-          <option value="<?= (int) $c['id'] ?>"><?= View::e($c['name']) ?></option>
+          <label class="chip">
+            <input type="checkbox" name="city_ids[]" value="<?= (int) $c['id'] ?>">
+            <span><?= View::e($c['name']) ?></span>
+          </label>
         <?php endforeach; ?>
-      </select>
+      </div>
     </div>
     <?php endif; ?>
 
@@ -95,8 +92,11 @@ use Core\View;
     <p class="reg-privacy">🔒 بياناتك بأمان — تستخدمها إدارة الموقع فقط لإرسال الأخبار والمناسبات، ولا تُعرض لأي زائر.</p>
   </form>
 
-  <p class="form-hint reg-manage">
-    لإلغاء الاشتراك أو تحديث حالة رقمك لاحقًا:
-    <a href="<?= Url::to('directory/manage-subscription') ?>">إدارة الاشتراك</a>
-  </p>
+  <div class="reg-alt-card">
+    <div class="reg-alt-text">
+      <b>🔄 غيّرت رقمك؟</b>
+      <span>احذف رقمك القديم من القائمة ثم سجّل رقمك الجديد حتى يبقى التواصل معك مستمرًا</span>
+    </div>
+    <a class="btn btn-outline-dark" href="<?= Url::to('directory/manage-subscription') ?>">حذف رقم قديم</a>
+  </div>
 </div>

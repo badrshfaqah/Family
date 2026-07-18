@@ -77,6 +77,8 @@ final class Request
                 $pathInfo = $uri;
             }
         }
+        // فك ترميز المسار ليعمل مع المسارات العربية (تصل من المتصفح مرمزة بنسق %XX)
+        $pathInfo = rawurldecode($pathInfo);
         $pathInfo = '/' . trim($pathInfo, '/');
         return $pathInfo === '/' ? '/' : rtrim($pathInfo, '/');
     }

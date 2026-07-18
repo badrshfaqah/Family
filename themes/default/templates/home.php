@@ -26,19 +26,6 @@ function fam_media_url($mediaId)
 $heroCover = fam_media_url(Settings::get('identity_cover_media_id', ''));
 ?>
 
-<?php /* قائمة استكشاف بأيقونات أسفل الشعار مباشرة — اختصارات بأسلوب التطبيقات */ ?>
-<div class="explore-bar">
-  <div class="container explore-scroll">
-    <a class="explore-item" href="<?= Url::to('directory/register') ?>"><span class="ex-icon">📱</span>جوال القبيلة</a>
-    <a class="explore-item" href="<?= Url::to('calendar') ?>"><span class="ex-icon">📅</span>الرزنامة</a>
-    <a class="explore-item" href="<?= Url::to('gatherings') ?>"><span class="ex-icon">☕</span>الجمعات</a>
-    <a class="explore-item" href="<?= Url::to('tree') ?>"><span class="ex-icon">🌳</span>شجرة النسب</a>
-    <a class="explore-item" href="<?= Url::to('gallery') ?>"><span class="ex-icon">🖼</span>مكتبة الصور</a>
-    <a class="explore-item" href="<?= Url::to('archive') ?>"><span class="ex-icon">📜</span>الأرشيف</a>
-    <a class="explore-item" href="<?= Url::to('news') ?>"><span class="ex-icon">📰</span>الأخبار</a>
-  </div>
-</div>
-
 <?php foreach ($sectionsOrder as $section): if (!$visible($section)) continue; ?>
 
   <?php if ($section === 'hero'): ?>

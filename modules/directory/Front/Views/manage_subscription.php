@@ -10,10 +10,10 @@ use Core\View;
 ?>
 <div class="container section">
   <div class="breadcrumbs"><a href="<?= Url::to('') ?>">الرئيسية</a> / إدارة الاشتراك</div>
-  <h1>إدارة الاشتراك في <?= View::e(Terms::phrase('family_directory')) ?></h1>
+  <h1>🗑 حذف رقم من <?= View::e(Terms::phrase('family_directory')) ?></h1>
   <p class="form-hint">
-    إذا رغبت في إلغاء اشتراك رقم جوالك من قائمة التواصل، أدخل الرقم أدناه. سيصل الطلب إلى إدارة الموقع
-    لمراجعته واعتماده، ولن يُحذف أي شيء تلقائيًا.
+    غيّرت رقمك أو رغبت في إلغاء الاشتراك؟ أدخل الرقم القديم أدناه وسيصل الطلب إلى إدارة الموقع
+    لمراجعته واعتماده. وإذا كان لديك رقم جديد فسجّله من <a href="<?= Url::to('directory/register') ?>">صفحة التسجيل</a>.
   </p>
 
   <?php if ($success): ?><div class="alert alert-success"><?= View::e($success) ?></div><?php endif; ?>

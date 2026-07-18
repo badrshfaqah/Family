@@ -20,54 +20,37 @@ function fam_calendar_query(array $overrides, array $base): string
 
 $baseQuery = [
     'type' => $selectedType,
-    'city' => $selectedCityIds,
     'when' => $when,
 ];
+
+$arMonths = [1 => 'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+$arDays = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+$todayTs = strtotime(date('Y-m-d'));
 ?>
 <div class="container section">
   <div class="breadcrumbs"><a href="<?= Url::to('') ?>">الرئيسية</a> / رزنامة المناسبات</div>
-  <h1>رزنامة المناسبات</h1>
+  <h1>📅 رزنامة المناسبات</h1>
 
-  <div style="display:flex;gap:8px;margin:14px 0;flex-wrap:wrap">
-    <a class="btn btn-sm <?= $viewMode === 'list' ? 'btn-primary' : 'btn-outline' ?>" href="?<?= fam_calendar_query(['view' => 'list'], $baseQuery) ?>">قائمة</a>
-    <a class="btn btn-sm <?= $viewMode === 'month' ? 'btn-primary' : 'btn-outline' ?>" href="?<?= fam_calendar_query(['view' => 'month'], $baseQuery) ?>">عرض شهري</a>
-    <?php if ($viewMode === 'list'): ?>
-      <a class="btn btn-sm <?= $when === 'upcoming' ? 'btn-primary' : 'btn-outline' ?>" href="?<?= fam_calendar_query(['view' => 'list', 'when' => 'upcoming'], $baseQuery) ?>">القادمة</a>
-      <a class="btn btn-sm <?= $when === 'past' ? 'btn-primary' : 'btn-outline' ?>" href="?<?= fam_calendar_query(['view' => 'list', 'when' => 'past'], $baseQuery) ?>">الماضية</a>
-    <?php endif; ?>
+  <div class="calx-tabs">
+    <a class="calx-tab <?= $viewMode === 'list' && $when === 'upcoming' ? 'active' : '' ?>" href="?<?= fam_calendar_query(['view' => 'list', 'when' => 'upcoming'], $baseQuery) ?>">القادمة</a>
+    <a class="calx-tab <?= $viewMode === 'list' && $when === 'past' ? 'active' : '' ?>" href="?<?= fam_calendar_query(['view' => 'list', 'when' => 'past'], $baseQuery) ?>">الماضية</a>
+    <a class="calx-tab <?= $viewMode === 'month' ? 'active' : '' ?>" href="?<?= fam_calendar_query(['view' => 'month'], $baseQuery) ?>">عرض شهري</a>
   </div>
 
-  <form method="get" class="card-box" style="display:flex;gap:12px;flex-wrap:wrap;align-items:end;margin-bottom:20px">
-    <input type="hidden" name="view" value="<?= View::e($viewMode) ?>">
-    <?php if ($viewMode === 'list'): ?><input type="hidden" name="when" value="<?= View::e($when) ?>"><?php endif; ?>
-    <div class="form-group">
-      <label>النوع</label>
-      <select class="form-control" name="type">
-        <option value="">كل الأنواع</option>
-        <?php foreach ($types as $t): ?>
-          <option value="<?= View::e($t) ?>" <?= $selectedType === $t ? 'selected' : '' ?>><?= View::e($t) ?></option>
-        <?php endforeach; ?>
-      </select>
-    </div>
-    <div class="form-group">
-      <label>المدن (يمكن اختيار أكثر من مدينة)</label>
-      <div style="display:flex;gap:10px;flex-wrap:wrap">
-        <?php foreach ($cities as $c): ?>
-          <label style="display:flex;gap:4px;align-items:center;font-size:.85rem">
-            <input type="checkbox" name="city[]" value="<?= $c['id'] ?>" <?= in_array((int) $c['id'], $selectedCityIds, true) ? 'checked' : '' ?>>
-            <?= View::e($c['name']) ?>
-          </label>
-        <?php endforeach; ?>
-      </div>
-    </div>
-    <button class="btn btn-secondary" type="submit">تصفية</button>
-  </form>
+  <?php if (!empty($types)): ?>
+  <div class="calx-types">
+    <a class="calx-type <?= $selectedType === '' ? 'active' : '' ?>" href="?<?= fam_calendar_query(['view' => $viewMode, 'type' => null], $baseQuery) ?>">الكل</a>
+    <?php foreach ($types as $t): ?>
+      <a class="calx-type <?= $selectedType === $t ? 'active' : '' ?>" href="?<?= fam_calendar_query(['view' => $viewMode, 'type' => $t], $baseQuery) ?>"><?= View::e($t) ?></a>
+    <?php endforeach; ?>
+  </div>
+  <?php endif; ?>
 
   <?php if ($viewMode === 'month' && $month): ?>
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
-      <a class="btn btn-sm btn-outline" href="?<?= fam_calendar_query(['view' => 'month', 'month' => $month['prev']], $baseQuery) ?>">الشهر السابق ←</a>
-      <b><?= View::e($month['label']) ?></b>
-      <a class="btn btn-sm btn-outline" href="?<?= fam_calendar_query(['view' => 'month', 'month' => $month['next']], $baseQuery) ?>">→ الشهر التالي</a>
+    <div class="calx-nav">
+      <a class="btn btn-sm btn-outline-dark" href="?<?= fam_calendar_query(['view' => 'month', 'month' => $month['prev']], $baseQuery) ?>">→ السابق</a>
+      <b style="font-family:var(--font-heading);color:var(--c-primary)"><?= View::e($month['label']) ?></b>
+      <a class="btn btn-sm btn-outline-dark" href="?<?= fam_calendar_query(['view' => 'month', 'month' => $month['next']], $baseQuery) ?>">التالي ←</a>
     </div>
     <?php
       $daysByDate = [];
@@ -75,19 +58,19 @@ $baseQuery = [
           $daysByDate[date('Y-m-d', strtotime($r['entry_datetime']))][] = $r;
       }
     ?>
-    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:24px">
-      <?php foreach (['أحد','اثنين','ثلاثاء','أربعاء','خميس','جمعة','سبت'] as $wd): ?>
-        <div style="text-align:center;font-weight:700;font-size:.8rem"><?= $wd ?></div>
+    <div class="calx-grid">
+      <?php foreach (['أحد', 'اثنين', 'ثلاثاء', 'أربعاء', 'خميس', 'جمعة', 'سبت'] as $wd): ?>
+        <div class="calx-grid-head"><?= $wd ?></div>
       <?php endforeach; ?>
       <?php for ($i = 0; $i < $month['first_weekday']; $i++): ?><div></div><?php endfor; ?>
       <?php for ($d = 1; $d <= $month['days_in_month']; $d++):
         $dateKey = date('Y-m-d', strtotime($month['key'] . '-' . str_pad((string) $d, 2, '0', STR_PAD_LEFT)));
         $dayEntries = $daysByDate[$dateKey] ?? [];
       ?>
-        <div style="border:1px solid var(--c-border);border-radius:8px;min-height:70px;padding:4px;font-size:.75rem">
-          <div style="font-weight:700"><?= $d ?></div>
+        <div class="calx-cell<?= $dayEntries ? ' has-events' : '' ?>">
+          <div class="d"><?= $d ?></div>
           <?php foreach (array_slice($dayEntries, 0, 2) as $e): ?>
-            <a href="<?= Url::to('calendar/' . $e['id']) ?>" style="display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><?= View::e($e['title']) ?></a>
+            <a href="<?= Url::to('calendar/' . $e['id']) ?>"><?= View::e($e['title']) ?></a>
           <?php endforeach; ?>
           <?php if (count($dayEntries) > 2): ?><span>+<?= count($dayEntries) - 2 ?></span><?php endif; ?>
         </div>
@@ -95,16 +78,55 @@ $baseQuery = [
     </div>
   <?php endif; ?>
 
-  <div class="grid grid-3">
-    <?php foreach ($rows as $ev): ?>
-      <a class="card" href="<?= Url::to('calendar/' . $ev['id']) ?>">
-        <div class="card-body">
-          <span class="card-meta"><?= View::e($ev['entry_type']) ?><?php if (!empty($ev['city_name'])): ?> · <?= View::e($ev['city_name']) ?><?php endif; ?></span>
-          <p class="card-title"><?= View::e($ev['title']) ?></p>
-          <div class="card-meta"><span><?= View::e(date('Y/m/d H:i', strtotime($ev['entry_datetime']))) ?></span></div>
+  <?php if ($viewMode === 'list'): ?>
+    <?php if (empty($rows)): ?>
+      <div class="empty-state">لا توجد مناسبات <?= $when === 'past' ? 'ماضية' : 'قادمة' ?> حاليًا.</div>
+    <?php else: ?>
+      <?php
+        // تجميع حسب الشهر لعرض أوضح
+        $byMonth = [];
+        foreach ($rows as $ev) {
+            $ts = strtotime($ev['entry_datetime']);
+            $byMonth[date('Y-m', $ts)][] = $ev;
+        }
+      ?>
+      <?php foreach ($byMonth as $monthKey => $monthRows):
+        $mTs = strtotime($monthKey . '-01');
+      ?>
+        <div class="calx-month"><span><?= $arMonths[(int) date('n', $mTs)] ?> <?= date('Y', $mTs) ?></span></div>
+        <div class="cal-list">
+          <?php foreach ($monthRows as $ev):
+            $ts = strtotime($ev['entry_datetime']);
+            $daysLeft = (int) floor((strtotime(date('Y-m-d', $ts)) - $todayTs) / 86400);
+            $isPast = $when === 'past';
+            if ($isPast) { $leftLabel = date('Y/m/d', $ts); }
+            elseif ($daysLeft <= 0) { $leftLabel = 'اليوم'; }
+            elseif ($daysLeft === 1) { $leftLabel = 'غدًا'; }
+            elseif ($daysLeft === 2) { $leftLabel = 'باقي يومين'; }
+            elseif ($daysLeft <= 10) { $leftLabel = 'باقي ' . $daysLeft . ' أيام'; }
+            else { $leftLabel = 'باقي ' . $daysLeft . ' يوم'; }
+            $time = date('g:i', $ts) . ' ' . (date('a', $ts) === 'pm' ? 'م' : 'ص');
+            $isNext = !$isPast && $ev === $rows[0];
+          ?>
+          <a class="cal-item<?= $isNext ? ' cal-next' : '' ?><?= $isPast ? ' cal-past' : '' ?>" href="<?= Url::to('calendar/' . $ev['id']) ?>">
+            <div class="cal-date">
+              <span><?= $arDays[(int) date('w', $ts)] ?></span>
+              <b><?= (int) date('j', $ts) ?></b>
+              <span><?= $arMonths[(int) date('n', $ts)] ?></span>
+            </div>
+            <div class="cal-info">
+              <p class="cal-title"><?= View::e($ev['title']) ?></p>
+              <span class="cal-meta">
+                <span>🏷 <?= View::e($ev['entry_type']) ?></span>
+                <span>🕗 <?= $time ?></span>
+                <?php if (!empty($ev['venue_name'])): ?><span>📍 <?= View::e($ev['venue_name']) ?><?= !empty($ev['city_name']) ? ' — ' . View::e($ev['city_name']) : '' ?></span><?php endif; ?>
+              </span>
+            </div>
+            <span class="cal-left"><?= $leftLabel ?></span>
+          </a>
+          <?php endforeach; ?>
         </div>
-      </a>
-    <?php endforeach; ?>
-    <?php if (empty($rows)): ?><div class="empty-state">لا توجد مواعيد مطابقة حاليًا.</div><?php endif; ?>
-  </div>
+      <?php endforeach; ?>
+    <?php endif; ?>
+  <?php endif; ?>
 </div>
