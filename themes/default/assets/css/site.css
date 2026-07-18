@@ -386,25 +386,41 @@ a{color:inherit;text-decoration:none}
 .gath-city-head::after{content:"";flex:1;height:1px;background:var(--c-border)}
 .gath-city-head:first-of-type{margin-top:6px}
 
-/* شجرة النسب: خريطة ذهنية */
+/* شجرة النسب: خريطة ذهنية
+   الحاوية تُثبَّت على اتجاه LTR لأن حسابات الوصلات (يمين/يسار) فيزيائية،
+   بينما تبقى أسماء العقد نفسها بالاتجاه العربي RTL. */
 .tree-chart-wrap{overflow-x:auto;padding:10px 4px 20px;-webkit-overflow-scrolling:touch}
-.tree-chart{display:inline-block;min-width:100%;text-align:center}
-.tree-chart ul{display:flex;justify-content:center;padding:22px 0 0;margin:0;list-style:none;position:relative}
-.tree-chart ul::before{
-  content:"";position:absolute;top:0;right:50%;width:0;height:22px;border-right:2px solid var(--c-secondary);
+.tree-chart{display:inline-block;min-width:100%;text-align:center;direction:ltr}
+.tree-chart ul{display:flex;justify-content:center;padding:0;margin:0;list-style:none}
+.tree-chart ul ul{padding-top:22px;position:relative}
+/* الخط النازل من الأب إلى شريط الأبناء */
+.tree-chart ul ul::before{
+  content:"";position:absolute;top:0;left:50%;width:0;height:22px;
+  border-left:2px solid var(--c-secondary);
 }
-.tree-chart>ul::before{display:none}
-.tree-chart li{position:relative;padding:22px 8px 0;display:flex;flex-direction:column;align-items:center}
+.tree-chart li{
+  position:relative;padding:22px 8px 0;
+  display:flex;flex-direction:column;align-items:center;
+}
+/* النصف الأيسر من الشريط الأفقي */
 .tree-chart li::before{
-  content:"";position:absolute;top:0;right:50%;width:0;height:22px;border-right:2px solid var(--c-secondary);
+  content:"";position:absolute;top:0;right:50%;width:50%;height:22px;
+  border-top:2px solid var(--c-secondary);
 }
+/* النصف الأيمن من الشريط الأفقي + الخط النازل لمنتصف العقدة */
 .tree-chart li::after{
-  content:"";position:absolute;top:0;right:0;left:0;height:0;border-top:2px solid var(--c-secondary);
+  content:"";position:absolute;top:0;left:50%;width:50%;height:22px;
+  border-top:2px solid var(--c-secondary);border-left:2px solid var(--c-secondary);
 }
-.tree-chart li:first-child::after{right:0;left:auto;width:50%}
-.tree-chart li:last-child::after{left:0;right:auto;width:50%}
-.tree-chart li:only-child::after{display:none}
-.tree-chart li:only-child::before{height:22px}
+/* أول ابن (الأيسر): لا امتداد لليسار */
+.tree-chart li:first-child::before{border-top:0}
+/* آخر ابن (الأيمن): لا امتداد لليمين، مع إبقاء الخط النازل */
+.tree-chart li:last-child::after{border-top:0;border-left:0}
+.tree-chart li:last-child::before{right:calc(50% - 2px);border-right:2px solid var(--c-secondary)}
+/* الابن الوحيد: خط نازل فقط بلا شريط أفقي (يعيد الخط الذي صفّرته قاعدة last-child) */
+.tree-chart li:only-child::before{display:none}
+.tree-chart li:only-child::after{border-top:0;border-left:2px solid var(--c-secondary)}
+/* الجذر: بلا أي وصلات علوية */
 .tree-chart>ul>li{padding-top:0}
 .tree-chart>ul>li::before,.tree-chart>ul>li::after{display:none}
 .tree-node{
