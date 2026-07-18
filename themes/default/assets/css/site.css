@@ -206,9 +206,55 @@ a{color:inherit;text-decoration:none}
 .cal-item.cal-next .cal-date{background:linear-gradient(135deg,var(--c-primary),var(--c-primary-dark))}
 .cal-item.cal-next .cal-left{background:var(--c-secondary);color:#2a220a;border-color:var(--c-secondary)}
 
+/* قائمة استكشاف بأيقونات أسفل الشعار */
+.explore-bar{background:var(--c-surface);border-bottom:1px solid var(--c-border);padding:12px 0 9px}
+.explore-scroll{
+  display:flex;gap:6px;overflow-x:auto;
+  scrollbar-width:none;-webkit-overflow-scrolling:touch;
+}
+.explore-scroll::-webkit-scrollbar{display:none}
+.explore-item{
+  flex:none;display:flex;flex-direction:column;align-items:center;gap:6px;
+  width:74px;text-align:center;font-size:.7rem;font-weight:700;color:var(--c-text);
+}
+.explore-item .ex-icon{
+  width:52px;height:52px;border-radius:17px;
+  background:linear-gradient(135deg,#f7f0df,#efe4cb);border:1px solid var(--c-border);
+  display:flex;align-items:center;justify-content:center;font-size:1.5rem;
+  box-shadow:var(--shadow);transition:transform .15s;
+}
+.explore-item:active .ex-icon{transform:scale(.92)}
+@media (min-width:960px){
+  .explore-scroll{justify-content:center;gap:26px}
+}
+
+/* الوسط: عمودا الرزنامة (يمين) والجمعات (يسار) */
+.home-cols{display:grid;gap:26px;grid-template-columns:1fr}
+.home-col{min-width:0}
+@media (min-width:960px){
+  .home-cols{grid-template-columns:1.15fr .85fr;align-items:start}
+}
+
 /* بطاقات الجمعات */
-.gathering-card{border-inline-start:4px solid var(--c-secondary)}
-.gathering-info{display:flex;flex-direction:column;gap:6px;color:var(--c-muted);font-size:.86rem}
+.gath-list{display:flex;flex-direction:column;gap:10px}
+.gath-card{
+  display:flex;align-items:center;gap:12px;position:relative;overflow:hidden;
+  background:var(--c-surface);border:1px solid var(--c-border);border-radius:var(--radius);
+  border-inline-start:4px solid var(--c-secondary);
+  padding:13px 14px;box-shadow:var(--shadow);
+}
+.gath-icon{
+  flex:none;width:48px;height:48px;border-radius:14px;
+  background:linear-gradient(135deg,var(--c-primary),var(--c-primary-dark));
+  display:flex;align-items:center;justify-content:center;font-size:1.4rem;
+}
+.gath-body{min-width:0;display:flex;flex-direction:column;gap:5px}
+.gath-title{margin:0;font-weight:700;font-size:.95rem}
+.gath-chip{
+  align-self:flex-start;background:#f3ead6;border:1px solid var(--c-secondary);
+  color:var(--c-primary);border-radius:999px;padding:3px 10px;font-size:.74rem;font-weight:800;
+}
+.gath-meta{color:var(--c-muted);font-size:.78rem}
 
 /* Section */
 .section{padding:28px 0}
