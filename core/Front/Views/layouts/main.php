@@ -189,31 +189,46 @@ $bottomNav = [
     <div class="footer-cols">
       <div>
         <h3><?= \Core\View::e($shortName) ?></h3>
-        <p><?= \Core\View::e(Settings::get('identity_brief', '')) ?></p>
+        <?php if (Settings::get('identity_brief')): ?><p><?= \Core\View::e(Settings::get('identity_brief', '')) ?></p><?php endif; ?>
+        <?php
+        $socials = [
+            'social_whatsapp' => '💬', 'social_x' => '𝕏', 'social_instagram' => '📷',
+            'social_snapchat' => '👻', 'social_youtube' => '▶', 'social_telegram' => '✈',
+        ];
+        $activeSocials = array_filter(array_map(fn($k) => Settings::get($k, ''), array_keys($socials)));
+        ?>
+        <?php if ($activeSocials): ?>
         <div class="social-row">
-          <?php
-          $socials = [
-              'social_whatsapp' => '💬', 'social_x' => '𝕏', 'social_instagram' => '📷',
-              'social_snapchat' => '👻', 'social_youtube' => '▶', 'social_telegram' => '✈',
-          ];
-          foreach ($socials as $key => $icon):
-              $val = Settings::get($key, '');
-              if ($val):
-          ?>
+          <?php foreach ($socials as $key => $icon): $val = Settings::get($key, ''); if ($val): ?>
             <a href="<?= \Core\View::e($val) ?>" target="_blank" rel="noopener"><?= $icon ?></a>
           <?php endif; endforeach; ?>
         </div>
+        <?php endif; ?>
       </div>
       <div>
         <h3>روابط</h3>
-        <?php foreach ($footerMenu as $navItem): ?>
-          <p><a href="<?= \Core\View::e(fam_menu_link($navItem)) ?>"><?= \Core\View::e($navItem['label']) ?></a></p>
-        <?php endforeach; ?>
+        <?php if ($footerMenu): ?>
+          <?php foreach ($footerMenu as $navItem): ?>
+            <p><a href="<?= \Core\View::e(fam_menu_link($navItem)) ?>"><?= \Core\View::e($navItem['label']) ?></a></p>
+          <?php endforeach; ?>
+        <?php else: ?>
+          <?php // قائمة التذييل بقاعدة البيانات فارغة: تُعرض روابط أقسام الموقع تلقائيًا ?>
+          <p><a href="<?= Url::to('') ?>">الرئيسية</a></p>
+          <?php foreach ($siteMenu as $navItem): ?>
+            <p><a href="<?= \Core\View::e($navItem['url']) ?>"><?= \Core\View::e($navItem['label']) ?></a></p>
+          <?php endforeach; ?>
+        <?php endif; ?>
       </div>
       <div>
-        <h3>التواصل</h3>
-        <?php if (Settings::get('contact_phone')): ?><p><?= \Core\View::e(Settings::get('contact_phone')) ?></p><?php endif; ?>
-        <?php if (Settings::get('contact_email')): ?><p><?= \Core\View::e(Settings::get('contact_email')) ?></p><?php endif; ?>
+        <h3>خدمات</h3>
+        <p><a href="<?= Url::to('install-app') ?>">📲 أضف الموقع لشاشتك الرئيسية</a></p>
+        <?php if (\Core\ModuleManager::isEnabled('directory')): ?>
+          <p><a href="<?= Url::to('directory/register') ?>">📱 التسجيل في جوال القبيلة</a></p>
+          <p><a href="<?= Url::to('directory/manage-subscription') ?>">🗑 حذف رقم قديم</a></p>
+        <?php endif; ?>
+        <p><a href="<?= Url::to('family') ?>">ℹ️ عن البرنامج</a></p>
+        <?php if (Settings::get('contact_phone')): ?><p dir="ltr" style="text-align:end">📞 <?= \Core\View::e(Settings::get('contact_phone')) ?></p><?php endif; ?>
+        <?php if (Settings::get('contact_email')): ?><p dir="ltr" style="text-align:end">✉️ <?= \Core\View::e(Settings::get('contact_email')) ?></p><?php endif; ?>
       </div>
     </div>
     <div class="copyright">© <?= date('Y') ?> <?= \Core\View::e($shortName) ?> — جميع الحقوق محفوظة — برنامج العائلة — تطوير <a href="https://almgrat.com" target="_blank" rel="noopener">المجرات</a></div>
