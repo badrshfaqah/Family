@@ -64,8 +64,34 @@ a{color:var(--primary);text-decoration:none;transition:all .25s cubic-bezier(.4,
 a:hover{color:var(--accent)}
 .wrap{max-width:1120px;margin:0 auto;padding:0 20px;position:relative;z-index:1}
 
+/* شريط علوي بشعار المجرات — مطابق لترويسة ar.almgrat.com */
+.g-top{
+  position:sticky;top:0;z-index:100;
+  background:rgba(255,255,255,.85);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);
+}
+.g-top-in{max-width:1120px;margin:0 auto;padding:10px 20px;display:flex;align-items:center;justify-content:space-between}
+.site-logo{display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0}
+.logo-img{
+  width:46px;height:46px;object-fit:contain;
+  filter:drop-shadow(0 2px 10px rgba(37,99,235,.35));
+  transition:transform .3s ease;
+}
+.site-logo:hover .logo-img{transform:scale(1.06)}
+.logo-text{display:flex;flex-direction:column;line-height:1.1}
+.logo-name-ar{
+  font-size:17px;font-weight:800;
+  background:var(--gradient-1);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.logo-name-en{
+  font-size:9px;font-weight:600;color:#94A3B8;
+  letter-spacing:3px;text-transform:uppercase;font-family:'Courier New',monospace;
+}
+.g-top .btn{padding:9px 20px;font-size:.85rem;border-radius:10px}
+
 /* الترويسة */
-.hero{text-align:center;padding:72px 0 48px;position:relative}
+.hero{text-align:center;padding:56px 0 48px;position:relative}
 .hero::after{
   content:'';position:absolute;top:-80px;left:50%;transform:translateX(-50%);
   width:640px;height:420px;border-radius:50%;z-index:-1;
@@ -228,6 +254,19 @@ a:hover{color:var(--accent)}
 </style>
 </head>
 <body>
+
+<div class="g-top">
+  <div class="g-top-in">
+    <a href="https://ar.almgrat.com" target="_blank" rel="noopener" class="site-logo">
+      <img src="<?= \Core\Support\Url::to('admin/assets/img/almgrat-logo.png') ?>" class="logo-img" alt="المجرات — ALmgrat">
+      <span class="logo-text">
+        <span class="logo-name-ar">المجرات</span>
+        <span class="logo-name-en">ALMGRAT</span>
+      </span>
+    </a>
+    <a class="btn btn-primary" href="https://almgrat.com" target="_blank" rel="noopener">اطلب البرنامج</a>
+  </div>
+</div>
 
 <header class="hero wrap">
   <span class="maker">🚀 من تطوير <b>المجرات</b></span>
