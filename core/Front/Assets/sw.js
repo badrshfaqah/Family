@@ -5,7 +5,7 @@
  * ليعمل سواء كان النظام في الجذر أو داخل مجلد فرعي.
  */
 
-var CACHE_NAME = 'fam-cache-v1';
+var CACHE_NAME = 'fam-cache-v2';
 var BASE_PATH = self.location.pathname.replace(/sw\.js$/, '');
 
 self.addEventListener('install', function (event) {
