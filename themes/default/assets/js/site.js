@@ -1,6 +1,28 @@
 (function () {
   'use strict';
 
+  // التقاط حدث التثبيت فور تحميل السكربت (قد يُطلقه المتصفح قبل اكتمال تحميل الصفحة)
+  var deferredInstallPrompt = null;
+
+  window.addEventListener('beforeinstallprompt', function (e) {
+    e.preventDefault();
+    deferredInstallPrompt = e;
+    revealInstallButtons();
+  });
+
+  window.addEventListener('appinstalled', function () {
+    deferredInstallPrompt = null;
+    var bar = document.querySelector('[data-a2hs]');
+    if (bar) bar.hidden = true;
+    try { localStorage.setItem('fam_a2hs_closed', '1'); } catch (e) {}
+  });
+
+  function revealInstallButtons() {
+    document.querySelectorAll('[data-a2hs-install]').forEach(function (b) { b.hidden = false; });
+    var pageCard = document.querySelector('[data-android-install]');
+    if (pageCard) pageCard.hidden = false;
+  }
+
   document.addEventListener('DOMContentLoaded', function () {
     initMobileNav();
     initCountdowns();
@@ -12,21 +34,20 @@
 
   // بانر "أضف للشاشة الرئيسية" + التثبيت المباشر حيث يدعمه المتصفح
   function initA2hs() {
-    var deferredPrompt = null;
-
-    window.addEventListener('beforeinstallprompt', function (e) {
-      e.preventDefault();
-      deferredPrompt = e;
-      document.querySelectorAll('[data-a2hs-install]').forEach(function (b) { b.hidden = false; });
-      var pageCard = document.querySelector('[data-android-install]');
-      if (pageCard) pageCard.hidden = false;
-    });
+    // الحدث قد يكون التُقط قبل اكتمال تحميل الصفحة — أظهر الأزرار الآن
+    if (deferredInstallPrompt) revealInstallButtons();
 
     document.addEventListener('click', function (e) {
       var trigger = e.target.closest('[data-a2hs-install],[data-a2hs-install-page]');
-      if (!trigger || !deferredPrompt) return;
-      deferredPrompt.prompt();
-      deferredPrompt = null;
+      if (!trigger) return;
+      if (deferredInstallPrompt) {
+        deferredInstallPrompt.prompt();
+        deferredInstallPrompt.userChoice.then(function () { deferredInstallPrompt = null; });
+        return;
+      }
+      // لا يوجد أمر تثبيت متاح (استُهلك أو غير مدعوم): انتقل لصفحة الشرح
+      var fallback = trigger.getAttribute('data-install-fallback');
+      if (fallback && location.pathname.indexOf('install-app') === -1) location.href = fallback;
     });
 
     var bar = document.querySelector('[data-a2hs]');
@@ -70,13 +91,22 @@
 
     function markDone() {
       buttons.forEach(function (b) {
-        if (b.classList.contains('icon-btn')) {
-          b.textContent = '🔔';
-          b.classList.add('push-on');
+        if (b.hasAttribute('data-hide-on-active')) {
+          b.hidden = true;
         } else {
           b.textContent = '✅ التنبيهات مفعلة';
+          b.disabled = true;
         }
       });
+    }
+
+    // إذا كانت التنبيهات مفعلة مسبقًا على هذا الجهاز: أخفِ زر الترويسة
+    if (supported && Notification.permission === 'granted') {
+      navigator.serviceWorker.ready.then(function (reg) {
+        return reg.pushManager.getSubscription();
+      }).then(function (sub) {
+        if (sub) markDone();
+      }).catch(function () {});
     }
 
     buttons.forEach(function (btn) {

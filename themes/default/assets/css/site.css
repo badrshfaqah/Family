@@ -497,8 +497,14 @@ a{color:inherit;text-decoration:none}
 .tree-image{overflow:auto;border:1px solid var(--c-border);border-radius:var(--radius);background:#fff}
 .tree-image img{width:100%;height:auto}
 
-/* جرس التنبيهات في الترويسة + رسالة التأكيد العائمة */
-.icon-btn.push-on{background:#e8f6ee}
+/* زر تفعيل التنبيهات في الترويسة + رسالة التأكيد العائمة */
+.btn-notify{
+  flex:none;background:#f3ead6;border:1px solid var(--c-secondary);color:var(--c-primary);
+  border-radius:999px;padding:8px 13px;font-size:.78rem;font-weight:800;cursor:pointer;
+  font-family:var(--font);white-space:nowrap;
+}
+.btn-notify:active{transform:scale(.96)}
+.btn-notify[hidden]{display:none}
 .push-toast{
   position:fixed;bottom:calc(76px + env(safe-area-inset-bottom));inset-inline:16px;z-index:90;
   margin:0 auto;max-width:420px;text-align:center;

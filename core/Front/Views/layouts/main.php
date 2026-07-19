@@ -124,11 +124,10 @@ $metaDescription = $metaDescription ?? Settings::get('seo_default_description', 
     <div class="header-actions">
       <?php $pushKey = \Core\Push::isSupported() ? \Core\Push::publicKey() : ''; ?>
       <?php if ($pushKey !== ''): ?>
-      <button class="icon-btn" data-push-enable
+      <button class="btn-notify" data-push-enable data-hide-on-active
               data-vapid="<?= \Core\View::e($pushKey) ?>"
               data-subscribe-url="<?= Url::to('push/subscribe') ?>"
-              data-install-url="<?= Url::to('install-app') ?>"
-              aria-label="تفعيل التنبيهات">🔔</button>
+              data-install-url="<?= Url::to('install-app') ?>">فعّل التنبيهات</button>
       <?php endif; ?>
       <a class="icon-btn" href="<?= Url::to('search') ?>" aria-label="بحث">🔍</a>
       <button class="icon-btn nav-mobile-trigger" data-nav-trigger aria-label="القائمة">☰</button>
@@ -167,7 +166,7 @@ $bottomNav = [
 <div class="a2hs-bar" data-a2hs hidden>
   <span class="a2hs-text">📲 أضف الموقع لشاشتك الرئيسية وفعّل التنبيهات</span>
   <span class="a2hs-actions">
-    <button class="btn btn-sm btn-primary" data-a2hs-install hidden>تثبيت</button>
+    <button class="btn btn-sm btn-primary" data-a2hs-install data-install-fallback="<?= Url::to('install-app') ?>" hidden>تثبيت</button>
     <a class="btn btn-sm btn-outline-dark" href="<?= Url::to('install-app') ?>">الطريقة</a>
     <button class="a2hs-close" data-a2hs-close aria-label="إغلاق">✕</button>
   </span>

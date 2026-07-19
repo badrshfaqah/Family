@@ -2,7 +2,7 @@
   "name": "نظام إدارة محتوى العوائل والقبائل",
   "name_en": "Family & Tribe Content Management System",
   "slug": "family",
-  "version": "1.5.1",
+  "version": "1.5.2",
   "exclude_from_package": [],
   "preserve": ["config.php", "storage"],
   "update": {}
