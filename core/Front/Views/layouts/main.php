@@ -122,6 +122,14 @@ $metaDescription = $metaDescription ?? Settings::get('seo_default_description', 
       <?php endforeach; ?>
     </nav>
     <div class="header-actions">
+      <?php $pushKey = \Core\Push::isSupported() ? \Core\Push::publicKey() : ''; ?>
+      <?php if ($pushKey !== ''): ?>
+      <button class="icon-btn" data-push-enable
+              data-vapid="<?= \Core\View::e($pushKey) ?>"
+              data-subscribe-url="<?= Url::to('push/subscribe') ?>"
+              data-install-url="<?= Url::to('install-app') ?>"
+              aria-label="تفعيل التنبيهات">🔔</button>
+      <?php endif; ?>
       <a class="icon-btn" href="<?= Url::to('search') ?>" aria-label="بحث">🔍</a>
       <button class="icon-btn nav-mobile-trigger" data-nav-trigger aria-label="القائمة">☰</button>
     </div>

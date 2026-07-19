@@ -497,6 +497,20 @@ a{color:inherit;text-decoration:none}
 .tree-image{overflow:auto;border:1px solid var(--c-border);border-radius:var(--radius);background:#fff}
 .tree-image img{width:100%;height:auto}
 
+/* جرس التنبيهات في الترويسة + رسالة التأكيد العائمة */
+.icon-btn.push-on{background:#e8f6ee}
+.push-toast{
+  position:fixed;bottom:calc(76px + env(safe-area-inset-bottom));inset-inline:16px;z-index:90;
+  margin:0 auto;max-width:420px;text-align:center;
+  background:var(--c-primary-dark);color:#fff;border-radius:12px;
+  padding:12px 16px;font-size:.86rem;font-weight:700;
+  box-shadow:0 10px 26px rgba(0,0,0,.25);
+  opacity:0;transform:translateY(8px);pointer-events:none;
+  transition:opacity .25s,transform .25s;
+}
+.push-toast.show{opacity:1;transform:translateY(0)}
+@media (min-width:960px){.push-toast{bottom:20px}}
+
 /* بانر "أضف للشاشة الرئيسية" */
 .a2hs-bar{
   position:fixed;inset-inline:10px;z-index:49;

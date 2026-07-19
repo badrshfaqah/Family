@@ -42,50 +42,82 @@
     });
   }
 
-  // تفعيل تنبيهات Push والاشتراك فيها
+  // تفعيل تنبيهات Push والاشتراك فيها — يعمل من أي زر [data-push-enable] (الترويسة أو صفحة التثبيت)
   function initPush() {
-    var btn = document.querySelector('[data-push-enable]');
-    if (!btn) return;
+    var buttons = document.querySelectorAll('[data-push-enable]');
+    if (!buttons.length) return;
 
     var status = document.querySelector('[data-push-status]');
-    function say(msg) { if (status) status.textContent = msg; }
+    var supported = ('serviceWorker' in navigator) && ('PushManager' in window) && ('Notification' in window);
 
-    if (!('serviceWorker' in navigator) || !('PushManager' in window) || !('Notification' in window)) {
-      btn.disabled = true;
-      say('متصفحك لا يدعم التنبيهات حاليًا — على الآيفون ثبّت الموقع على الشاشة الرئيسية أولًا ثم افتحه من الأيقونة.');
-      return;
+    function say(msg) {
+      if (status) status.textContent = msg;
+      showToast(msg);
     }
 
-    if (Notification.permission === 'granted') {
-      say('التنبيهات مأذون بها مسبقًا — اضغط الزر لتأكيد الاشتراك.');
+    function showToast(msg) {
+      var toast = document.querySelector('.push-toast');
+      if (!toast) {
+        toast = document.createElement('div');
+        toast.className = 'push-toast';
+        document.body.appendChild(toast);
+      }
+      toast.textContent = msg;
+      toast.classList.add('show');
+      clearTimeout(toast._timer);
+      toast._timer = setTimeout(function () { toast.classList.remove('show'); }, 3500);
     }
 
-    btn.addEventListener('click', function () {
-      Notification.requestPermission().then(function (permission) {
-        if (permission !== 'granted') {
-          say('لم يُمنح الإذن — يمكنك السماح بالتنبيهات من إعدادات المتصفح ثم المحاولة مجددًا.');
+    function markDone() {
+      buttons.forEach(function (b) {
+        if (b.classList.contains('icon-btn')) {
+          b.textContent = '🔔';
+          b.classList.add('push-on');
+        } else {
+          b.textContent = '✅ التنبيهات مفعلة';
+        }
+      });
+    }
+
+    buttons.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        // متصفح لا يدعم التنبيهات (مثل سفاري الآيفون قبل تثبيت الموقع): وجّه لصفحة الشرح
+        if (!supported) {
+          var installUrl = btn.getAttribute('data-install-url');
+          if (installUrl && location.pathname.indexOf('install-app') === -1) {
+            location.href = installUrl;
+          } else {
+            say('على الآيفون: ثبّت الموقع على الشاشة الرئيسية أولًا، ثم افتحه من الأيقونة وفعّل التنبيهات.');
+          }
           return;
         }
-        navigator.serviceWorker.ready.then(function (reg) {
-          return reg.pushManager.subscribe({
-            userVisibleOnly: true,
-            applicationServerKey: urlBase64ToUint8Array(btn.getAttribute('data-vapid'))
-          });
-        }).then(function (sub) {
-          return fetch(btn.getAttribute('data-subscribe-url') || 'push/subscribe', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(sub)
-          });
-        }).then(function (res) {
-          if (res.ok) {
-            say('✅ تم تفعيل التنبيهات بنجاح — سيصلك كل جديد');
-            btn.textContent = '✅ التنبيهات مفعلة';
-          } else {
-            say('تعذر حفظ الاشتراك، حاول مرة أخرى.');
+
+        Notification.requestPermission().then(function (permission) {
+          if (permission !== 'granted') {
+            say('لم يُمنح الإذن — يمكنك السماح بالتنبيهات من إعدادات المتصفح ثم المحاولة مجددًا.');
+            return;
           }
-        }).catch(function () {
-          say('تعذر التفعيل، حاول مرة أخرى.');
+          navigator.serviceWorker.ready.then(function (reg) {
+            return reg.pushManager.subscribe({
+              userVisibleOnly: true,
+              applicationServerKey: urlBase64ToUint8Array(btn.getAttribute('data-vapid'))
+            });
+          }).then(function (sub) {
+            return fetch(btn.getAttribute('data-subscribe-url') || 'push/subscribe', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(sub)
+            });
+          }).then(function (res) {
+            if (res.ok) {
+              say('✅ تم تفعيل التنبيهات — سيصلك كل جديد');
+              markDone();
+            } else {
+              say('تعذر حفظ الاشتراك، حاول مرة أخرى.');
+            }
+          }).catch(function () {
+            say('تعذر التفعيل، حاول مرة أخرى.');
+          });
         });
       });
     });
