@@ -34,11 +34,17 @@ final class NotificationsController
             $subscribers = (int) Database::fetchValue('SELECT COUNT(*) FROM ' . Database::table('push_subscriptions'));
         }
 
+        $history = [];
+        if (Database::tableExists('push_log')) {
+            $history = Database::fetchAll('SELECT * FROM ' . Database::table('push_log') . ' ORDER BY id DESC LIMIT 30');
+        }
+
         echo View::render(CORE_PATH . '/Admin/Views/layouts/admin.php', [
             'pageTitle' => 'التنبيهات',
             'contentView' => CORE_PATH . '/Admin/Views/notifications/index.php',
             'supported' => $supported,
             'subscribers' => $subscribers,
+            'history' => $history,
         ]);
     }
 
@@ -67,6 +73,22 @@ final class NotificationsController
             'url' => $targetUrl,
             'icon' => Url::origin() . Url::to('pwa-icon-192.png'),
         ]);
+
+        // حفظ التنبيه في السجل مع اسم من أرسله
+        if (Database::tableExists('push_log')) {
+            $user = Auth::user();
+            Database::insert('push_log', [
+                'title' => $title,
+                'body' => $body !== '' ? $body : null,
+                'url' => $url !== '' ? $url : null,
+                'sent_by' => $user['id'] ?? null,
+                'sent_by_name' => $user['name'] ?? 'النظام',
+                'sent_count' => $result['sent'],
+                'failed_count' => $result['failed'],
+                'removed_count' => $result['removed'],
+                'created_at' => date('Y-m-d H:i:s'),
+            ]);
+        }
 
         ActivityLog::record('push_send', "إرسال تنبيه: {$title} (نجح {$result['sent']}، فشل {$result['failed']}، حُذف {$result['removed']})");
 

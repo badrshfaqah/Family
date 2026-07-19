@@ -201,3 +201,17 @@ CREATE TABLE IF NOT EXISTS `{prefix}push_subscriptions` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `push_subscriptions_endpoint_unique` (`endpoint_hash`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `{prefix}push_log` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `title` VARCHAR(120) NOT NULL,
+  `body` VARCHAR(255) NULL,
+  `url` VARCHAR(255) NULL,
+  `sent_by` INT UNSIGNED NULL,
+  `sent_by_name` VARCHAR(150) NOT NULL DEFAULT '',
+  `sent_count` INT UNSIGNED NOT NULL DEFAULT 0,
+  `failed_count` INT UNSIGNED NOT NULL DEFAULT 0,
+  `removed_count` INT UNSIGNED NOT NULL DEFAULT 0,
+  `created_at` DATETIME NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
