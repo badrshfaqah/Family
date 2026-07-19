@@ -29,6 +29,38 @@ $heroCover = fam_media_url(Settings::get('identity_cover_media_id', ''));
 <?php foreach ($sectionsOrder as $section): if (!$visible($section)) continue; ?>
 
   <?php if ($section === 'hero'): ?>
+
+  <?php
+    // إعلانات الوفيات النشطة: بطاقات صغيرة أعلى بطاقة التسجيل
+    $homeObituaries = [];
+    if (\Core\ModuleManager::isEnabled('obituaries') && \Core\Database::tableExists('obituaries')) {
+        $homeObituaries = \Core\Database::fetchAll(
+            'SELECT o.id, o.name, o.condolence_venue, c.name AS city_name
+             FROM ' . \Core\Database::table('obituaries') . ' o
+             LEFT JOIN ' . \Core\Database::table('cities') . " c ON c.id = o.city_id
+             WHERE o.status = 'active' ORDER BY o.id DESC LIMIT 3"
+        );
+    }
+  ?>
+  <?php if (!empty($homeObituaries)): ?>
+  <section class="obit-band">
+    <div class="container">
+      <div class="obit-list">
+        <?php foreach ($homeObituaries as $ob): ?>
+        <a class="obit-card" href="<?= Url::to('obituaries/' . $ob['id']) ?>">
+          <span class="obit-icon">🕊</span>
+          <span class="obit-body">
+            <b>وفاة <?= \Core\View::e($ob['name']) ?></b>
+            <?php if (!empty($ob['condolence_venue'])): ?><span class="obit-meta"><span>📍 العزاء: <?= \Core\View::e($ob['condolence_venue']) ?></span></span><?php endif; ?>
+          </span>
+          <?php if (!empty($ob['city_name'])): ?><span class="obit-city"><?= \Core\View::e($ob['city_name']) ?></span><?php endif; ?>
+        </a>
+        <?php endforeach; ?>
+      </div>
+    </div>
+  </section>
+  <?php endif; ?>
+
   <section class="join-band">
     <div class="container">
       <div class="join-band-inner">
@@ -40,16 +72,6 @@ $heroCover = fam_media_url(Settings::get('identity_cover_media_id', ''));
       </div>
     </div>
   </section>
-  <?php endif; ?>
-
-  <?php if ($section === 'ticker' && Settings::get('ticker_enabled', '1') === '1' && !empty($news)): ?>
-  <div class="ticker">
-    <div class="ticker-track">
-      <?php foreach (array_slice($news, 0, 6) as $n): ?>
-        <span>📰 <?= \Core\View::e($n['title']) ?></span>
-      <?php endforeach; ?>
-    </div>
-  </div>
   <?php endif; ?>
 
   <?php if ($section === 'next_event' && (!empty($comingSoon) || !empty($gatherings))): ?>

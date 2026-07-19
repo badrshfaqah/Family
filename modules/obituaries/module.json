@@ -1,0 +1,9 @@
+{
+  "slug": "obituaries",
+  "name": "الوفيات",
+  "description": "إعلانات الوفيات مع تفاصيل العزاء ومكانه، وبطاقة مميزة أعلى الصفحة الرئيسية.",
+  "version": "1.0.0",
+  "core_version": ">=1.0.0",
+  "namespace": "Modules\\Obituaries",
+  "author": "النظام"
+}

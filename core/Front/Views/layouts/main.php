@@ -54,6 +54,7 @@ $siteMenu = array_values(array_filter([
     ['url' => Url::to('directory/register'), 'icon' => '📱', 'label' => 'جوال القبيلة', 'show' => \Core\ModuleManager::isEnabled('directory')],
     ['url' => Url::to('calendar'), 'icon' => '📅', 'label' => 'الرزنامة', 'show' => \Core\ModuleManager::isEnabled('calendar')],
     ['url' => Url::to('gatherings'), 'icon' => '☕', 'label' => 'الجمعات', 'show' => \Core\ModuleManager::isEnabled('gatherings')],
+    ['url' => Url::to('obituaries'), 'icon' => '🕊', 'label' => 'الوفيات', 'show' => \Core\ModuleManager::isEnabled('obituaries')],
     ['url' => Url::to('tree'), 'icon' => '🌳', 'label' => 'شجرة النسب', 'show' => \Core\ModuleManager::isEnabled('family-tree')],
     ['url' => Url::to('gallery'), 'icon' => '🖼', 'label' => 'مكتبة الصور', 'show' => \Core\ModuleManager::isEnabled('gallery')],
     ['url' => Url::to('archive'), 'icon' => '📜', 'label' => 'الأرشيف', 'show' => \Core\ModuleManager::isEnabled('archive')],
@@ -198,7 +199,7 @@ $bottomNav = [
         <?php if (Settings::get('contact_email')): ?><p><?= \Core\View::e(Settings::get('contact_email')) ?></p><?php endif; ?>
       </div>
     </div>
-    <div class="copyright">© <?= date('Y') ?> <?= \Core\View::e($shortName) ?> — <?= \Core\View::e(Terms::phrase('official_site')) ?> — <a href="https://almgrat.com" target="_blank" rel="noopener">تطوير المجرات</a></div>
+    <div class="copyright">© <?= date('Y') ?> <?= \Core\View::e($shortName) ?> — جميع الحقوق محفوظة — برنامج العائلة — تطوير <a href="https://almgrat.com" target="_blank" rel="noopener">المجرات</a></div>
   </div>
 </footer>
 
