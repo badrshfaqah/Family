@@ -15,7 +15,7 @@ use Core\Support\Str;
 use Core\Support\Url;
 use Core\Terms;
 use Core\View;
-use Modules\Directory\Support\Csv;
+use Core\Support\Csv;
 use Modules\Directory\Support\Phone;
 
 final class DirectoryAdminController
@@ -417,7 +417,7 @@ final class DirectoryAdminController
         Auth::requirePermission('directory.manage');
 
         $out = Csv::startDownload('directory-template.csv');
-        fputcsv($out, ['name', 'phone', 'city', 'branch', 'email']);
+        Csv::writeRow($out, ['name', 'phone', 'city', 'branch', 'email']);
         fclose($out);
     }
 
@@ -447,9 +447,9 @@ final class DirectoryAdminController
         $sourceLabels = ['website_form' => 'نموذج الموقع', 'admin_manual' => 'إدخال يدوي', 'import_csv' => 'استيراد CSV'];
 
         $out = Csv::startDownload('directory-export-' . date('Ymd-His') . '.csv');
-        fputcsv($out, ['الاسم', 'الجوال', 'المدينة', 'الفرع', 'البريد الإلكتروني', 'الحالة', 'المصدر', 'تاريخ التسجيل']);
+        Csv::writeRow($out, ['الاسم', 'الجوال', 'المدينة', 'الفرع', 'البريد الإلكتروني', 'الحالة', 'المصدر', 'تاريخ التسجيل']);
         foreach ($rows as $r) {
-            fputcsv($out, [
+            Csv::writeRow($out, [
                 $r['name'],
                 $r['phone'],
                 $r['city_name'] ?? '',

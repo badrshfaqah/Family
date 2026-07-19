@@ -32,7 +32,7 @@ foreach ($users as $u) {
 <form method="get" action="<?= Url::admin('logs/users') ?>" style="display:flex;gap:10px;align-items:end;flex-wrap:wrap;margin-bottom:18px">
   <div class="form-group" style="margin:0;min-width:260px">
     <label>العضو</label>
-    <select class="form-control" name="user_id" onchange="this.form.submit()">
+    <select class="form-control" name="user_id" data-auto-submit>
       <option value="">— اختر عضوًا —</option>
       <?php foreach ($users as $u): ?>
         <option value="<?= (int) $u['id'] ?>" <?= (int) $u['id'] === $selectedUserId ? 'selected' : '' ?>>

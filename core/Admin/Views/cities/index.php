@@ -28,7 +28,7 @@ use Core\View;
           <option value="inactive" <?= $c['status'] === 'inactive' ? 'selected' : '' ?>>موقوفة</option>
         </select>
         <button class="btn btn-secondary btn-sm" type="submit">حفظ</button>
-        <button class="btn btn-danger btn-sm" type="submit" formaction="<?= Url::admin('cities/' . $c['id'] . '/delete') ?>" data-confirm="حذف هذه المدينة؟" onclick="return confirm('حذف هذه المدينة؟')">حذف</button>
+        <button class="btn btn-danger btn-sm" type="submit" formaction="<?= Url::admin('cities/' . $c['id'] . '/delete') ?>" data-confirm="حذف هذه المدينة؟">حذف</button>
         </form>
         </td>
       </tr>

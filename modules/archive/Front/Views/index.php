@@ -26,7 +26,7 @@ $totalPages = max(1, (int) ceil($total / $perPage));
 
   <?php if (!empty($categories)): ?>
   <form method="get" style="margin:14px 0">
-    <select class="form-control" name="category_id" onchange="this.form.submit()" style="max-width:220px">
+    <select class="form-control" name="category_id" data-auto-submit style="max-width:220px">
       <option value="">كل التصنيفات</option>
       <?php foreach ($categories as $c): ?>
         <option value="<?= $c['id'] ?>" <?= (int) $currentCategory === (int) $c['id'] ? 'selected' : '' ?>><?= View::e($c['name']) ?></option>

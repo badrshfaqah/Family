@@ -111,7 +111,7 @@ $exportQuery = http_build_query(array_filter($filters));
 </div>
 <?php endif; ?>
 
-<script>
+<script nonce="<?= \Core\Support\Security::cspNonce() ?>">
 document.querySelector('[data-select-all]')?.addEventListener('change', function () {
   document.querySelectorAll('input[name="ids[]"]').forEach(function (cb) { cb.checked = this.checked; }.bind(this));
 });

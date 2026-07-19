@@ -48,7 +48,7 @@ $menuLabels = ['main' => 'القائمة الرئيسية', 'mobile' => 'قائ�
           </select>
           <label style="font-size:.8rem;display:flex;gap:4px;align-items:center"><input type="checkbox" name="open_new_tab" <?= $item['open_new_tab'] ? 'checked' : '' ?>> جديدة</label>
           <button class="btn btn-secondary btn-sm" type="submit">حفظ</button>
-          <button class="btn btn-danger btn-sm" type="submit" formaction="<?= Url::admin('menus/' . $item['id'] . '/delete?slug=' . $slug) ?>" onclick="return confirm('حذف هذا العنصر؟')">حذف</button>
+          <button class="btn btn-danger btn-sm" type="submit" formaction="<?= Url::admin('menus/' . $item['id'] . '/delete?slug=' . $slug) ?>" data-confirm="حذف هذا العنصر؟">حذف</button>
         </form>
         </td>
       </tr>
@@ -58,7 +58,7 @@ $menuLabels = ['main' => 'القائمة الرئيسية', 'mobile' => 'قائ�
   </table>
 </div>
 
-<script>
+<script nonce="<?= \Core\Support\Security::cspNonce() ?>">
 (function () {
   var list = document.getElementById('menu-items-list');
   if (!list) return;

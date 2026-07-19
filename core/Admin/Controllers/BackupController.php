@@ -16,6 +16,8 @@ use Core\View;
 
 final class BackupController
 {
+    private const MAX_RESTORE_BYTES = 50 * 1024 * 1024;
+
     public function index(array $params): void
     {
         Auth::requirePermission('system.backup');
@@ -67,7 +69,7 @@ final class BackupController
         Auth::requirePermission('system.backup');
 
         $file = basename((string) $params['file']);
-        $path = Backup::backupsDir() . '/' . $file;
+        $path = Backup::resolveBackupPath($file);
 
         if (!is_file($path)) {
             http_response_code(404);
@@ -107,24 +109,37 @@ final class BackupController
         }
 
         $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-        if ($ext !== 'sql') {
-            Session::flash('error', 'يجب أن يكون الملف بصيغة SQL.');
+        if (($file['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK
+            || !in_array($ext, ['sql', 'enc'], true)
+            || (int) ($file['size'] ?? 0) < 1
+            || (int) $file['size'] > self::MAX_RESTORE_BYTES) {
+            Session::flash('error', 'يجب رفع ملف SQL أو نسخة مشفرة ENC صالحة لا تتجاوز 50 ميجابايت.');
             Response::redirect(Url::admin('backup'));
         }
 
         $tmpPath = STORAGE_PATH . '/temp/restore-' . Str::random(8) . '.sql';
-        move_uploaded_file($file['tmp_name'], $tmpPath);
+        if (!move_uploaded_file($file['tmp_name'], $tmpPath)) {
+            Session::flash('error', 'تعذر حفظ ملف الاستعادة مؤقتًا.');
+            Response::redirect(Url::admin('backup'));
+        }
 
+        $restorePath = $tmpPath;
         try {
+            if ($ext === 'enc') {
+                $restorePath = Backup::decryptDatabaseBackup($tmpPath);
+            }
             // نسخة أمان تلقائية قبل الاستعادة تحسبًا لأي خطأ
             Backup::dumpDatabase();
-            Backup::restoreDatabase($tmpPath);
+            Backup::restoreDatabase($restorePath);
             ActivityLog::record('backup_restore', 'استعادة نسخة احتياطية لقاعدة البيانات');
             Session::flash('success', 'تمت الاستعادة بنجاح. تم أخذ نسخة احتياطية تلقائية قبل الاستعادة تحسبًا لأي خطأ.');
         } catch (\Throwable $e) {
             Session::flash('error', 'فشلت عملية الاستعادة: ' . $e->getMessage());
         } finally {
             @unlink($tmpPath);
+            if ($restorePath !== $tmpPath) {
+                @unlink($restorePath);
+            }
         }
 
         Response::redirect(Url::admin('backup'));

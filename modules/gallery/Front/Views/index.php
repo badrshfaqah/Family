@@ -26,13 +26,13 @@ $totalPages = max(1, (int) ceil($total / $perPage));
 
   <?php if (!empty($years)): ?>
   <form method="get" style="display:flex;gap:10px;flex-wrap:wrap;margin:14px 0">
-    <select class="form-control" name="year" onchange="this.form.submit()" style="max-width:160px">
+    <select class="form-control" name="year" data-auto-submit style="max-width:160px">
       <option value="">كل السنوات</option>
       <?php foreach ($years as $y): ?>
         <option value="<?= View::e((string) $y['year']) ?>" <?= (int) $currentYear === (int) $y['year'] ? 'selected' : '' ?>><?= View::e((string) $y['year']) ?></option>
       <?php endforeach; ?>
     </select>
-    <select class="form-control" name="type" onchange="this.form.submit()" style="max-width:160px">
+    <select class="form-control" name="type" data-auto-submit style="max-width:160px">
       <option value="">كل الأنواع</option>
       <option value="photo" <?= $currentType === 'photo' ? 'selected' : '' ?>>صور</option>
       <option value="video" <?= $currentType === 'video' ? 'selected' : '' ?>>فيديو</option>

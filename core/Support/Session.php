@@ -10,12 +10,17 @@ final class Session
             return;
         }
 
+        ini_set('session.use_strict_mode', '1');
+        ini_set('session.use_only_cookies', '1');
+        ini_set('session.cookie_httponly', '1');
+
         $params = session_get_cookie_params();
+        $configuredHttps = defined('APP_URL') && strtolower((string) parse_url((string) APP_URL, PHP_URL_SCHEME)) === 'https';
         session_set_cookie_params([
             'lifetime' => 0,
             'path' => $params['path'],
             'domain' => $params['domain'],
-            'secure' => !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off',
+            'secure' => $configuredHttps || (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off'),
             'httponly' => true,
             'samesite' => 'Lax',
         ]);

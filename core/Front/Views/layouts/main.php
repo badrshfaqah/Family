@@ -127,7 +127,8 @@ $metaDescription = $metaDescription ?? Settings::get('seo_default_description', 
       <button class="btn-notify" data-push-enable data-hide-on-active
               data-vapid="<?= \Core\View::e($pushKey) ?>"
               data-subscribe-url="<?= Url::to('push/subscribe') ?>"
-              data-install-url="<?= Url::to('install-app') ?>">فعّل التنبيهات</button>
+              data-install-url="<?= Url::to('install-app') ?>"
+              data-csrf-token="<?= \Core\View::e(\Core\Support\Csrf::token()) ?>">فعّل التنبيهات</button>
       <?php endif; ?>
       <a class="icon-btn" href="<?= Url::to('search') ?>" aria-label="بحث">🔍</a>
       <button class="icon-btn nav-mobile-trigger" data-nav-trigger aria-label="القائمة">☰</button>
@@ -233,7 +234,7 @@ $bottomNav = [
 <?php endif; ?>
 
 <script src="<?= Url::theme('assets/js/site.js') ?>?v=<?= CORE_VERSION ?>"></script>
-<script>
+<script nonce="<?= \Core\Support\Security::cspNonce() ?>">
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function () {
     navigator.serviceWorker.register('<?= Url::to('sw.js') ?>').catch(function () {});

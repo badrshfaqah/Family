@@ -1,5 +1,7 @@
 <?php
-/** @var string $pushPublicKey */
+/** @var string $pushPublicKey
+ *  @var string $pushCsrfToken
+ */
 use Core\Support\Url;
 use Core\View;
 ?>
@@ -44,7 +46,7 @@ use Core\View;
       <div class="install-card-head"><span>🔔</span><b>تفعيل التنبيهات</b></div>
       <p>فعّل التنبيهات ليصلك إشعار فوري بالمناسبات والوفيات وكل جديد — حتى والموقع مغلق.</p>
       <?php if ($pushPublicKey !== ''): ?>
-        <button class="btn btn-primary btn-block" data-push-enable data-vapid="<?= View::e($pushPublicKey) ?>" data-subscribe-url="<?= Url::to('push/subscribe') ?>">🔔 تفعيل التنبيهات</button>
+        <button class="btn btn-primary btn-block" data-push-enable data-vapid="<?= View::e($pushPublicKey) ?>" data-subscribe-url="<?= Url::to('push/subscribe') ?>" data-csrf-token="<?= View::e($pushCsrfToken) ?>">🔔 تفعيل التنبيهات</button>
         <p class="form-hint" data-push-status style="text-align:center;margin-top:10px"></p>
         <p class="form-hint" style="margin-top:6px">📌 على الآيفون: ثبّت الموقع على الشاشة الرئيسية أولًا (بالخطوات أعلاه)، ثم افتح التطبيق من الأيقونة وفعّل التنبيهات من داخله — هذا شرط من نظام iOS (الإصدار 16.4 فأحدث).</p>
       <?php else: ?>

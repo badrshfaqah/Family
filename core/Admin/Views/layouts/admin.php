@@ -80,7 +80,11 @@ function fam_admin_active(string $url, string $current): bool
       <div class="admin-topbar-user">
         <a href="<?= Url::to('') ?>" target="_blank" class="btn-link">مشاهدة الموقع ↗</a>
         <span><?= View::e($user['name'] ?? '') ?></span>
-        <a href="<?= Url::admin('logout') ?>" class="btn-link">خروج</a>
+        <a href="<?= Url::admin('two-factor') ?>" class="btn-link">الأمان</a>
+        <form method="post" action="<?= Url::admin('logout') ?>" style="display:inline">
+          <?= \Core\Support\Csrf::field() ?>
+          <button type="submit" class="btn-link" style="border:0;background:none;padding:0;cursor:pointer;font:inherit">خروج</button>
+        </form>
       </div>
     </header>
 

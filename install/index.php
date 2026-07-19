@@ -200,6 +200,8 @@ function installer_build_config(array $db): string
     $authKey = bin2hex(random_bytes(32));
     $secureKey = bin2hex(random_bytes(32));
     $loggedKey = bin2hex(random_bytes(32));
+    $backupKey = bin2hex(random_bytes(32));
+    $backupPath = dirname(ROOT_PATH) . '/family-cms-backups';
 
     $php = "<?php\n";
     $php .= "// تم إنشاء هذا الملف تلقائيًا بواسطة معالج التثبيت في " . date('Y-m-d H:i:s') . "\n\n";
@@ -214,6 +216,10 @@ function installer_build_config(array $db): string
     $php .= "define('SECURE_AUTH_KEY', " . var_export($secureKey, true) . ");\n";
     $php .= "define('LOGGED_IN_KEY', " . var_export($loggedKey, true) . ");\n\n";
     $php .= "define('APP_DEBUG', false);\n";
+    $php .= "define('APP_URL', " . var_export(\Core\Support\Url::origin(), true) . ");\n";
+    $php .= "define('BACKUP_PATH', " . var_export($backupPath, true) . ");\n";
+    $php .= "define('BACKUP_ENCRYPTION_KEY', " . var_export($backupKey, true) . ");\n";
+    $php .= "define('ALLOW_MODULE_UPLOAD', false);\n";
     $php .= "define('APP_TIMEZONE', 'Asia/Riyadh');\n";
 
     return $php;

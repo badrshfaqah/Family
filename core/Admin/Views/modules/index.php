@@ -1,6 +1,7 @@
 <?php
 /** @var array $modules
  *  @var bool $zipSupported
+ *  @var bool $moduleUploadEnabled
  */
 use Core\Support\Csrf;
 use Core\Support\Url;
@@ -8,7 +9,9 @@ use Core\View;
 ?>
 <div class="card-box">
   <h2 style="margin-top:0;font-size:1rem">رفع إضافة جديدة (ملف ZIP)</h2>
-  <?php if (!$zipSupported): ?>
+  <?php if (!$moduleUploadEnabled): ?>
+    <p class="form-hint">رفع الإضافات معطّل أمنيًا. لتثبيت حزمة موثوقة فقط، عيّن <code>ALLOW_MODULE_UPLOAD</code> إلى <code>true</code> مؤقتًا ثم أعده إلى <code>false</code>.</p>
+  <?php elseif (!$zipSupported): ?>
     <p class="form-hint">مكتبة ZipArchive غير مفعّلة على هذا السيرفر. يمكنك رفع مجلد الإضافة يدويًا عبر مدير الملفات إلى مجلد modules ثم تحديث هذه الصفحة.</p>
   <?php else: ?>
   <form method="post" action="<?= Url::admin('modules/upload') ?>" enctype="multipart/form-data" style="display:flex;gap:10px;align-items:end">

@@ -47,11 +47,17 @@ final class AuthController
             return;
         }
 
+        if (!empty($result['requires_2fa'])) {
+            Response::redirect(Url::admin('login/two-factor'));
+        }
+
         Response::redirect(Url::admin(''));
     }
 
     public function logout(array $params): void
     {
+        Auth::requireLogin();
+        Csrf::verifyRequestOrFail();
         Auth::logout();
         Response::redirect(Url::admin('login'));
     }
@@ -73,8 +79,12 @@ final class AuthController
 
         // رسالة عامة واحدة دائمًا، سواء كان البريد مسجلًا أم لا، لمنع كشف حسابات موجودة
         $genericMessage = true;
+        $ipKey = 'forgot-password-ip:' . Request::ip();
 
-        if ($email !== '' && !RateLimiter::tooManyAttempts('forgot-password:' . $email, 5, 15)) {
+        if ($email !== ''
+            && !RateLimiter::tooManyAttempts($ipKey, 10, 15)
+            && !RateLimiter::tooManyAttempts('forgot-password:' . $email, 5, 15)) {
+            RateLimiter::hit($ipKey);
             RateLimiter::hit('forgot-password:' . $email);
 
             $user = Database::fetchOne(
@@ -84,9 +94,13 @@ final class AuthController
 
             if ($user) {
                 $token = Str::random(48);
+                Database::query(
+                    'UPDATE ' . Database::table('password_resets') . ' SET used_at = NOW() WHERE user_id = ? AND used_at IS NULL',
+                    [$user['id']]
+                );
                 Database::insert('password_resets', [
                     'user_id' => $user['id'],
-                    'token' => $token,
+                    'token' => hash('sha256', $token),
                     'expires_at' => date('Y-m-d H:i:s', time() + 3600),
                     'created_at' => date('Y-m-d H:i:s'),
                 ]);
@@ -156,7 +170,10 @@ final class AuthController
             'password_hash' => Security::hashPassword($password),
         ], ['id' => $reset['user_id']]);
 
-        Database::update('password_resets', ['used_at' => date('Y-m-d H:i:s')], ['id' => $reset['id']]);
+        Database::query(
+            'UPDATE ' . Database::table('password_resets') . ' SET used_at = NOW() WHERE user_id = ? AND used_at IS NULL',
+            [$reset['user_id']]
+        );
 
         $user = Database::fetchOne('SELECT username FROM ' . Database::table('admin_users') . ' WHERE id = ?', [$reset['user_id']]);
         ActivityLog::record('password_reset_complete', 'إعادة تعيين كلمة مرور ناجحة للمستخدم: ' . ($user['username'] ?? $reset['user_id']));
@@ -170,10 +187,12 @@ final class AuthController
         if ($token === '') {
             return null;
         }
+        $tokenHash = hash('sha256', $token);
         return Database::fetchOne(
             'SELECT * FROM ' . Database::table('password_resets') . '
-             WHERE token = ? AND used_at IS NULL AND expires_at >= NOW()',
-            [$token]
+             WHERE token IN (?, ?) AND used_at IS NULL AND expires_at >= NOW()
+             ORDER BY id DESC LIMIT 1',
+            [$tokenHash, $token]
         );
     }
 }

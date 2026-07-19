@@ -60,16 +60,31 @@ final class Url
 
     public static function current(): string
     {
-        $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
-        $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
         $uri = $_SERVER['REQUEST_URI'] ?? '/';
-        return $scheme . '://' . $host . $uri;
+        return self::origin() . (str_starts_with($uri, '/') ? $uri : '/');
     }
 
     public static function origin(): string
     {
+        if (defined('APP_URL')) {
+            $configured = rtrim((string) APP_URL, '/');
+            if (filter_var($configured, FILTER_VALIDATE_URL)
+                && in_array(strtolower((string) parse_url($configured, PHP_URL_SCHEME)), ['http', 'https'], true)) {
+                return $configured;
+            }
+        }
+
         $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
-        $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+        // SERVER_NAME يأتي من إعداد الخادم، بخلاف Host الذي يتحكم به العميل.
+        $host = strtolower((string) ($_SERVER['SERVER_NAME'] ?? 'localhost'));
+        if (!filter_var($host, FILTER_VALIDATE_IP)
+            && !preg_match('/^(?:[a-z0-9](?:[a-z0-9.-]{0,251}[a-z0-9])?)$/', $host)) {
+            $host = 'localhost';
+        }
+        $port = (int) ($_SERVER['SERVER_PORT'] ?? ($scheme === 'https' ? 443 : 80));
+        if (($scheme === 'https' && $port !== 443) || ($scheme === 'http' && $port !== 80)) {
+            $host .= ':' . $port;
+        }
         return $scheme . '://' . $host;
     }
 

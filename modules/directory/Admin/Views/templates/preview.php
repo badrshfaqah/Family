@@ -34,17 +34,17 @@ $placeholderLabels = [
 <div class="card-box" style="max-width:640px">
   <h3 style="margin-top:0;font-size:1rem">النص النهائي</h3>
   <textarea id="dir-tpl-rendered" class="form-control" rows="8" readonly><?= View::e($rendered) ?></textarea>
-  <button type="button" class="btn btn-secondary" style="margin-top:10px" onclick="fam_copy_dir_tpl()">نسخ النص</button>
+  <button type="button" class="btn btn-secondary" style="margin-top:10px" data-copy-directory-template>نسخ النص</button>
   <span id="dir-tpl-copied" class="form-hint" style="display:none;color:#1c6e3c">تم نسخ النص.</span>
 </div>
 
-<script>
-function fam_copy_dir_tpl() {
+<script nonce="<?= \Core\Support\Security::cspNonce() ?>">
+document.querySelector('[data-copy-directory-template]')?.addEventListener('click', function () {
   var el = document.getElementById('dir-tpl-rendered');
   el.select();
   navigator.clipboard && navigator.clipboard.writeText ? navigator.clipboard.writeText(el.value) : document.execCommand('copy');
   var msg = document.getElementById('dir-tpl-copied');
   msg.style.display = 'inline';
   setTimeout(function () { msg.style.display = 'none'; }, 2000);
-}
+});
 </script>

@@ -133,6 +133,7 @@ final class UsersController
             Response::redirect(Url::admin('users'));
         }
 
+        \Core\TwoFactor::disable($id);
         Database::delete('admin_users', ['id' => $id]);
         ActivityLog::record('user_delete', 'حذف مستخدم إداري رقم: ' . $id);
         Session::flash('success', 'تم حذف المستخدم.');

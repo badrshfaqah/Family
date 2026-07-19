@@ -246,12 +246,12 @@ final class NewsletterAdminController
         $out = fopen('php://output', 'w');
         // BOM لضمان فتح الأحرف العربية بشكل صحيح في برامج مثل إكسل.
         fwrite($out, "\xEF\xBB\xBF");
-        fputcsv($out, ['id', 'name', 'email', 'status', 'category', 'source', 'subscribed_at', 'unsubscribed_at'], ',', '"', '\\');
+        \Core\Support\Csv::writeRow($out, ['id', 'name', 'email', 'status', 'category', 'source', 'subscribed_at', 'unsubscribed_at']);
         foreach ($rows as $r) {
-            fputcsv($out, [
+            \Core\Support\Csv::writeRow($out, [
                 $r['id'], $r['name'], $r['email'], $r['status'], $r['category'],
                 $r['source'], $r['subscribed_at'], $r['unsubscribed_at'],
-            ], ',', '"', '\\');
+            ]);
         }
         fclose($out);
         ActivityLog::record('newsletter_export', 'تصدير CSV لعدد ' . count($rows) . ' مشترك');

@@ -23,6 +23,11 @@ final class RateLimiter
 
         $windowExpired = strtotime($row['first_attempt_at']) < (time() - $decayMinutes * 60);
         if ($windowExpired) {
+            // نعيد تهيئة الصف بدل حذفه لتجنب تعارض INSERT بين طلبات متزامنة.
+            Database::update('rate_limits', [
+                'attempts' => 0,
+                'first_attempt_at' => date('Y-m-d H:i:s'),
+            ], ['limit_key' => $key]);
             return false;
         }
 

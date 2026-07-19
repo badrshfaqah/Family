@@ -37,4 +37,9 @@ Options -Indexes
 <IfModule mod_rewrite.c>
     RewriteCond %{REQUEST_URI} ^.*/storage/uploads/.*\.php$ [NC]
     RewriteRule ^ - [F,L]
+
+    # منع تقديم محتوى ويب نشط من مجلد الرفع حتى لو كان ملفًا قديمًا.
+    RewriteCond %{REQUEST_URI} ^.*/storage/uploads/ [NC]
+    RewriteCond %{REQUEST_URI} \.(html?|xhtml|shtml|svg|xml|xsl|js|mjs|css|cgi|pl|py|sh)$ [NC]
+    RewriteRule ^ - [F,L]
 </IfModule>

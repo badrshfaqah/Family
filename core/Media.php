@@ -13,6 +13,11 @@ final class Media
 {
     private const ALLOWED_IMAGE = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
     private const ALLOWED_DOC = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'mp3', 'mp4'];
+    private const DANGEROUS_EXTENSIONS = [
+        'php', 'php3', 'php4', 'php5', 'php7', 'php8', 'phtml', 'phar',
+        'html', 'htm', 'xhtml', 'shtml', 'svg', 'xml', 'xsl',
+        'js', 'mjs', 'css', 'htaccess', 'user.ini', 'cgi', 'pl', 'py', 'sh',
+    ];
 
     public static function maxUploadBytes(): int
     {
@@ -23,7 +28,12 @@ final class Media
     public static function allowedExtensions(): array
     {
         $extra = Settings::get('media_allowed_extensions', '');
-        $extra = is_string($extra) && $extra !== '' ? array_map('trim', explode(',', $extra)) : [];
+        $extra = is_string($extra) && $extra !== '' ? array_map(
+            fn($ext) => strtolower(ltrim(trim($ext), '.')),
+            explode(',', $extra)
+        ) : [];
+        $extra = array_filter($extra, fn($ext) => preg_match('/^[a-z0-9]{1,10}$/', $ext)
+            && !in_array($ext, self::DANGEROUS_EXTENSIONS, true));
         return array_unique(array_merge(self::ALLOWED_IMAGE, self::ALLOWED_DOC, $extra));
     }
 
@@ -103,10 +113,44 @@ final class Media
 
     private static function verifyRealType(string $tmpPath, string $ext): bool
     {
-        if (self::isImageExt($ext) && $ext !== 'webp') {
-            return (bool) @getimagesize($tmpPath);
+        $mime = strtolower((string) (mime_content_type($tmpPath) ?: ''));
+
+        if (self::isImageExt($ext)) {
+            $info = @getimagesize($tmpPath);
+            if (!$info) {
+                return false;
+            }
+            $expected = match ($ext) {
+                'jpg', 'jpeg' => ['image/jpeg'],
+                'png' => ['image/png'],
+                'gif' => ['image/gif'],
+                'webp' => ['image/webp'],
+                default => [],
+            };
+            return in_array(strtolower((string) ($info['mime'] ?? $mime)), $expected, true);
         }
-        return true;
+
+        $allowedMimes = match ($ext) {
+            'pdf' => ['application/pdf'],
+            'doc' => ['application/msword', 'application/vnd.ms-office', 'application/cdfv2', 'application/octet-stream'],
+            'docx' => ['application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/zip'],
+            'xls' => ['application/vnd.ms-excel', 'application/vnd.ms-office', 'application/cdfv2', 'application/octet-stream'],
+            'xlsx' => ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/zip'],
+            'mp3' => ['audio/mpeg', 'audio/mp3', 'application/octet-stream'],
+            'mp4' => ['video/mp4', 'audio/mp4', 'application/mp4', 'application/octet-stream'],
+            default => [],
+        };
+
+        if ($allowedMimes) {
+            return in_array($mime, $allowedMimes, true);
+        }
+
+        // الامتدادات الإضافية لا يجوز أن تحمل محتوى نشطًا ينفذه المتصفح.
+        return !in_array($mime, [
+            'text/html', 'application/xhtml+xml', 'image/svg+xml',
+            'text/xml', 'application/xml', 'text/javascript',
+            'application/javascript', 'application/x-httpd-php',
+        ], true);
     }
 
     /**

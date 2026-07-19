@@ -13,16 +13,22 @@ use Core\Admin\Controllers\ModulesController;
 use Core\Admin\Controllers\RolesController;
 use Core\Admin\Controllers\SettingsController;
 use Core\Admin\Controllers\UsersController;
+use Core\Admin\Controllers\TwoFactorController;
 
 /** @var Router $router */
 
 $router->get('/login', [AuthController::class, 'showLogin']);
 $router->post('/login', [AuthController::class, 'login']);
-$router->get('/logout', [AuthController::class, 'logout']);
+$router->get('/login/two-factor', [TwoFactorController::class, 'challengeForm']);
+$router->post('/login/two-factor', [TwoFactorController::class, 'challenge']);
+$router->post('/logout', [AuthController::class, 'logout']);
 $router->get('/forgot-password', [AuthController::class, 'showForgotPassword']);
 $router->post('/forgot-password', [AuthController::class, 'sendResetLink']);
 $router->get('/reset-password/{token}', [AuthController::class, 'showResetPassword']);
 $router->post('/reset-password/{token}', [AuthController::class, 'updatePassword']);
+$router->get('/two-factor', [TwoFactorController::class, 'settings']);
+$router->post('/two-factor/enable', [TwoFactorController::class, 'enable']);
+$router->post('/two-factor/disable', [TwoFactorController::class, 'disable']);
 
 $router->get('/', [DashboardController::class, 'index']);
 

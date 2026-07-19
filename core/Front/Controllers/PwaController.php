@@ -4,6 +4,9 @@ namespace Core\Front\Controllers;
 
 use Core\Database;
 use Core\Settings;
+use Core\Support\Csrf;
+use Core\Support\RateLimiter;
+use Core\Support\Request;
 use Core\Support\Url;
 
 /**
@@ -20,6 +23,7 @@ final class PwaController
 
         echo \Core\View::renderLayout($layout, $view, [
             'pushPublicKey' => \Core\Push::isSupported() ? \Core\Push::publicKey() : '',
+            'pushCsrfToken' => Csrf::token(),
             'pageTitle' => 'إضافة الموقع لشاشتك الرئيسية',
             'metaDescription' => 'طريقة تثبيت الموقع كتطبيق على جوالك وتفعيل التنبيهات.',
         ]);
@@ -29,6 +33,21 @@ final class PwaController
     public function pushSubscribe(array $params): void
     {
         header('Content-Type: application/json; charset=utf-8');
+
+        $csrfToken = (string) ($_SERVER['HTTP_X_CSRF_TOKEN'] ?? '');
+        if (!Csrf::verify($csrfToken)) {
+            http_response_code(419);
+            echo json_encode(['ok' => false]);
+            return;
+        }
+
+        $throttleKey = 'push_subscribe:' . Request::ip();
+        if (RateLimiter::tooManyAttempts($throttleKey, 10, 60)) {
+            http_response_code(429);
+            echo json_encode(['ok' => false]);
+            return;
+        }
+        RateLimiter::hit($throttleKey);
 
         if (!Database::tableExists('push_subscriptions')) {
             http_response_code(503);
@@ -42,8 +61,11 @@ final class PwaController
         $p256dh = (string) ($data['keys']['p256dh'] ?? '');
         $auth = (string) ($data['keys']['auth'] ?? '');
 
-        if (!filter_var($endpoint, FILTER_VALIDATE_URL) || !str_starts_with($endpoint, 'https://')
-            || $p256dh === '' || $auth === '' || strlen($endpoint) > 500) {
+        if (!filter_var($endpoint, FILTER_VALIDATE_URL) || !\Core\Push::isSafeEndpoint($endpoint)
+            || $p256dh === '' || $auth === '' || strlen($endpoint) > 500
+            || strlen($p256dh) > 255 || strlen($auth) > 255
+            || !preg_match('/^[A-Za-z0-9_-]+$/', $p256dh)
+            || !preg_match('/^[A-Za-z0-9_-]+$/', $auth)) {
             http_response_code(422);
             echo json_encode(['ok' => false]);
             return;

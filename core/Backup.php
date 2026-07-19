@@ -8,9 +8,29 @@ namespace Core;
  */
 final class Backup
 {
+    private const ENCRYPTED_MAGIC = "HNTB1";
+    private const ENCRYPTION_CHUNK = 1048576;
+
     public static function backupsDir(): string
     {
-        return STORAGE_PATH . '/backups';
+        $configured = defined('BACKUP_PATH') ? rtrim((string) BACKUP_PATH, '/\\') : '';
+        $dir = $configured !== '' ? $configured : STORAGE_PATH . '/backups';
+        if (!is_dir($dir) && !mkdir($dir, 0700, true) && !is_dir($dir)) {
+            throw new \RuntimeException('تعذر إنشاء مجلد النسخ الاحتياطية.');
+        }
+        @chmod($dir, 0700);
+        return $dir;
+    }
+
+    public static function resolveBackupPath(string $fileName): string
+    {
+        $fileName = basename($fileName);
+        $primary = self::backupsDir() . '/' . $fileName;
+        if (is_file($primary)) {
+            return $primary;
+        }
+        $legacy = STORAGE_PATH . '/backups/' . $fileName;
+        return is_file($legacy) ? $legacy : $primary;
     }
 
     public static function dumpDatabase(): string
@@ -57,6 +77,9 @@ final class Backup
         fwrite($handle, "SET FOREIGN_KEY_CHECKS=1;\n");
         fclose($handle);
 
+        $fileName = self::encryptBackup($filePath, 'D');
+        $filePath = self::backupsDir() . '/' . $fileName;
+
         Database::insert('backups_log', [
             'type' => 'database',
             'file_path' => $fileName,
@@ -94,6 +117,8 @@ final class Backup
         }
 
         $zip->close();
+        $fileName = self::encryptBackup($filePath, 'F');
+        $filePath = self::backupsDir() . '/' . $fileName;
 
         Database::insert('backups_log', [
             'type' => 'files',
@@ -118,7 +143,7 @@ final class Backup
     {
         $row = Database::fetchOne('SELECT * FROM ' . Database::table('backups_log') . ' WHERE id = ?', [$id]);
         if ($row) {
-            $path = self::backupsDir() . '/' . $row['file_path'];
+            $path = self::resolveBackupPath($row['file_path']);
             if (is_file($path)) {
                 @unlink($path);
             }
@@ -154,8 +179,128 @@ final class Backup
             if ($statement === '' || str_starts_with($statement, '--')) {
                 continue;
             }
+            if (!self::isAllowedRestoreStatement($statement)) {
+                throw new \RuntimeException('يحتوي ملف النسخة الاحتياطية على أمر SQL غير مسموح به.');
+            }
             $pdo->exec($statement);
         }
+    }
+
+    /** يفك نسخة قاعدة بيانات مشفرة إلى ملف مؤقت ويعيد مساره. */
+    public static function decryptDatabaseBackup(string $encryptedPath): string
+    {
+        $output = STORAGE_PATH . '/temp/restore-dec-' . bin2hex(random_bytes(8)) . '.sql';
+        self::decryptBackup($encryptedPath, $output, 'D');
+        return $output;
+    }
+
+    private static function encryptBackup(string $plainPath, string $type): string
+    {
+        $secret = defined('BACKUP_ENCRYPTION_KEY') ? trim((string) BACKUP_ENCRYPTION_KEY) : '';
+        if ($secret === '') {
+            return basename($plainPath);
+        }
+        if (!function_exists('sodium_crypto_secretstream_xchacha20poly1305_init_push')) {
+            throw new \RuntimeException('مكتبة Sodium مطلوبة لتشفير النسخ الاحتياطية.');
+        }
+
+        $key = sodium_crypto_generichash($secret, '', SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_KEYBYTES);
+        [$state, $header] = sodium_crypto_secretstream_xchacha20poly1305_init_push($key);
+        $encryptedPath = $plainPath . '.enc';
+        $input = fopen($plainPath, 'rb');
+        $output = fopen($encryptedPath, 'wb');
+        if (!$input || !$output) {
+            throw new \RuntimeException('تعذر فتح ملف النسخة الاحتياطية للتشفير.');
+        }
+        fwrite($output, self::ENCRYPTED_MAGIC . $type . $header);
+
+        $current = fread($input, self::ENCRYPTION_CHUNK);
+        if ($current === false || $current === '') {
+            fwrite($output, sodium_crypto_secretstream_xchacha20poly1305_push(
+                $state,
+                '',
+                '',
+                SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_TAG_FINAL
+            ));
+        }
+        while ($current !== false && $current !== '') {
+            $next = fread($input, self::ENCRYPTION_CHUNK);
+            $tag = ($next === false || $next === '')
+                ? SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_TAG_FINAL
+                : SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_TAG_MESSAGE;
+            fwrite($output, sodium_crypto_secretstream_xchacha20poly1305_push($state, $current, '', $tag));
+            $current = $next;
+        }
+        fclose($input);
+        fclose($output);
+        @chmod($encryptedPath, 0600);
+        @unlink($plainPath);
+        sodium_memzero($key);
+        return basename($encryptedPath);
+    }
+
+    private static function decryptBackup(string $encryptedPath, string $outputPath, string $expectedType): void
+    {
+        $secret = defined('BACKUP_ENCRYPTION_KEY') ? trim((string) BACKUP_ENCRYPTION_KEY) : '';
+        if ($secret === '' || !function_exists('sodium_crypto_secretstream_xchacha20poly1305_init_pull')) {
+            throw new \RuntimeException('مفتاح أو مكتبة فك تشفير النسخة الاحتياطية غير متوفر.');
+        }
+        $input = fopen($encryptedPath, 'rb');
+        $output = fopen($outputPath, 'wb');
+        if (!$input || !$output) {
+            throw new \RuntimeException('تعذر فتح ملف النسخة الاحتياطية المشفرة.');
+        }
+
+        $prefix = fread($input, strlen(self::ENCRYPTED_MAGIC) + 1);
+        $header = fread($input, SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_HEADERBYTES);
+        if ($prefix !== self::ENCRYPTED_MAGIC . $expectedType || strlen($header) !== SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_HEADERBYTES) {
+            fclose($input); fclose($output); @unlink($outputPath);
+            throw new \RuntimeException('نوع ملف النسخة الاحتياطية المشفرة غير صالح.');
+        }
+
+        $key = sodium_crypto_generichash($secret, '', SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_KEYBYTES);
+        $state = sodium_crypto_secretstream_xchacha20poly1305_init_pull($header, $key);
+        $sawFinal = false;
+        while (!feof($input)) {
+            $cipher = fread($input, self::ENCRYPTION_CHUNK + SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_ABYTES);
+            if ($cipher === false || $cipher === '') {
+                break;
+            }
+            $result = sodium_crypto_secretstream_xchacha20poly1305_pull($state, $cipher);
+            if ($result === false) {
+                fclose($input); fclose($output); @unlink($outputPath);
+                throw new \RuntimeException('فشل التحقق من سلامة النسخة الاحتياطية المشفرة.');
+            }
+            [$plain, $tag] = $result;
+            fwrite($output, $plain);
+            if ($tag === SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_TAG_FINAL) {
+                $sawFinal = true;
+                break;
+            }
+        }
+        fclose($input);
+        fclose($output);
+        sodium_memzero($key);
+        if (!$sawFinal) {
+            @unlink($outputPath);
+            throw new \RuntimeException('ملف النسخة الاحتياطية المشفرة مبتور أو غير مكتمل.');
+        }
+        @chmod($outputPath, 0600);
+    }
+
+    private static function isAllowedRestoreStatement(string $statement): bool
+    {
+        $normalized = ltrim($statement);
+        if (preg_match('/^SET\s+FOREIGN_KEY_CHECKS\s*=\s*[01]$/i', $normalized)) {
+            return true;
+        }
+
+        if (!preg_match('/^(DROP\s+TABLE\s+IF\s+EXISTS|CREATE\s+TABLE|INSERT\s+INTO)\s+`([^`]+)`/i', $normalized, $match)) {
+            return false;
+        }
+
+        $prefix = Database::prefix();
+        return $prefix === '' || str_starts_with($match[2], $prefix);
     }
 
     private static function splitSqlStatements(string $sql): array

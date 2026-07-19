@@ -71,7 +71,7 @@ $renderNode = function (array $n, bool $isRoot) use (&$renderNode, $byParent, $p
   <div class="family-tree-actions" style="display:flex;gap:10px;margin:14px 0;flex-wrap:wrap">
     <a class="btn btn-sm <?= $viewMode === 'tree' ? 'btn-primary' : 'btn-outline-dark' ?>" href="<?= Url::to('tree') ?>"><?= $treeImageUrl ? 'الصورة' : 'الخريطة' ?></a>
     <a class="btn btn-sm <?= $viewMode === 'sequential' ? 'btn-primary' : 'btn-outline-dark' ?>" href="<?= Url::to('tree?view=sequential') ?>">عرض تسلسلي</a>
-    <button class="btn btn-sm btn-outline-dark" onclick="window.print()">طباعة</button>
+    <button class="btn btn-sm btn-outline-dark" data-print-page>طباعة</button>
   </div>
 
   <?php if ($viewMode === 'tree' && $treeImageUrl): ?>

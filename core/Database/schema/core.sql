@@ -189,6 +189,15 @@ CREATE TABLE IF NOT EXISTS `{prefix}password_resets` (
   KEY `password_resets_user_idx` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS `{prefix}admin_user_mfa` (
+  `user_id` INT UNSIGNED NOT NULL,
+  `secret_encrypted` TEXT NOT NULL,
+  `recovery_codes` TEXT NOT NULL,
+  `enabled_at` DATETIME NOT NULL,
+  `updated_at` DATETIME NOT NULL,
+  PRIMARY KEY (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS `{prefix}push_subscriptions` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `endpoint` VARCHAR(500) NOT NULL,

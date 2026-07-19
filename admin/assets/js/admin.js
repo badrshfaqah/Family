@@ -16,5 +16,11 @@
         }
       });
     });
+
+    document.querySelectorAll('[data-auto-submit]').forEach(function (el) {
+      el.addEventListener('change', function () {
+        if (el.form) el.form.submit();
+      });
+    });
   });
 })();

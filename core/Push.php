@@ -50,6 +50,11 @@ final class Push
         return (string) Settings::get('push_vapid_public', '');
     }
 
+    public static function isSafeEndpoint(string $endpoint): bool
+    {
+        return self::resolveSafeEndpoint($endpoint) !== null;
+    }
+
     /**
      * إرسال إشعار لكل المشتركين. يعيد [sent, failed, removed].
      * يحذف الاشتراكات الميتة (404/410) تلقائيًا.
@@ -86,6 +91,11 @@ final class Push
     public static function sendToSubscription(array $sub, array $payload): int
     {
         $endpoint = $sub['endpoint'];
+        $resolved = self::resolveSafeEndpoint($endpoint);
+        if ($resolved === null) {
+            Support\Logger::error('unsafe push endpoint rejected', ['endpoint' => substr($endpoint, 0, 100)]);
+            return 410;
+        }
         $userPublic = self::b64urlDecode($sub['p256dh']);
         $userAuth = self::b64urlDecode($sub['auth']);
         if (strlen($userPublic) !== 65 || strlen($userAuth) < 16) {
@@ -101,6 +111,11 @@ final class Push
             CURLOPT_POSTFIELDS => $body,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_TIMEOUT => 15,
+            CURLOPT_CONNECTTIMEOUT => 5,
+            CURLOPT_PROTOCOLS => CURLPROTO_HTTPS,
+            CURLOPT_REDIR_PROTOCOLS => CURLPROTO_HTTPS,
+            CURLOPT_FOLLOWLOCATION => false,
+            CURLOPT_RESOLVE => [$resolved['host'] . ':443:' . $resolved['ip']],
             CURLOPT_HTTPHEADER => [
                 'Content-Type: application/octet-stream',
                 'Content-Encoding: aes128gcm',
@@ -115,6 +130,26 @@ final class Push
         curl_close($ch);
 
         return $code;
+    }
+
+    /** يحظر loopback والشبكات الخاصة ويثبّت نتيجة DNS لمنع DNS rebinding. */
+    private static function resolveSafeEndpoint(string $endpoint): ?array
+    {
+        $parts = parse_url($endpoint);
+        if (!is_array($parts) || strtolower((string) ($parts['scheme'] ?? '')) !== 'https'
+            || empty($parts['host']) || (isset($parts['port']) && (int) $parts['port'] !== 443)
+            || isset($parts['user']) || isset($parts['pass'])) {
+            return null;
+        }
+
+        $host = strtolower(rtrim((string) $parts['host'], '.'));
+        $ips = filter_var($host, FILTER_VALIDATE_IP) ? [$host] : (gethostbynamel($host) ?: []);
+        foreach ($ips as $ip) {
+            if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
+                return ['host' => $host, 'ip' => $ip];
+            }
+        }
+        return null;
     }
 
     /** تشفير الحمولة وفق RFC 8291 (aes128gcm) */

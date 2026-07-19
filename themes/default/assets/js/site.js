@@ -24,6 +24,7 @@
   }
 
   document.addEventListener('DOMContentLoaded', function () {
+    initDeclarativeActions();
     initMobileNav();
     initCountdowns();
     initShare();
@@ -31,6 +32,17 @@
     initA2hs();
     initPush();
   });
+
+  function initDeclarativeActions() {
+    document.querySelectorAll('[data-auto-submit]').forEach(function (el) {
+      el.addEventListener('change', function () {
+        if (el.form) el.form.submit();
+      });
+    });
+    document.querySelectorAll('[data-print-page]').forEach(function (el) {
+      el.addEventListener('click', function () { window.print(); });
+    });
+  }
 
   // بانر "أضف للشاشة الرئيسية" + التثبيت المباشر حيث يدعمه المتصفح
   function initA2hs() {
@@ -135,7 +147,10 @@
           }).then(function (sub) {
             return fetch(btn.getAttribute('data-subscribe-url') || 'push/subscribe', {
               method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
+              headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-Token': btn.getAttribute('data-csrf-token') || ''
+              },
               body: JSON.stringify(sub)
             });
           }).then(function (res) {

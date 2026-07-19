@@ -14,6 +14,10 @@ use Core\View;
 
 final class ModulesController
 {
+    private const MAX_ZIP_BYTES = 20 * 1024 * 1024;
+    private const MAX_EXTRACTED_BYTES = 100 * 1024 * 1024;
+    private const MAX_ZIP_ENTRIES = 2000;
+
     public function index(array $params): void
     {
         Auth::requirePermission('system.modules');
@@ -34,6 +38,7 @@ final class ModulesController
             'contentView' => CORE_PATH . '/Admin/Views/modules/index.php',
             'modules' => $modules,
             'zipSupported' => class_exists('ZipArchive'),
+            'moduleUploadEnabled' => defined('ALLOW_MODULE_UPLOAD') && ALLOW_MODULE_UPLOAD === true,
         ]);
     }
 
@@ -80,6 +85,11 @@ final class ModulesController
         Auth::requirePermission('system.modules');
         Csrf::verifyRequestOrFail();
 
+        if (!defined('ALLOW_MODULE_UPLOAD') || ALLOW_MODULE_UPLOAD !== true) {
+            Session::flash('error', 'رفع الإضافات معطّل في إعدادات الإنتاج. فعّله صراحةً فقط عند رفع حزمة موثوقة.');
+            Response::redirect(Url::admin('modules'));
+        }
+
         if (!class_exists('ZipArchive')) {
             Session::flash('error', 'مكتبة ZipArchive غير متوفرة على هذا السيرفر، الرجاء رفع الإضافة عبر مدير الملفات مباشرة إلى مجلد modules.');
             Response::redirect(Url::admin('modules'));
@@ -91,6 +101,14 @@ final class ModulesController
             Response::redirect(Url::admin('modules'));
         }
 
+        if (($file['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK
+            || (int) ($file['size'] ?? 0) < 1
+            || (int) $file['size'] > self::MAX_ZIP_BYTES
+            || strtolower(pathinfo((string) $file['name'], PATHINFO_EXTENSION)) !== 'zip') {
+            Session::flash('error', 'حزمة الإضافة غير صالحة أو يتجاوز حجمها 20 ميجابايت.');
+            Response::redirect(Url::admin('modules'));
+        }
+
         $tmpExtractDir = STORAGE_PATH . '/temp/module-' . Str::random(8);
         mkdir($tmpExtractDir, 0755, true);
 
@@ -99,7 +117,18 @@ final class ModulesController
             Session::flash('error', 'تعذر فتح ملف ZIP، تأكد من أنه غير تالف.');
             Response::redirect(Url::admin('modules'));
         }
-        $zip->extractTo($tmpExtractDir);
+
+        try {
+            $this->validateArchive($zip);
+            if (!$zip->extractTo($tmpExtractDir)) {
+                throw new \RuntimeException('تعذر استخراج حزمة الإضافة.');
+            }
+        } catch (\Throwable $e) {
+            $zip->close();
+            $this->rrmdir($tmpExtractDir);
+            Session::flash('error', $e->getMessage());
+            Response::redirect(Url::admin('modules'));
+        }
         $zip->close();
 
         $manifestPath = $this->findManifest($tmpExtractDir);
@@ -117,6 +146,11 @@ final class ModulesController
         }
 
         $slug = preg_replace('/[^a-z0-9\-]/', '', strtolower($manifest['slug']));
+        if ($slug === '' || $slug !== strtolower((string) $manifest['slug'])) {
+            $this->rrmdir($tmpExtractDir);
+            Session::flash('error', 'معرّف الإضافة غير صالح. استخدم أحرفًا إنجليزية صغيرة وأرقامًا وشرطة فقط.');
+            Response::redirect(Url::admin('modules'));
+        }
         $target = ModuleManager::modulesPath() . '/' . $slug;
 
         if (is_dir($target)) {
@@ -145,6 +179,38 @@ final class ModulesController
             }
         }
         return null;
+    }
+
+    private function validateArchive(\ZipArchive $zip): void
+    {
+        if ($zip->numFiles < 1 || $zip->numFiles > self::MAX_ZIP_ENTRIES) {
+            throw new \RuntimeException('عدد الملفات داخل الحزمة غير مسموح به.');
+        }
+
+        $expandedBytes = 0;
+        for ($i = 0; $i < $zip->numFiles; $i++) {
+            $stat = $zip->statIndex($i);
+            $name = str_replace('\\', '/', (string) ($stat['name'] ?? ''));
+            $parts = explode('/', $name);
+            if ($name === '' || str_contains($name, "\0") || str_starts_with($name, '/')
+                || preg_match('/^[a-zA-Z]:\//', $name) || in_array('..', $parts, true)) {
+                throw new \RuntimeException('تحتوي الحزمة على مسار ملف غير آمن.');
+            }
+
+            $expandedBytes += (int) ($stat['size'] ?? 0);
+            if ($expandedBytes > self::MAX_EXTRACTED_BYTES) {
+                throw new \RuntimeException('الحجم المستخرج للحزمة يتجاوز الحد المسموح.');
+            }
+
+            $opsys = 0;
+            $attributes = 0;
+            if ($zip->getExternalAttributesIndex($i, $opsys, $attributes)) {
+                $fileType = ($attributes >> 16) & 0170000;
+                if ($fileType === 0120000) {
+                    throw new \RuntimeException('لا يُسمح بالروابط الرمزية داخل حزمة الإضافة.');
+                }
+            }
+        }
     }
 
     private function rrmdir(string $dir): void

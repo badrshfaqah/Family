@@ -60,7 +60,7 @@ $currentFont = $settings['theme_font'] ?? 'default';
   <button class="btn btn-primary" type="submit">حفظ</button>
 </form>
 
-<script>
+<script nonce="<?= \Core\Support\Security::cspNonce() ?>">
 document.querySelectorAll('.btn-preset').forEach(function (btn) {
   btn.addEventListener('click', function () {
     document.getElementById('theme_color_primary').value = btn.getAttribute('data-primary');

@@ -35,7 +35,7 @@ if (!empty($item['excerpt'])) {
     $jsonLd['description'] = $item['excerpt'];
 }
 ?>
-<script type="application/ld+json"><?= str_replace('</', '<\/', json_encode($jsonLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)) ?></script>
+<script type="application/ld+json" nonce="<?= \Core\Support\Security::cspNonce() ?>"><?= str_replace('</', '<\/', json_encode($jsonLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)) ?></script>
 <div class="container section">
   <div class="breadcrumbs"><a href="<?= Url::to('') ?>">الرئيسية</a> / <a href="<?= Url::to('news') ?>"><?= View::e(Terms::phrase('news')) ?></a> / <?= View::e($item['title']) ?></div>
 

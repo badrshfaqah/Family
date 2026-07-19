@@ -12,7 +12,12 @@ final class Mail
     public static function send(string $toEmail, string $subject, string $bodyHtml): bool
     {
         $fromName = Settings::get('mail_from_name', '') ?: Settings::get('identity_short_name', 'الموقع');
-        $fromEmail = Settings::get('mail_from_email', '') ?: ('no-reply@' . ($_SERVER['HTTP_HOST'] ?? 'localhost'));
+        $fromEmail = Settings::get('mail_from_email', '') ?: ('no-reply@' . self::serverHostname());
+        $fromEmail = filter_var($fromEmail, FILTER_VALIDATE_EMAIL) ?: 'no-reply@example.invalid';
+        $toEmail = filter_var($toEmail, FILTER_VALIDATE_EMAIL) ?: '';
+        if ($toEmail === '') {
+            return false;
+        }
 
         $smtpHost = Settings::get('mail_smtp_host', '');
 
@@ -51,12 +56,12 @@ final class Mail
         }
 
         self::expect($socket, '220');
-        self::command($socket, 'EHLO ' . ($_SERVER['HTTP_HOST'] ?? 'localhost'), '250');
+        self::command($socket, 'EHLO ' . self::serverHostname(), '250');
 
         if ($encryption === 'tls') {
             self::command($socket, 'STARTTLS', '220');
             stream_socket_enable_crypto($socket, true, STREAM_CRYPTO_METHOD_TLS_CLIENT);
-            self::command($socket, 'EHLO ' . ($_SERVER['HTTP_HOST'] ?? 'localhost'), '250');
+            self::command($socket, 'EHLO ' . self::serverHostname(), '250');
         }
 
         if ($user !== '') {
@@ -107,5 +112,11 @@ final class Mail
     private static function encodeHeader(string $value): string
     {
         return '=?UTF-8?B?' . base64_encode($value) . '?=';
+    }
+
+    private static function serverHostname(): string
+    {
+        $host = (string) parse_url(Support\Url::origin(), PHP_URL_HOST);
+        return preg_match('/^[a-zA-Z0-9.-]+$/', $host) ? $host : 'localhost.localdomain';
     }
 }

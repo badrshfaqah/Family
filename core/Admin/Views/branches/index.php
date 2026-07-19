@@ -35,7 +35,7 @@ use Core\View;
             <option value="inactive" <?= $b['status'] === 'inactive' ? 'selected' : '' ?>>موقوف</option>
           </select>
           <button class="btn btn-secondary btn-sm" type="submit">حفظ</button>
-          <button class="btn btn-danger btn-sm" type="submit" formaction="<?= Url::admin('branches/' . $b['id'] . '/delete') ?>" onclick="return confirm('حذف هذا الفرع؟')">حذف</button>
+          <button class="btn btn-danger btn-sm" type="submit" formaction="<?= Url::admin('branches/' . $b['id'] . '/delete') ?>" data-confirm="حذف هذا الفرع؟">حذف</button>
         </form>
         </td>
       </tr>
