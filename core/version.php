@@ -2,5 +2,5 @@
 
 // إصدار نواة النظام. يُستخدم في التحقق من توافق الإضافات وشاشة معلومات النظام.
 if (!defined('CORE_VERSION')) {
-    define('CORE_VERSION', '1.3.2');
+    define('CORE_VERSION', '1.3.3');
 }
