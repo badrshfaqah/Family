@@ -14,7 +14,6 @@ $requiredExtensions = [
     'session' => 'جلسات تسجيل الدخول',
     'dom' => 'تنقية HTML الآمنة ومنع XSS',
     'openssl' => 'تشفير مفاتيح المصادقة الثنائية',
-    'sodium' => 'تشفير النسخ الاحتياطية بصورة تدفقية',
 ];
 
 $extensionChecks = [];
@@ -24,6 +23,7 @@ foreach ($requiredExtensions as $ext => $desc) {
 
 $optionalExtensions = [
     'zip' => 'رفع الإضافات بصيغة ZIP والنسخ الاحتياطي للملفات',
+    'sodium' => 'تشفير النسخ الاحتياطية بصورة تدفقية (يلزم فقط عند ضبط BACKUP_ENCRYPTION_KEY)',
 ];
 $optionalChecks = [];
 foreach ($optionalExtensions as $ext => $desc) {
