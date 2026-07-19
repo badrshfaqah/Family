@@ -58,6 +58,7 @@ $router->get('/backup/{file}/download', [BackupController::class, 'download']);
 $router->post('/backup/{id}/delete', [BackupController::class, 'delete']);
 
 $router->get('/logs', [LogsController::class, 'index']);
+$router->get('/logs/users', [LogsController::class, 'userActivity']);
 
 $router->get('/media', [MediaController::class, 'index']);
 $router->post('/media/upload', [MediaController::class, 'upload']);
