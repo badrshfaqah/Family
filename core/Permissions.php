@@ -67,17 +67,19 @@ final class Permissions
         $all = self::allKeys();
 
         return [
+            // مدير النظام: كل الصلاحيات دائمًا (ولا يمكن تقييده من واجهة الأدوار)
             'system_admin' => $all,
-            'content_manager' => [
-                'content.news', 'content.events', 'content.gatherings', 'content.pages',
-                'content.media', 'content.archive', 'content.announcements', 'content.tree',
-                'reports.view',
+            // مدير الموقع: كل شيء عدا إدارة المستخدمين والإضافات والنسخ الاحتياطي
+            'site_manager' => array_values(array_merge(
+                array_diff($all, ['system.users', 'system.modules', 'system.backup']),
+                ['content.obituaries']
+            )),
+            // محتوى: إدارة المحتوى فقط دون بيانات جوال العائلة أو أي إعدادات نظام
+            'content_editor' => [
+                'content.news', 'content.events', 'content.gatherings', 'content.obituaries',
+                'content.pages', 'content.media', 'content.archive', 'content.announcements',
+                'content.tree', 'reports.view',
             ],
-            'communication_manager' => [
-                'directory.view', 'directory.manage', 'directory.export',
-                'newsletter.manage', 'templates.manage', 'reports.view',
-            ],
-            'viewer' => ['reports.view'],
         ];
     }
 }

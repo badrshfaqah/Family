@@ -21,9 +21,8 @@ final class DefaultSeeder
     {
         $roles = [
             ['slug' => 'system_admin', 'name' => 'مدير النظام', 'is_system' => 1],
-            ['slug' => 'content_manager', 'name' => 'مدير المحتوى', 'is_system' => 1],
-            ['slug' => 'communication_manager', 'name' => 'مدير التواصل', 'is_system' => 1],
-            ['slug' => 'viewer', 'name' => 'مشاهد', 'is_system' => 1],
+            ['slug' => 'site_manager', 'name' => 'مدير الموقع', 'is_system' => 1],
+            ['slug' => 'content_editor', 'name' => 'محتوى', 'is_system' => 1],
         ];
 
         $roleIds = [];
