@@ -156,6 +156,15 @@ $bottomNav = [
     ['match' => 'directory', 'url' => Url::to('directory/register'), 'icon' => '📱', 'label' => 'جوال القبيلة', 'show' => \Core\ModuleManager::isEnabled('directory')],
 ];
 ?>
+<div class="a2hs-bar" data-a2hs hidden>
+  <span class="a2hs-text">📲 أضف الموقع لشاشتك الرئيسية وفعّل التنبيهات</span>
+  <span class="a2hs-actions">
+    <button class="btn btn-sm btn-primary" data-a2hs-install hidden>تثبيت</button>
+    <a class="btn btn-sm btn-outline-dark" href="<?= Url::to('install-app') ?>">الطريقة</a>
+    <button class="a2hs-close" data-a2hs-close aria-label="إغلاق">✕</button>
+  </span>
+</div>
+
 <nav class="bottom-nav" aria-label="التنقل السريع">
   <?php foreach ($bottomNav as $item): if (!$item['show']) continue;
       $isActive = $item['match'] === '' ? $currentRel === '' : str_starts_with($currentRel . '/', $item['match'] . '/');

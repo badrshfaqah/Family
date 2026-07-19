@@ -6,7 +6,99 @@
     initCountdowns();
     initShare();
     initAnnouncements();
+    initA2hs();
+    initPush();
   });
+
+  // بانر "أضف للشاشة الرئيسية" + التثبيت المباشر حيث يدعمه المتصفح
+  function initA2hs() {
+    var deferredPrompt = null;
+
+    window.addEventListener('beforeinstallprompt', function (e) {
+      e.preventDefault();
+      deferredPrompt = e;
+      document.querySelectorAll('[data-a2hs-install]').forEach(function (b) { b.hidden = false; });
+      var pageCard = document.querySelector('[data-android-install]');
+      if (pageCard) pageCard.hidden = false;
+    });
+
+    document.addEventListener('click', function (e) {
+      var trigger = e.target.closest('[data-a2hs-install],[data-a2hs-install-page]');
+      if (!trigger || !deferredPrompt) return;
+      deferredPrompt.prompt();
+      deferredPrompt = null;
+    });
+
+    var bar = document.querySelector('[data-a2hs]');
+    if (!bar) return;
+
+    var standalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+    if (standalone || localStorage.getItem('fam_a2hs_closed') === '1') return;
+
+    bar.hidden = false;
+    bar.querySelector('[data-a2hs-close]').addEventListener('click', function () {
+      bar.hidden = true;
+      localStorage.setItem('fam_a2hs_closed', '1');
+    });
+  }
+
+  // تفعيل تنبيهات Push والاشتراك فيها
+  function initPush() {
+    var btn = document.querySelector('[data-push-enable]');
+    if (!btn) return;
+
+    var status = document.querySelector('[data-push-status]');
+    function say(msg) { if (status) status.textContent = msg; }
+
+    if (!('serviceWorker' in navigator) || !('PushManager' in window) || !('Notification' in window)) {
+      btn.disabled = true;
+      say('متصفحك لا يدعم التنبيهات حاليًا — على الآيفون ثبّت الموقع على الشاشة الرئيسية أولًا ثم افتحه من الأيقونة.');
+      return;
+    }
+
+    if (Notification.permission === 'granted') {
+      say('التنبيهات مأذون بها مسبقًا — اضغط الزر لتأكيد الاشتراك.');
+    }
+
+    btn.addEventListener('click', function () {
+      Notification.requestPermission().then(function (permission) {
+        if (permission !== 'granted') {
+          say('لم يُمنح الإذن — يمكنك السماح بالتنبيهات من إعدادات المتصفح ثم المحاولة مجددًا.');
+          return;
+        }
+        navigator.serviceWorker.ready.then(function (reg) {
+          return reg.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: urlBase64ToUint8Array(btn.getAttribute('data-vapid'))
+          });
+        }).then(function (sub) {
+          return fetch(btn.getAttribute('data-subscribe-url') || 'push/subscribe', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(sub)
+          });
+        }).then(function (res) {
+          if (res.ok) {
+            say('✅ تم تفعيل التنبيهات بنجاح — سيصلك كل جديد');
+            btn.textContent = '✅ التنبيهات مفعلة';
+          } else {
+            say('تعذر حفظ الاشتراك، حاول مرة أخرى.');
+          }
+        }).catch(function () {
+          say('تعذر التفعيل، حاول مرة أخرى.');
+        });
+      });
+    });
+  }
+
+  function urlBase64ToUint8Array(base64String) {
+    var padding = '='.repeat((4 - base64String.length % 4) % 4);
+    var base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+    var raw = window.atob(base64);
+    var output = new Uint8Array(raw.length);
+    for (var i = 0; i < raw.length; ++i) output[i] = raw.charCodeAt(i);
+    return output;
+  }
 
   function initMobileNav() {
     var trigger = document.querySelector('[data-nav-trigger]');

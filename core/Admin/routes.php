@@ -60,6 +60,9 @@ $router->post('/backup/{id}/delete', [BackupController::class, 'delete']);
 $router->get('/logs', [LogsController::class, 'index']);
 $router->get('/logs/users', [LogsController::class, 'userActivity']);
 
+$router->get('/notifications', [\Core\Admin\Controllers\NotificationsController::class, 'index']);
+$router->post('/notifications/send', [\Core\Admin\Controllers\NotificationsController::class, 'send']);
+
 $router->get('/media', [MediaController::class, 'index']);
 $router->post('/media/upload', [MediaController::class, 'upload']);
 $router->post('/media/{id}/update', [MediaController::class, 'update']);

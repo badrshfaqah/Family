@@ -33,6 +33,7 @@ $systemMenu = [
     ['label' => 'النسخ الاحتياطي', 'url' => Url::admin('backup'), 'icon' => '💾', 'perm' => 'system.backup'],
     ['label' => 'سجل العمليات', 'url' => Url::admin('logs'), 'icon' => '🧾', 'perm' => 'system.logs'],
     ['label' => 'نشاط المستخدمين', 'url' => Url::admin('logs/users'), 'icon' => '👁️', 'perm' => 'system.users'],
+    ['label' => 'التنبيهات', 'url' => Url::admin('notifications'), 'icon' => '🔔', 'perm' => 'system.settings'],
     ['label' => 'الإعدادات', 'url' => Url::admin('settings'), 'icon' => '⚙️', 'perm' => 'system.settings'],
 ];
 

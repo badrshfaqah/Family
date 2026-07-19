@@ -12,6 +12,70 @@ use Core\Support\Url;
  */
 final class PwaController
 {
+    /** صفحة شرح إضافة الموقع للشاشة الرئيسية وتفعيل التنبيهات */
+    public function installApp(array $params): void
+    {
+        $layout = CORE_PATH . '/Front/Views/layouts/main.php';
+        $view = CORE_PATH . '/Front/Views/install-app.php';
+
+        echo \Core\View::renderLayout($layout, $view, [
+            'pushPublicKey' => \Core\Push::isSupported() ? \Core\Push::publicKey() : '',
+            'pageTitle' => 'إضافة الموقع لشاشتك الرئيسية',
+            'metaDescription' => 'طريقة تثبيت الموقع كتطبيق على جوالك وتفعيل التنبيهات.',
+        ]);
+    }
+
+    /** استقبال اشتراك التنبيهات من المتصفح وتخزينه */
+    public function pushSubscribe(array $params): void
+    {
+        header('Content-Type: application/json; charset=utf-8');
+
+        if (!Database::tableExists('push_subscriptions')) {
+            http_response_code(503);
+            echo json_encode(['ok' => false]);
+            return;
+        }
+
+        $raw = file_get_contents('php://input');
+        $data = json_decode((string) $raw, true);
+        $endpoint = (string) ($data['endpoint'] ?? '');
+        $p256dh = (string) ($data['keys']['p256dh'] ?? '');
+        $auth = (string) ($data['keys']['auth'] ?? '');
+
+        if (!filter_var($endpoint, FILTER_VALIDATE_URL) || !str_starts_with($endpoint, 'https://')
+            || $p256dh === '' || $auth === '' || strlen($endpoint) > 500) {
+            http_response_code(422);
+            echo json_encode(['ok' => false]);
+            return;
+        }
+
+        $hash = hash('sha256', $endpoint);
+        $exists = Database::fetchValue(
+            'SELECT id FROM ' . Database::table('push_subscriptions') . ' WHERE endpoint_hash = ?',
+            [$hash]
+        );
+
+        if ($exists) {
+            Database::update('push_subscriptions', [
+                'p256dh' => $p256dh,
+                'auth' => $auth,
+                'updated_at' => date('Y-m-d H:i:s'),
+            ], ['id' => $exists]);
+        } else {
+            Database::insert('push_subscriptions', [
+                'endpoint' => $endpoint,
+                'endpoint_hash' => $hash,
+                'p256dh' => $p256dh,
+                'auth' => $auth,
+                'user_agent' => substr($_SERVER['HTTP_USER_AGENT'] ?? '', 0, 255),
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s'),
+            ]);
+        }
+
+        echo json_encode(['ok' => true]);
+    }
+
     public function manifest(array $params): void
     {
         $shortName = Settings::get('identity_short_name', '') ?: Settings::get('identity_official_name', 'الموقع');

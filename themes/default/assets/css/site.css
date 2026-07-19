@@ -497,6 +497,38 @@ a{color:inherit;text-decoration:none}
 .tree-image{overflow:auto;border:1px solid var(--c-border);border-radius:var(--radius);background:#fff}
 .tree-image img{width:100%;height:auto}
 
+/* بانر "أضف للشاشة الرئيسية" */
+.a2hs-bar{
+  position:fixed;inset-inline:10px;z-index:49;
+  bottom:calc(70px + env(safe-area-inset-bottom));
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  background:var(--c-surface);border:1px solid var(--c-secondary);border-radius:14px;
+  padding:10px 12px;box-shadow:0 8px 24px rgba(60,44,24,.18);
+}
+.a2hs-bar[hidden]{display:none}
+.a2hs-text{font-size:.8rem;font-weight:700;min-width:0}
+.a2hs-actions{display:flex;align-items:center;gap:6px;flex:none}
+.a2hs-actions .btn-sm{padding:7px 12px;min-height:34px;font-size:.78rem}
+.a2hs-close{background:none;border:none;font-size:1rem;cursor:pointer;color:var(--c-muted);padding:4px}
+@media (min-width:960px){
+  .a2hs-bar{bottom:14px;max-width:520px;inset-inline:auto;left:14px}
+}
+
+/* صفحة إضافة الموقع للشاشة الرئيسية */
+.install-cards{max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+.install-card{
+  background:var(--c-surface);border:1px solid var(--c-border);border-radius:var(--radius);
+  padding:18px;box-shadow:var(--shadow);
+}
+.install-card-head{display:flex;align-items:center;gap:8px;font-size:1.02rem;margin-bottom:10px}
+.install-card-head span{font-size:1.3rem}
+.install-card p{margin:0 0 10px;color:var(--c-muted);font-size:.9rem}
+.install-steps{margin:0;padding-inline-start:20px;display:flex;flex-direction:column;gap:8px;font-size:.9rem}
+.install-key{
+  display:inline-block;background:#f3ead6;border:1px solid var(--c-secondary);
+  border-radius:8px;padding:1px 8px;font-weight:700;font-size:.84em;
+}
+
 /* Breadcrumbs */
 .breadcrumbs{font-size:.85rem;color:var(--c-muted);margin-bottom:14px}
 .breadcrumbs a{color:var(--c-primary)}

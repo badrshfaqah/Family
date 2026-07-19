@@ -32,6 +32,8 @@ $router->get('/family', [FamilyController::class, 'index']);
 $router->get('/manifest.webmanifest', [PwaController::class, 'manifest']);
 $router->get('/sw.js', [PwaController::class, 'serviceWorker']);
 $router->get('/pwa-icon-{size}.png', [PwaController::class, 'icon']);
+$router->get('/install-app', [PwaController::class, 'installApp']);
+$router->post('/push/subscribe', [PwaController::class, 'pushSubscribe']);
 
 $router->setNotFound(function () {
     NotFound::render();

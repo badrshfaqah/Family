@@ -1,0 +1,47 @@
+<?php
+/** @var bool $supported
+ *  @var int $subscribers
+ */
+use Core\Support\Csrf;
+use Core\Support\Url;
+use Core\View;
+?>
+<?php if (!$supported): ?>
+  <div class="alert alert-error">التنبيهات غير متاحة: الخادم لا يوفر دوال التشفير المطلوبة (OpenSSL / hash_hkdf / cURL).</div>
+<?php else: ?>
+
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:18px">
+  <div style="background:#fff;border:1px solid #e5e5e5;border-radius:12px;padding:14px;text-align:center">
+    <b style="font-size:1.5rem;display:block"><?= $subscribers ?></b>
+    <span class="form-hint">جهاز مشترك في التنبيهات</span>
+  </div>
+</div>
+
+<p class="form-hint" style="margin:0 0 14px">
+  يشترك الزوار من صفحة <a href="<?= Url::to('install-app') ?>" target="_blank">إضافة الموقع للشاشة الرئيسية</a>.
+  التنبيه يصل للأجهزة المشتركة فورًا حتى والموقع مغلق (على الآيفون يتطلب تثبيت الموقع كتطبيق أولًا).
+</p>
+
+<form method="post" action="<?= Url::admin('notifications/send') ?>" class="card-box" style="max-width:560px" data-confirm="إرسال التنبيه الآن لجميع الأجهزة المشتركة؟">
+  <?= Csrf::field() ?>
+
+  <div class="form-group">
+    <label>عنوان التنبيه</label>
+    <input class="form-control" name="title" maxlength="80" placeholder="مثال: دعوة لحضور اجتماع العائلة" required>
+  </div>
+
+  <div class="form-group">
+    <label>نص التنبيه</label>
+    <textarea class="form-control" name="body" rows="3" maxlength="200" placeholder="مثال: يسرنا دعوتكم لحضور الاجتماع السنوي يوم الجمعة القادمة بعد صلاة العصر"></textarea>
+  </div>
+
+  <div class="form-group">
+    <label>الرابط عند الضغط على التنبيه (اختياري)</label>
+    <input class="form-control" dir="ltr" name="url" placeholder="calendar أو رابط كامل https://...">
+    <div class="form-hint">اتركه فارغًا لفتح الصفحة الرئيسية.</div>
+  </div>
+
+  <button class="btn btn-primary btn-block" type="submit">🔔 إرسال التنبيه للجميع (<?= $subscribers ?>)</button>
+</form>
+
+<?php endif; ?>
