@@ -317,8 +317,8 @@ a{color:inherit;text-decoration:none}
 .quick-link{background:var(--c-surface);border:1px solid var(--c-border);border-radius:var(--radius);padding:14px 8px;text-align:center;font-weight:700;font-size:.85rem}
 .ql-icon{display:block;font-size:1.7rem;margin-bottom:6px;line-height:1}
 
-/* Footer */
-.site-footer{background:#2b2013;color:#e9e1d2;margin-top:36px;padding:32px 0 18px;position:relative}
+/* Footer: مضغوط وموسّط، مصمم للجوال أولًا */
+.site-footer{background:#2b2013;color:#e9e1d2;margin-top:36px;padding:22px 0 14px;position:relative;text-align:center}
 .site-footer::before{
   content:"";position:absolute;top:0;inset-inline:0;height:8px;
   background:
@@ -326,12 +326,22 @@ a{color:inherit;text-decoration:none}
     repeating-linear-gradient(45deg,var(--c-secondary) 0 5px,transparent 5px 10px),
     var(--c-primary-dark);
 }
-.site-footer h3{color:#fff;font-size:1rem;font-family:var(--font-heading)}
 .site-footer a{color:#d6c9b2}
-.footer-cols{display:grid;gap:24px;grid-template-columns:1fr}
-.social-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
-.social-row a{background:rgba(255,255,255,.08);width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center}
-.copyright{border-top:1px solid rgba(255,255,255,.1);margin-top:22px;padding-top:14px;font-size:.82rem;color:#b3a488;text-align:center}
+.footer-brand{color:#fff;font-weight:800;font-size:1.05rem}
+.footer-brief{color:#b3a488;font-size:.8rem;margin:4px auto 0;max-width:480px;line-height:1.7}
+.footer-links{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin:14px 0 0}
+.footer-links a{
+  background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);
+  border-radius:999px;padding:6px 13px;font-size:.76rem;font-weight:700;color:#e9e1d2;
+}
+.footer-services{
+  display:flex;flex-wrap:wrap;justify-content:center;gap:4px 16px;
+  margin:12px 0 0;font-size:.78rem;
+}
+.social-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:12px}
+.social-row a{background:rgba(255,255,255,.08);width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center}
+.footer-contact{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 16px;margin-top:10px;font-size:.78rem;color:#b3a488}
+.copyright{border-top:1px solid rgba(255,255,255,.1);margin-top:14px;padding-top:11px;font-size:.74rem;color:#b3a488;text-align:center;line-height:1.8}
 
 /* Empty state */
 .empty-state{text-align:center;padding:50px 16px;color:var(--c-muted)}
@@ -579,7 +589,6 @@ a{color:inherit;text-decoration:none}
   .grid-3{grid-template-columns:repeat(3,1fr)}
   .stats-grid{grid-template-columns:repeat(4,1fr)}
   .quick-links{grid-template-columns:repeat(6,1fr)}
-  .footer-cols{grid-template-columns:repeat(4,1fr)}
   .hero{min-height:380px}
   .hero-content h1{font-size:2rem}
   .hero-slider .slide{min-height:340px}
