@@ -235,6 +235,85 @@ a:hover{color:var(--accent)}
 .changelog-body hr{border:none;border-top:1px solid var(--border);margin:14px 0}
 .changelog-body code{background:var(--bg-3);border-radius:5px;padding:1px 6px;font-size:.8em}
 
+/* شريط الأرقام */
+.stats-strip{
+  display:grid;grid-template-columns:repeat(2,1fr);gap:14px;
+  background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);
+  padding:22px;box-shadow:var(--shadow-card);
+}
+@media(min-width:760px){.stats-strip{grid-template-columns:repeat(4,1fr)}}
+.stat{text-align:center}
+.stat b{
+  display:block;font-size:1.9rem;font-weight:900;line-height:1.2;
+  background:var(--gradient-1);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+}
+.stat span{color:var(--text-muted);font-size:.82rem;font-weight:700}
+
+/* معرض شاشات البرنامج */
+.shots{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+@media(min-width:960px){.shots{grid-template-columns:repeat(4,1fr)}}
+.shot{text-align:center}
+.shot .frame{
+  border-radius:22px;overflow:hidden;background:#fff;
+  border:1px solid var(--border);box-shadow:var(--shadow-lg);
+  aspect-ratio:9/16.6;display:flex;flex-direction:column;
+  transition:transform .25s;
+}
+.shot:hover .frame{transform:translateY(-6px)}
+.shot .cap{color:var(--text-muted);font-size:.8rem;font-weight:800;margin-top:12px}
+/* شاشة القفل مع تنبيه */
+.scr-lock{background:linear-gradient(180deg,#1a2440,#0F172A);color:#fff;padding:22px 10px;flex:1;display:flex;flex-direction:column}
+.scr-lock .clock{font-size:2.1rem;font-weight:300;text-align:center;letter-spacing:2px}
+.scr-lock .date{text-align:center;font-size:.6rem;opacity:.75;margin-bottom:16px}
+.notif{
+  background:rgba(255,255,255,.95);color:#1E293B;border-radius:14px;padding:9px 11px;
+  text-align:right;box-shadow:0 8px 22px rgba(0,0,0,.35);
+}
+.notif .nh{display:flex;align-items:center;gap:6px;font-size:.55rem;color:#64748B;margin-bottom:4px}
+.notif .nh .ic{width:15px;height:15px;border-radius:4px;background:linear-gradient(135deg,#5b4327,#3c2c18);display:inline-flex;align-items:center;justify-content:center;font-size:.5rem}
+.notif .nh .now{margin-inline-start:auto}
+.notif b{display:block;font-size:.66rem;margin-bottom:2px}
+.notif p{font-size:.6rem;color:#475569;line-height:1.6}
+.notif+.notif{margin-top:8px;opacity:.92}
+/* شاشات بألوان البرنامج التراثية */
+.scr{flex:1;background:#f5efe2;padding:10px;display:flex;flex-direction:column;gap:7px;overflow:hidden}
+.scr .bar{background:#5b4327;color:#fff;border-radius:9px;padding:6px 9px;font-size:.6rem;font-weight:800;text-align:right;display:flex;justify-content:space-between;align-items:center}
+.mini-cal{display:flex;align-items:center;gap:6px;background:#fffdf8;border:1px solid #e7dcc6;border-radius:10px;padding:6px}
+.mini-cal.hot{border-color:#c9a24b;background:linear-gradient(135deg,#fffdf8,#f8f0dd)}
+.mini-cal .d{flex:none;width:30px;text-align:center;background:#5b4327;color:#fff;border-radius:7px;padding:3px 0;font-size:.52rem;line-height:1.3}
+.mini-cal .d b{display:block;font-size:.72rem}
+.mini-cal .t{flex:1;text-align:right;min-width:0}
+.mini-cal .t b{display:block;font-size:.58rem;color:#2a2214;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mini-cal .t i{font-style:normal;font-size:.48rem;color:#83725a}
+.mini-cal .left{flex:none;background:#c9a24b;color:#2a220a;border-radius:999px;padding:2px 6px;font-size:.45rem;font-weight:800;white-space:nowrap}
+.mini-obit{background:#f7f5f0;border:1px solid #ddd6c8;border-inline-start:3px solid #8a8478;border-radius:10px;padding:7px 9px;text-align:right;display:flex;gap:6px;align-items:center}
+.mini-obit .t{flex:1;min-width:0}
+.mini-obit b{display:block;font-size:.58rem;color:#3c382f}
+.mini-obit i{font-style:normal;font-size:.48rem;color:#7a7466}
+.mini-obit .city{flex:none;background:#eceae3;border-radius:999px;padding:2px 6px;font-size:.45rem;font-weight:800;color:#5c574a}
+.mini-form{background:#fffdf8;border:1px solid #e7dcc6;border-radius:12px;padding:9px;display:flex;flex-direction:column;gap:6px;text-align:right}
+.mini-form .fld{background:#fff;border:1px solid #e7dcc6;border-radius:8px;padding:6px 8px;font-size:.52rem;color:#83725a}
+.mini-form .chips{display:flex;gap:4px;flex-wrap:wrap}
+.mini-form .chip{border:1px solid #e7dcc6;border-radius:999px;padding:3px 8px;font-size:.48rem;font-weight:800;color:#5b4327;background:#fff}
+.mini-form .chip.on{background:#c9a24b;border-color:#c9a24b;color:#2a220a}
+.mini-form .go{background:#c9a24b;color:#2a220a;border-radius:999px;padding:6px;font-size:.56rem;font-weight:900;text-align:center;margin-top:2px}
+.scr .hint{font-size:.5rem;color:#83725a;text-align:center;margin-top:auto}
+
+/* خطوات الانطلاق */
+.steps{display:grid;grid-template-columns:1fr;gap:16px;counter-reset:st}
+@media(min-width:760px){.steps{grid-template-columns:repeat(3,1fr)}}
+.step{
+  background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);
+  padding:26px 20px;text-align:center;box-shadow:var(--shadow-card);position:relative;
+}
+.step .num{
+  width:44px;height:44px;border-radius:50%;margin:0 auto 12px;
+  background:var(--gradient-1);color:#fff;font-weight:900;font-size:1.1rem;
+  display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-md);
+}
+.step b{display:block;color:var(--dark);font-size:1rem;margin-bottom:6px;font-weight:800}
+.step p{color:var(--text-muted);font-size:.84rem}
+
 /* دعوة أخيرة وفوتر */
 .final-cta{
   text-align:center;background:var(--gradient-1);color:#fff;
@@ -271,13 +350,22 @@ a:hover{color:var(--accent)}
 <header class="hero wrap">
   <span class="maker">🚀 من تطوير <b>المجرات</b></span>
   <h1>برنامج <span class="gradient-text">العائلة</span></h1>
-  <p class="tagline">نظام متكامل لإنشاء الموقع الرسمي لأي عائلة أو قبيلة — يجمع أهلك في مكان واحد: مناسبات، جمعات، أخبار، وتنبيهات تصل لجوالاتهم فورًا.</p>
-  <span class="version">الإصدار <?= View::e($coreVersion) ?></span>
+  <p class="tagline">وداعًا لضياع أخبار العائلة بين قروبات الواتساب.. موقع رسمي يليق باسم عائلتك، يتثبّت كتطبيق على جوالات الجميع، ويوصّل كل مناسبة وخبر وعزاء <b>بتنبيه فوري</b> لكل فرد.</p>
+  <span class="version">الإصدار <?= View::e($coreVersion) ?> — يتطور باستمرار</span>
   <div class="ctas">
     <a class="btn btn-primary" href="https://almgrat.com" target="_blank" rel="noopener">اطلب البرنامج لعائلتك</a>
     <a class="btn btn-outline" href="<?= View::e($siteBase) ?>">شاهد مثالًا حيًا ←</a>
   </div>
 </header>
+
+<section class="wrap" style="padding:6px 20px 14px">
+  <div class="stats-strip">
+    <div class="stat"><b>12</b><span>إضافة متكاملة مرفقة</span></div>
+    <div class="stat"><b>100%</b><span>عربي — واجهة ولوحة تحكم</span></div>
+    <div class="stat"><b>0</b><span>خبرة تقنية مطلوبة للإدارة</span></div>
+    <div class="stat"><b>24/7</b><span>تنبيهات تصل حتى والموقع مغلق</span></div>
+  </div>
+</section>
 
 <section class="section wrap">
   <span class="section-badge">المميزات</span>
@@ -292,6 +380,84 @@ a:hover{color:var(--accent)}
     <div class="feature"><span class="fi">🌳</span><b>شجرة النسب</b><p>خريطة نسب تفاعلية متصلة الأجيال، أو صورة مخطوطة ترفعها الإدارة — بدون بيانات حساسة.</p></div>
     <div class="feature"><span class="fi">🛡️</span><b>أمان مشدد</b><p>مصادقة ثنائية، صلاحيات ثلاثية المستويات، سجل نشاط لكل مستخدم، وحماية مراجعة أمنيًا.</p></div>
     <div class="feature"><span class="fi">🧩</span><b>إضافات مرنة</b><p>كل ميزة إضافة مستقلة تفعّلها أو تعطلها بضغطة: معرض، أرشيف، أخبار، جمعات، قائمة بريدية.</p></div>
+  </div>
+</section>
+
+<section class="section wrap">
+  <span class="section-badge">من داخل البرنامج</span>
+  <h2 class="section-title">لقطات تتكلم عن نفسها</h2>
+  <p class="section-sub">هذي تجربة أفراد عائلتك اليومية مع البرنامج — من التنبيه على شاشة القفل إلى التسجيل بضغطة</p>
+  <div class="shots">
+
+    <div class="shot">
+      <div class="frame">
+        <div class="scr-lock">
+          <div class="clock">9:41</div>
+          <div class="date">الجمعة، 24 يوليو</div>
+          <div class="notif">
+            <div class="nh"><span class="ic">🕊</span> موقع العائلة <span class="now">الآن</span></div>
+            <b>وفاة الوالد فلان بن فلان</b>
+            <p>العزاء بمقر العائلة — من بعد صلاة المغرب. اضغط للتفاصيل والموقع</p>
+          </div>
+          <div class="notif">
+            <div class="nh"><span class="ic">📅</span> موقع العائلة <span class="now">قبل ساعة</span></div>
+            <b>تذكير: زواج ابن العم غدًا</b>
+            <p>قاعة الاحتفالات الكبرى — الساعة 7:00 مساءً</p>
+          </div>
+        </div>
+      </div>
+      <div class="cap">🔔 التنبيه يوصل قبل ما يسألون "متى العزاء؟"</div>
+    </div>
+
+    <div class="shot">
+      <div class="frame">
+        <div class="scr">
+          <div class="bar">📅 رزنامة المناسبات <span>›</span></div>
+          <div class="mini-cal hot"><div class="d"><span>الجمعة</span><b>25</b></div><div class="t"><b>زواج ابن العم</b><i>🕗 7:00 م · قاعة الاحتفالات</i></div><span class="left">غدًا</span></div>
+          <div class="mini-cal"><div class="d"><span>الأحد</span><b>27</b></div><div class="t"><b>حفل تخرج أبناء العائلة</b><i>🕗 8:00 م · الصالة الكبرى</i></div><span class="left">باقي 3 أيام</span></div>
+          <div class="mini-cal"><div class="d"><span>الخميس</span><b>31</b></div><div class="t"><b>اجتماع العائلة السنوي</b><i>🕗 9:00 م · الاستراحة</i></div><span class="left">باقي 7 أيام</span></div>
+          <div class="mini-cal"><div class="d"><span>الجمعة</span><b>8</b></div><div class="t"><b>وليمة عشاء الفريج</b><i>🕗 8:30 م · منزل العم</i></div><span class="left">باقي 15 يوم</span></div>
+          <div class="hint">عدّاد تنازلي واضح لكل مناسبة</div>
+        </div>
+      </div>
+      <div class="cap">📅 محد يفوته شي بعد اليوم</div>
+    </div>
+
+    <div class="shot">
+      <div class="frame">
+        <div class="scr">
+          <div class="bar">🕊 الوفيات والعزاء <span>›</span></div>
+          <div class="mini-obit"><span>🕊</span><div class="t"><b>وفاة الوالد فلان بن فلان</b><i>📍 العزاء: مقر العائلة — حي الروضة</i></div><span class="city">الرياض</span></div>
+          <div class="mini-obit"><span>🕊</span><div class="t"><b>وفاة الوالدة أم فلان</b><i>📍 العزاء: منزل العائلة القديم</i></div><span class="city">بريدة</span></div>
+          <div class="mini-form" style="text-align:center">
+            <div class="fld" style="text-align:center">🗓 تاريخ الوفاة · 🕰 أوقات العزاء</div>
+            <div class="fld" style="text-align:center">🗺 موقع العزاء على الخريطة ←</div>
+          </div>
+          <div class="hint">إعلان وقور بكل التفاصيل التي يحتاجها المعزّون</div>
+        </div>
+      </div>
+      <div class="cap">🕊 في اللحظات الصعبة، الخبر يوصل بكرامة</div>
+    </div>
+
+    <div class="shot">
+      <div class="frame">
+        <div class="scr">
+          <div class="bar">📱 التسجيل في جوال العائلة <span>›</span></div>
+          <div class="mini-form">
+            <div class="fld">الاسم: محمد بن فلان</div>
+            <div class="fld">الجوال: 05xxxxxxxx</div>
+            <div class="chips"><span class="chip on">الرياض</span><span class="chip on">جدة</span><span class="chip">بريدة</span></div>
+            <div class="go">سجّلني ✨</div>
+          </div>
+          <div class="mini-form" style="text-align:center">
+            <div class="fld" style="text-align:center">🔒 الأرقام للإدارة فقط — لا تُعرض لأحد</div>
+          </div>
+          <div class="hint">تسجيل ذاتي بثوانٍ — والقاعدة تكبر وحدها</div>
+        </div>
+      </div>
+      <div class="cap">📱 قاعدة تواصل العائلة تبني نفسها</div>
+    </div>
+
   </div>
 </section>
 
@@ -341,6 +507,17 @@ a:hover{color:var(--accent)}
 </section>
 
 <section class="section wrap">
+  <span class="section-badge">كيف تنطلق؟</span>
+  <h2 class="section-title">موقع عائلتك جاهز بثلاث خطوات</h2>
+  <p class="section-sub">ما تحتاج مبرمج ولا خبرة — المجرات تجهز لك كل شيء</p>
+  <div class="steps">
+    <div class="step"><span class="num">1</span><b>اطلبه من المجرات</b><p>تواصل معنا ونجهّز البرنامج بهوية عائلتك: الاسم والشعار والألوان — على نطاقكم الخاص.</p></div>
+    <div class="step"><span class="num">2</span><b>أضف محتواك</b><p>من لوحة تحكم عربية بسيطة: مناسبات، أخبار، صور، شجرة النسب — أي فرد من العائلة يقدر يديرها.</p></div>
+    <div class="step"><span class="num">3</span><b>شارك الرابط</b><p>أرسل الرابط بقروب العائلة مرة واحدة — يثبّتونه كتطبيق، يفعّلون التنبيهات، وكل جديد يوصلهم تلقائيًا.</p></div>
+  </div>
+</section>
+
+<section class="section wrap">
   <span class="section-badge">الإضافات</span>
   <h2 class="section-title">كل ما تحتاجه في مكان واحد</h2>
   <p class="section-sub">تُقرأ هذه القائمة تلقائيًا من ملفات النظام وتتحدث مع كل إصدار</p>
@@ -366,9 +543,9 @@ a:hover{color:var(--accent)}
 
 <section class="section wrap">
   <div class="final-cta">
-    <h2>جاهز تجمع عائلتك في مكان واحد؟</h2>
-    <p>يعمل على أي استضافة مشتركة عادية — تركيب من المتصفح بالكامل بدون خبرة تقنية</p>
-    <a class="btn" href="https://almgrat.com" target="_blank" rel="noopener">تواصل مع المجرات الآن 🚀</a>
+    <h2>عائلتك تستاهل أكثر من قروب واتساب</h2>
+    <p>موقع رسمي باسمها، تطبيق على جوالات أفرادها، وتنبيه يجمعهم في كل مناسبة — كل هذا بطلب واحد من المجرات</p>
+    <a class="btn" href="https://almgrat.com" target="_blank" rel="noopener">اطلب برنامج العائلة الآن 🚀</a>
   </div>
 </section>
 
