@@ -26,16 +26,13 @@ final class FamilyController
             $changelogHtml = Markdown::toHtml((string) file_get_contents($changelogPath));
         }
 
-        $layout = CORE_PATH . '/Front/Views/layouts/main.php';
-        $view = ROOT_PATH . '/themes/default/templates/family.php';
-
-        echo View::renderLayout($layout, $view, [
-            'pageTitle' => 'Family — عن البرنامج',
-            'metaDescription' => 'نبذة عن نظام إدارة محتوى العوائل والقبائل: مميزاته وإضافاته وسجل تحديثاته.',
+        // صفحة مستقلة بهوية خاصة (مادة تسويقية للبرنامج) — لا تستخدم قالب موقع التركيب
+        echo View::render(CORE_PATH . '/Front/Views/family-landing.php', [
             'coreVersion' => defined('CORE_VERSION') ? CORE_VERSION : '',
             'modules' => $modules,
             'installedMap' => $installedMap,
             'changelogHtml' => $changelogHtml,
+            'siteBase' => \Core\Support\Url::to(''),
         ]);
     }
 }

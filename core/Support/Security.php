@@ -175,7 +175,7 @@ final class Security
             . "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
             . "font-src 'self' data: https://fonts.gstatic.com; "
             . "img-src 'self' data: https:; connect-src 'self' https:; "
-            . "object-src 'none'; frame-src 'none'; base-uri 'self'; "
+            . "object-src 'none'; frame-src 'self'; base-uri 'self'; "
             . "form-action 'self'; frame-ancestors 'self'");
         $configuredHttps = defined('APP_URL') && strtolower((string) parse_url((string) APP_URL, PHP_URL_SCHEME)) === 'https';
         if ($configuredHttps || (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')) {
