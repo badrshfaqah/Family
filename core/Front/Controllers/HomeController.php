@@ -120,6 +120,7 @@ final class HomeController
             'gallery' => ['table' => 'gallery_photos', 'where' => '1=1'],
             'archive' => ['table' => 'archive_items', 'where' => "status = 'published'"],
             'directory_count' => ['table' => 'directory_contacts', 'where' => "status = 'active'"],
+            'push_subscribers' => ['table' => 'push_subscriptions', 'where' => '1=1'],
         ];
 
         foreach ($map as $key => $conf) {

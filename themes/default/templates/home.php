@@ -155,7 +155,7 @@ $heroCover = fam_media_url(Settings::get('identity_cover_media_id', ''));
   <?php if ($section === 'stats' && !empty($stats)): ?>
   <section class="section container">
     <div class="stats-grid">
-      <?php $labels = ['news' => 'خبر منشور', 'events' => 'مناسبة', 'gatherings' => 'جمعة نشطة', 'gallery' => 'صورة', 'archive' => 'وثيقة', 'directory_count' => 'رقم مسجّل']; ?>
+      <?php $labels = ['news' => 'خبر منشور', 'events' => 'مناسبة', 'gatherings' => 'جمعة نشطة', 'gallery' => 'صورة', 'archive' => 'وثيقة', 'directory_count' => 'رقم مسجّل', 'push_subscribers' => 'جهاز مشترك في التنبيهات']; ?>
       <?php foreach ($stats as $key => $value): ?>
         <div class="stat-card"><b><?= (int) $value ?></b><span><?= \Core\View::e($labels[$key] ?? $key) ?></span></div>
       <?php endforeach; ?>
