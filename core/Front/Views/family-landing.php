@@ -1,6 +1,6 @@
 <?php
 /**
- * صفحة برنامج العائلة التعريفية — مادة تسويقية مستقلة بهوية المجرات.
+ * صفحة برنامج العائلة التعريفية — مادة تسويقية مستقلة بهوية المجرات (ar.almgrat.com).
  * ترافق كل تركيبة من البرنامج على مسار /family وتتحدث تلقائيًا مع كل إصدار:
  * الإضافات من module.json، السجل من CHANGELOG.md، والمعاينة الحية من موقع التركيب نفسه.
  *
@@ -21,107 +21,130 @@ use Core\View;
 <meta name="robots" content="index, follow">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Tajawal:wght@400;500;700;800&display=swap">
 <style>
+/* هوية المجرات — تصميم أبيض فاتح (ar.almgrat.com) */
 :root{
-  --g-bg:#0b0f26;
-  --g-bg2:#131a3d;
-  --g-surface:rgba(255,255,255,.05);
-  --g-border:rgba(255,255,255,.1);
-  --g-text:#eef0fa;
-  --g-muted:#9aa3c7;
-  --g-gold:#e8b64c;
-  --g-violet:#7c6cff;
-  --g-radius:18px;
+  --primary:#2563EB;
+  --primary-light:#3B82F6;
+  --accent:#7C3AED;
+  --green:#059669;
+  --dark:#0F172A;
+  --bg:#FFFFFF;
+  --bg-2:#F8FAFF;
+  --bg-3:#F1F5FF;
+  --border:#E2E8F0;
+  --border-hover:#93C5FD;
+  --text:#1E293B;
+  --text-muted:#64748B;
+  --gradient-1:linear-gradient(135deg,#2563EB 0%,#7C3AED 100%);
+  --shadow-md:0 4px 16px rgba(37,99,235,.10);
+  --shadow-lg:0 12px 40px rgba(37,99,235,.12);
+  --shadow-card:0 2px 12px rgba(0,0,0,.06);
+  --radius-lg:16px;
+  --radius-xl:24px;
+  --font-main:'Cairo','Tajawal',sans-serif;
 }
-*{box-sizing:border-box}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
 body{
-  margin:0;font-family:'Tajawal',Tahoma,Arial,sans-serif;
-  background:var(--g-bg);color:var(--g-text);line-height:1.8;font-size:16px;
-  background-image:
-    radial-gradient(700px 350px at 85% -50px,rgba(124,108,255,.22),transparent 70%),
-    radial-gradient(600px 300px at 10% 20%,rgba(232,182,76,.1),transparent 70%);
-  background-attachment:fixed;
+  font-family:var(--font-main);background:var(--bg);color:var(--text);
+  direction:rtl;text-align:right;line-height:1.7;overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
 }
-a{color:inherit;text-decoration:none}
-.wrap{max-width:1060px;margin:0 auto;padding:0 18px}
-
-/* نجوم خافتة */
-.stars{position:fixed;inset:0;pointer-events:none;opacity:.5;background-image:
-  radial-gradient(1.2px 1.2px at 20% 30%,#fff,transparent),
-  radial-gradient(1px 1px at 70% 12%,#fff,transparent),
-  radial-gradient(1.4px 1.4px at 40% 70%,#ffffffcc,transparent),
-  radial-gradient(1px 1px at 90% 55%,#fff,transparent),
-  radial-gradient(1px 1px at 55% 40%,#ffffffaa,transparent),
-  radial-gradient(1.3px 1.3px at 12% 80%,#fff,transparent)}
+/* شبكة خلفية خفيفة — بصمة هوية المجرات */
+body::before{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:
+    linear-gradient(rgba(37,99,235,.03) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(37,99,235,.03) 1px,transparent 1px);
+  background-size:48px 48px;
+}
+a{color:var(--primary);text-decoration:none;transition:all .25s cubic-bezier(.4,0,.2,1)}
+a:hover{color:var(--accent)}
+.wrap{max-width:1120px;margin:0 auto;padding:0 20px;position:relative;z-index:1}
 
 /* الترويسة */
-.hero{position:relative;text-align:center;padding:60px 0 40px}
-.hero .maker{
-  display:inline-flex;align-items:center;gap:8px;
-  background:var(--g-surface);border:1px solid var(--g-border);border-radius:999px;
-  padding:7px 16px;font-size:.82rem;font-weight:700;color:var(--g-muted);
+.hero{text-align:center;padding:72px 0 48px;position:relative}
+.hero::after{
+  content:'';position:absolute;top:-80px;left:50%;transform:translateX(-50%);
+  width:640px;height:420px;border-radius:50%;z-index:-1;
+  background:radial-gradient(closest-side,rgba(124,58,237,.08),rgba(37,99,235,.05),transparent);
 }
-.hero .maker b{color:var(--g-gold)}
+.maker{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--bg-3);border:1px solid var(--border);border-radius:999px;
+  padding:8px 18px;font-size:.85rem;font-weight:700;color:var(--text-muted);
+}
+.maker b{background:var(--gradient-1);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
 .hero h1{
-  margin:20px 0 6px;font-size:2.3rem;font-weight:900;line-height:1.3;
-  background:linear-gradient(90deg,#fff 30%,var(--g-gold));
+  margin:22px 0 6px;font-weight:900;line-height:1.2;color:var(--dark);
+  font-size:clamp(38px,5.5vw,64px);
+}
+.hero h1 .gradient-text{
+  background:var(--gradient-1);
   -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
 }
-.hero .tagline{margin:0 auto;max-width:640px;color:var(--g-muted);font-size:1.05rem}
-.hero .version{
-  display:inline-block;margin-top:14px;background:rgba(124,108,255,.15);
-  border:1px solid rgba(124,108,255,.4);color:#c9c2ff;
-  border-radius:999px;padding:4px 14px;font-size:.78rem;font-weight:800;
+.tagline{margin:0 auto;max-width:620px;color:var(--text-muted);font-size:1.08rem}
+.version{
+  display:inline-block;margin-top:16px;background:var(--bg-3);
+  border:1px solid var(--border);color:var(--primary);
+  border-radius:999px;padding:5px 16px;font-size:.8rem;font-weight:800;
 }
-.hero .ctas{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:26px}
+.ctas{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:28px}
 .btn{
   display:inline-flex;align-items:center;justify-content:center;gap:8px;
-  border-radius:999px;padding:13px 26px;font-weight:800;font-size:.95rem;
-  border:none;cursor:pointer;font-family:inherit;
+  border-radius:12px;padding:14px 30px;font-weight:800;font-size:1rem;
+  border:none;cursor:pointer;font-family:var(--font-main);
+  transition:all .25s cubic-bezier(.4,0,.2,1);
 }
-.btn-gold{background:linear-gradient(135deg,var(--g-gold),#d99b26);color:#231a05;box-shadow:0 8px 26px rgba(232,182,76,.3)}
-.btn-ghost{background:var(--g-surface);border:1px solid var(--g-border);color:var(--g-text)}
+.btn-primary{background:var(--primary);color:#fff;box-shadow:0 4px 14px rgba(37,99,235,.3)}
+.btn-primary:hover{background:var(--primary-light);color:#fff;transform:translateY(-2px)}
+.btn-outline{background:transparent;color:var(--primary);border:1.5px solid var(--primary)}
+.btn-outline:hover{background:var(--bg-3);color:var(--primary)}
 
 /* الأقسام */
-.section{padding:38px 0}
-.section-title{text-align:center;font-size:1.5rem;font-weight:900;margin:0 0 8px}
-.section-sub{text-align:center;color:var(--g-muted);margin:0 auto 28px;max-width:560px;font-size:.92rem}
+.section{padding:46px 0}
+.section-alt{background:var(--bg-2);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.section-badge{
+  display:table;margin:0 auto 12px;background:var(--bg-3);color:var(--primary);
+  border:1px solid var(--border);border-radius:999px;padding:5px 16px;
+  font-size:.78rem;font-weight:800;
+}
+.section-title{text-align:center;font-size:clamp(26px,3.5vw,40px);font-weight:800;color:var(--dark);margin-bottom:10px}
+.section-sub{text-align:center;color:var(--text-muted);margin:0 auto 32px;max-width:560px;font-size:.95rem}
 
 /* المميزات */
-.features{display:grid;grid-template-columns:1fr;gap:14px}
+.features{display:grid;grid-template-columns:1fr;gap:16px}
 @media(min-width:640px){.features{grid-template-columns:repeat(2,1fr)}}
 @media(min-width:960px){.features{grid-template-columns:repeat(4,1fr)}}
 .feature{
-  background:var(--g-surface);border:1px solid var(--g-border);border-radius:var(--g-radius);
-  padding:22px 18px;transition:transform .2s,border-color .2s;
+  background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);
+  padding:24px 20px;box-shadow:var(--shadow-card);
+  transition:all .25s cubic-bezier(.4,0,.2,1);
 }
-.feature:hover{transform:translateY(-4px);border-color:rgba(232,182,76,.4)}
+.feature:hover{transform:translateY(-5px);border-color:var(--border-hover);box-shadow:var(--shadow-lg)}
 .feature .fi{
-  width:50px;height:50px;border-radius:14px;display:flex;align-items:center;justify-content:center;
-  font-size:1.5rem;margin-bottom:12px;
-  background:linear-gradient(135deg,rgba(124,108,255,.25),rgba(232,182,76,.2));
-  border:1px solid var(--g-border);
+  width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;
+  font-size:1.5rem;margin-bottom:14px;background:var(--bg-3);border:1px solid var(--border);
 }
-.feature b{display:block;font-size:1rem;margin-bottom:5px}
-.feature p{margin:0;color:var(--g-muted);font-size:.84rem;line-height:1.75}
+.feature b{display:block;font-size:1.02rem;margin-bottom:6px;color:var(--dark);font-weight:800}
+.feature p{color:var(--text-muted);font-size:.85rem;line-height:1.75}
 
 /* المعاينة */
-.previews{display:flex;gap:34px;flex-wrap:wrap;justify-content:center;align-items:flex-start}
+.previews{display:flex;gap:40px;flex-wrap:wrap;justify-content:center;align-items:flex-start}
 .device{text-align:center}
-.device .label{color:var(--g-muted);font-size:.85rem;font-weight:700;margin-top:14px}
+.device .label{color:var(--text-muted);font-size:.88rem;font-weight:700;margin-top:16px}
 .phone{
   width:270px;height:552px;border-radius:38px;padding:10px;position:relative;
-  background:#1a1f3d;border:1px solid var(--g-border);
-  box-shadow:0 24px 60px rgba(0,0,0,.5),0 0 0 2px rgba(124,108,255,.2);
+  background:var(--dark);
+  box-shadow:var(--shadow-lg),0 0 0 1px var(--border);
 }
 .phone::before{
   content:"";position:absolute;top:16px;left:50%;transform:translateX(-50%);
-  width:78px;height:8px;border-radius:999px;background:#0b0f26;z-index:2;
+  width:78px;height:8px;border-radius:999px;background:#000;z-index:2;
 }
-.phone .screen{
-  width:100%;height:100%;border-radius:29px;overflow:hidden;background:#fff;position:relative;
-}
+.phone .screen{width:100%;height:100%;border-radius:29px;overflow:hidden;background:#fff;position:relative}
 .phone iframe{
   width:375px;height:767px;border:0;
   transform:scale(.6667);transform-origin:top right;
@@ -129,9 +152,9 @@ a{color:inherit;text-decoration:none}
 }
 /* مجسم لوحة التحكم */
 .admin-mock{
-  width:min(470px,92vw);border-radius:16px;overflow:hidden;
-  background:#f6f4ef;border:1px solid var(--g-border);
-  box-shadow:0 24px 60px rgba(0,0,0,.5),0 0 0 2px rgba(232,182,76,.18);
+  width:min(470px,92vw);border-radius:var(--radius-lg);overflow:hidden;
+  background:#f6f4ef;border:1px solid var(--border);
+  box-shadow:var(--shadow-lg);
   direction:rtl;text-align:right;
 }
 .am-top{background:#183f35;color:#fff;padding:9px 14px;display:flex;align-items:center;gap:8px;font-size:.66rem;font-weight:800}
@@ -151,68 +174,74 @@ a{color:inherit;text-decoration:none}
 .am-badge{background:#e7f6ee;color:#1c6e3c;border-radius:999px;padding:1px 7px;font-size:.5rem;font-weight:800}
 
 /* الإضافات */
-.modules{display:grid;grid-template-columns:1fr;gap:10px}
+.modules{display:grid;grid-template-columns:1fr;gap:12px}
 @media(min-width:640px){.modules{grid-template-columns:repeat(2,1fr)}}
 @media(min-width:960px){.modules{grid-template-columns:repeat(3,1fr)}}
 .module{
-  background:var(--g-surface);border:1px solid var(--g-border);border-radius:14px;
-  padding:14px 16px;display:flex;justify-content:space-between;gap:10px;align-items:flex-start;
+  background:#fff;border:1px solid var(--border);border-radius:12px;
+  padding:16px 18px;display:flex;justify-content:space-between;gap:10px;align-items:flex-start;
+  box-shadow:var(--shadow-card);transition:all .25s;
 }
-.module b{display:block;font-size:.92rem;margin-bottom:3px}
-.module p{margin:0;color:var(--g-muted);font-size:.78rem;line-height:1.7}
-.module .mv{flex:none;color:#c9c2ff;font-size:.68rem;font-weight:800;background:rgba(124,108,255,.15);border-radius:999px;padding:2px 9px}
+.module:hover{border-color:var(--border-hover)}
+.module b{display:block;font-size:.95rem;margin-bottom:3px;color:var(--dark);font-weight:800}
+.module p{color:var(--text-muted);font-size:.8rem;line-height:1.7}
+.module .mv{
+  flex:none;color:var(--accent);font-size:.7rem;font-weight:800;
+  background:#F5F3FF;border:1px solid #ddd6fe;border-radius:999px;padding:2px 10px;
+}
 
 /* سجل التحديثات */
 .changelog{
-  background:var(--g-surface);border:1px solid var(--g-border);border-radius:var(--g-radius);
-  padding:8px 22px;
+  background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);
+  padding:8px 22px;box-shadow:var(--shadow-card);
 }
 .changelog summary{
   cursor:pointer;font-weight:800;padding:12px 0;font-size:1rem;list-style:none;
-  display:flex;align-items:center;justify-content:space-between;
+  display:flex;align-items:center;justify-content:space-between;color:var(--dark);
 }
-.changelog summary::after{content:"⌄";color:var(--g-gold);font-size:1.2rem}
+.changelog summary::after{content:"⌄";color:var(--primary);font-size:1.2rem}
 .changelog[open] summary::after{content:"⌃"}
-.changelog-body{border-top:1px solid var(--g-border);padding:14px 0;max-height:420px;overflow-y:auto;font-size:.85rem;color:#c6cbe4}
-.changelog-body h2,.changelog-body h3{color:#fff;font-size:1rem;margin:16px 0 6px}
-.changelog-body h4,.changelog-body h5{color:var(--g-gold);font-size:.9rem;margin:12px 0 5px}
-.changelog-body ul{padding-inline-start:20px;margin:6px 0}
+.changelog-body{border-top:1px solid var(--border);padding:14px 0;max-height:420px;overflow-y:auto;font-size:.85rem;color:var(--text)}
+.changelog-body h2,.changelog-body h3{color:var(--dark);font-size:1rem;margin:16px 0 6px}
+.changelog-body h4,.changelog-body h5{color:var(--primary);font-size:.9rem;margin:12px 0 5px}
+.changelog-body ul{padding-inline-start:20px;margin:6px 0;list-style:disc}
 .changelog-body li{margin:3px 0}
-.changelog-body hr{border:none;border-top:1px solid var(--g-border);margin:14px 0}
-.changelog-body code{background:rgba(255,255,255,.1);border-radius:5px;padding:1px 6px;font-size:.8em}
+.changelog-body hr{border:none;border-top:1px solid var(--border);margin:14px 0}
+.changelog-body code{background:var(--bg-3);border-radius:5px;padding:1px 6px;font-size:.8em}
 
 /* دعوة أخيرة وفوتر */
 .final-cta{
-  text-align:center;background:linear-gradient(135deg,rgba(124,108,255,.16),rgba(232,182,76,.12));
-  border:1px solid var(--g-border);border-radius:var(--g-radius);padding:38px 20px;
+  text-align:center;background:var(--gradient-1);color:#fff;
+  border-radius:var(--radius-xl);padding:46px 22px;box-shadow:var(--shadow-lg);
 }
-.final-cta h2{margin:0 0 8px;font-size:1.4rem;font-weight:900}
-.final-cta p{margin:0 0 20px;color:var(--g-muted);font-size:.92rem}
-.g-footer{text-align:center;padding:30px 0 26px;color:var(--g-muted);font-size:.8rem}
-.g-footer a{color:var(--g-gold);font-weight:800}
+.final-cta h2{margin:0 0 8px;font-size:clamp(22px,3vw,32px);font-weight:900}
+.final-cta p{margin:0 0 22px;color:rgba(255,255,255,.85);font-size:.95rem}
+.final-cta .btn{background:#fff;color:var(--primary)}
+.final-cta .btn:hover{transform:translateY(-2px)}
+.g-footer{text-align:center;padding:32px 0 28px;color:var(--text-muted);font-size:.82rem;border-top:1px solid var(--border);margin-top:46px}
+.g-footer a{font-weight:800}
 @media(max-width:639px){
-  .hero{padding:44px 0 30px}
-  .hero h1{font-size:1.7rem}
+  .hero{padding:50px 0 36px}
   .phone{width:240px;height:492px}
   .phone iframe{transform:scale(.5893)}
 }
 </style>
 </head>
 <body>
-<div class="stars"></div>
 
 <header class="hero wrap">
-  <span class="maker">🌌 من تطوير <b>المجرات</b></span>
-  <h1>برنامج العائلة</h1>
+  <span class="maker">🚀 من تطوير <b>المجرات</b></span>
+  <h1>برنامج <span class="gradient-text">العائلة</span></h1>
   <p class="tagline">نظام متكامل لإنشاء الموقع الرسمي لأي عائلة أو قبيلة — يجمع أهلك في مكان واحد: مناسبات، جمعات، أخبار، وتنبيهات تصل لجوالاتهم فورًا.</p>
   <span class="version">الإصدار <?= View::e($coreVersion) ?></span>
   <div class="ctas">
-    <a class="btn btn-gold" href="https://almgrat.com" target="_blank" rel="noopener">اطلب البرنامج لعائلتك ✨</a>
-    <a class="btn btn-ghost" href="<?= View::e($siteBase) ?>">شاهد مثالًا حيًا ←</a>
+    <a class="btn btn-primary" href="https://almgrat.com" target="_blank" rel="noopener">اطلب البرنامج لعائلتك</a>
+    <a class="btn btn-outline" href="<?= View::e($siteBase) ?>">شاهد مثالًا حيًا ←</a>
   </div>
 </header>
 
 <section class="section wrap">
+  <span class="section-badge">المميزات</span>
   <h2 class="section-title">ليش برنامج العائلة؟</h2>
   <p class="section-sub">مصمم خصيصًا لطبيعة العوائل والقبائل العربية — بدون تعقيد، وبخصوصية تامة لبيانات أفراد العائلة</p>
   <div class="features">
@@ -227,50 +256,54 @@ a{color:inherit;text-decoration:none}
   </div>
 </section>
 
-<section class="section wrap">
-  <h2 class="section-title">شوفه بعينك</h2>
-  <p class="section-sub">معاينة حية مباشرة من هذا التركيب — مو صور معدلة</p>
-  <div class="previews">
-    <div class="device">
-      <div class="phone"><div class="screen"><iframe src="<?= View::e($siteBase) ?>" title="معاينة حية للموقع" loading="lazy" tabindex="-1"></iframe></div></div>
-      <div class="label">📱 الموقع كما يراه الزائر — معاينة حية</div>
-    </div>
-    <div class="device">
-      <div class="admin-mock" aria-hidden="true">
-        <div class="am-top"><span class="dot"></span> لوحة التحكم — برنامج العائلة</div>
-        <div class="am-body">
-          <div class="am-side">
-            <span class="on">🏠 الرئيسية</span>
-            <span>📰 الأخبار</span>
-            <span>📅 الرزنامة</span>
-            <span>🕊 الوفيات</span>
-            <span>📱 جوال العائلة</span>
-            <span>🔔 التنبيهات</span>
-            <span>👁 نشاط المستخدمين</span>
-            <span>⚙️ الإعدادات</span>
-          </div>
-          <div class="am-main">
-            <div class="am-stats">
-              <div class="am-stat"><b>124</b><i>رقم مسجّل</i></div>
-              <div class="am-stat"><b>86</b><i>مشترك بالتنبيهات</i></div>
-              <div class="am-stat"><b>17</b><i>مناسبة</i></div>
+<section class="section section-alt">
+  <div class="wrap">
+    <span class="section-badge">معاينة حية</span>
+    <h2 class="section-title">شوفه بعينك</h2>
+    <p class="section-sub">معاينة حية مباشرة من هذا التركيب — مو صور معدلة</p>
+    <div class="previews">
+      <div class="device">
+        <div class="phone"><div class="screen"><iframe src="<?= View::e($siteBase) ?>" title="معاينة حية للموقع" loading="lazy" tabindex="-1"></iframe></div></div>
+        <div class="label">📱 الموقع كما يراه الزائر — معاينة حية</div>
+      </div>
+      <div class="device">
+        <div class="admin-mock" aria-hidden="true">
+          <div class="am-top"><span class="dot"></span> لوحة التحكم — برنامج العائلة</div>
+          <div class="am-body">
+            <div class="am-side">
+              <span class="on">🏠 الرئيسية</span>
+              <span>📰 الأخبار</span>
+              <span>📅 الرزنامة</span>
+              <span>🕊 الوفيات</span>
+              <span>📱 جوال العائلة</span>
+              <span>🔔 التنبيهات</span>
+              <span>👁 نشاط المستخدمين</span>
+              <span>⚙️ الإعدادات</span>
             </div>
-            <div class="am-table">
-              <div class="am-th">آخر التنبيهات المرسلة</div>
-              <div class="am-tr"><span>دعوة اجتماع العائلة السنوي</span><span class="am-badge">وصل 86</span></div>
-              <div class="am-tr"><span>تهنئة بنجاح أبناء العائلة</span><span class="am-badge">وصل 84</span></div>
-              <div class="am-tr"><span>موعد جمعة الخميس</span><span class="am-badge">وصل 79</span></div>
+            <div class="am-main">
+              <div class="am-stats">
+                <div class="am-stat"><b>124</b><i>رقم مسجّل</i></div>
+                <div class="am-stat"><b>86</b><i>مشترك بالتنبيهات</i></div>
+                <div class="am-stat"><b>17</b><i>مناسبة</i></div>
+              </div>
+              <div class="am-table">
+                <div class="am-th">آخر التنبيهات المرسلة</div>
+                <div class="am-tr"><span>دعوة اجتماع العائلة السنوي</span><span class="am-badge">وصل 86</span></div>
+                <div class="am-tr"><span>تهنئة بنجاح أبناء العائلة</span><span class="am-badge">وصل 84</span></div>
+                <div class="am-tr"><span>موعد جمعة الخميس</span><span class="am-badge">وصل 79</span></div>
+              </div>
             </div>
           </div>
         </div>
+        <div class="label">🖥 لوحة تحكم عربية بسيطة لغير المتخصصين</div>
       </div>
-      <div class="label">🖥 لوحة تحكم عربية بسيطة لغير المتخصصين</div>
     </div>
   </div>
 </section>
 
 <section class="section wrap">
-  <h2 class="section-title">كل الإضافات المرفقة</h2>
+  <span class="section-badge">الإضافات</span>
+  <h2 class="section-title">كل ما تحتاجه في مكان واحد</h2>
   <p class="section-sub">تُقرأ هذه القائمة تلقائيًا من ملفات النظام وتتحدث مع كل إصدار</p>
   <div class="modules">
     <?php foreach ($modules as $slug => $m): ?>
@@ -296,7 +329,7 @@ a{color:inherit;text-decoration:none}
   <div class="final-cta">
     <h2>جاهز تجمع عائلتك في مكان واحد؟</h2>
     <p>يعمل على أي استضافة مشتركة عادية — تركيب من المتصفح بالكامل بدون خبرة تقنية</p>
-    <a class="btn btn-gold" href="https://almgrat.com" target="_blank" rel="noopener">تواصل مع المجرات الآن 🚀</a>
+    <a class="btn" href="https://almgrat.com" target="_blank" rel="noopener">تواصل مع المجرات الآن 🚀</a>
   </div>
 </section>
 
