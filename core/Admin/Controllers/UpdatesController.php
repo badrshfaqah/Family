@@ -107,6 +107,15 @@ final class UpdatesController
             Response::redirect(Url::admin('updates'));
         }
 
+        // تطبيق ترحيلات قاعدة البيانات المرافقة للنسخة الجديدة (الملفات استُبدلت للتو)
+        $migrations = [];
+        try {
+            $migrations = \Core\Database\Migrator::migrate();
+        } catch (\Throwable $e) {
+            Session::flash('error', 'حُدثت الملفات لكن تعذر تطبيق ترحيلات قاعدة البيانات: ' . $e->getMessage());
+            Response::redirect(Url::admin('updates'));
+        }
+
         // قراءة الإصدار الجديد من الملف مباشرة (الثابت القديم محمّل في الذاكرة)
         $newVersion = $oldVersion;
         if (preg_match("/CORE_VERSION',\s*'([^']+)'/", (string) file_get_contents(ROOT_PATH . '/core/version.php'), $m)) {
@@ -114,8 +123,9 @@ final class UpdatesController
         }
 
         Settings::clearCacheFile();
-        ActivityLog::record('system_update', "تحديث النظام من GitHub: {$oldVersion} ← {$newVersion} ({$info['label']})");
-        Session::flash('success', "تم التحديث بنجاح: {$oldVersion} ← {$newVersion}");
+        $migrationsNote = $migrations ? ('، وطُبق ' . count($migrations) . ' ترحيل على قاعدة البيانات') : '';
+        ActivityLog::record('system_update', "تحديث النظام من GitHub: {$oldVersion} ← {$newVersion} ({$info['label']}){$migrationsNote}");
+        Session::flash('success', "تم التحديث بنجاح: {$oldVersion} ← {$newVersion}{$migrationsNote}.");
         Response::redirect(Url::admin('updates'));
     }
 
