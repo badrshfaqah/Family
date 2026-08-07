@@ -173,6 +173,7 @@ $heroCover = fam_media_url(Settings::get('identity_cover_media_id', ''));
 
   <?php if ($section === 'stats' && !empty($stats)): ?>
   <section class="section container">
+    <div class="section-head"><h2>موقعنا بالأرقام</h2></div>
     <div class="stats-grid">
       <?php $labels = [
         'news' => ['📰', 'خبر منشور'], 'events' => ['🎪', 'مناسبة'], 'gatherings' => ['☕', 'جمعة نشطة'],

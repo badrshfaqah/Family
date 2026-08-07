@@ -14,7 +14,11 @@ use Core\View;
       <?php if (!empty($poem['occasion'])): ?><span class="poem-occasion"><?= View::e($poem['occasion']) ?></span><?php endif; ?>
     </header>
 
+    <div class="ornament" aria-hidden="true">❖ ✦ ❖</div>
+
     <div class="poem-body"><?= nl2br(View::e($poem['content'])) ?></div>
+
+    <div class="ornament" aria-hidden="true">❖ ✦ ❖</div>
 
     <footer class="poem-foot">
       <a class="btn btn-outline-dark btn-sm" href="<?= Url::to('poetry/' . $poem['poet_ref']) ?>">← بقية قصائد <?= View::e($poem['poet_name']) ?></a>

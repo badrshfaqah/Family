@@ -890,3 +890,82 @@ a{color:inherit;text-decoration:none}
 a,button{-webkit-tap-highlight-color:transparent}
 .card,.gath-card,.cal-item,.obit-card{transition:transform .15s}
 .card:active,.gath-card:active,.cal-item:active,.obit-card:active{transform:scale(.985)}
+
+/* ─── لمسات المصمم: تفاعلات دقيقة واتساق إبداعي ─────────────── */
+
+/* تحديد النص وإبراز التركيز بهوية الموقع */
+::selection{background:var(--c-secondary);color:#2a220a}
+:focus-visible{outline:2.5px solid var(--c-secondary);outline-offset:2px;border-radius:6px}
+
+/* شريط تمرير مخصص للشاشات الكبيرة */
+@media (min-width:960px){
+  ::-webkit-scrollbar{width:11px}
+  ::-webkit-scrollbar-track{background:var(--c-bg)}
+  ::-webkit-scrollbar-thumb{background:#d8c9a8;border-radius:999px;border:3px solid var(--c-bg)}
+  ::-webkit-scrollbar-thumb:hover{background:var(--c-secondary)}
+}
+
+/* أزرار أرقى: تدرج ذهبي وارتفاع عند التفاعل */
+.btn{transition:transform .18s ease,box-shadow .18s ease,filter .18s ease}
+.btn-primary{
+  background:linear-gradient(135deg,#dcb763,#c9a24b 55%,#b8923e);
+  box-shadow:0 3px 10px rgba(201,162,75,.3);
+}
+.btn:hover{transform:translateY(-2px);filter:brightness(1.03)}
+.btn:active{transform:translateY(0) scale(.97)}
+
+/* سلوك موحد لكل البطاقات على أجهزة الماوس: ارتفاع وحد ذهبي وتقريب الصورة */
+@media (hover:hover) and (min-width:960px){
+  .card{transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease}
+  .card:hover{transform:translateY(-4px);border-color:var(--c-secondary);box-shadow:0 10px 26px rgba(60,44,24,.14)}
+  .card-img img{transition:transform .4s ease}
+  .card:hover .card-img img{transform:scale(1.05)}
+  .cal-item,.obit-card,.gath-card{transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease}
+  .cal-item:hover,.obit-card:hover,.gath-card:hover{transform:translateY(-3px);border-color:var(--c-secondary)}
+}
+
+/* مؤشر نشط أنيق بشريط التنقل السفلي (أسلوب التطبيقات) */
+.bottom-nav a{position:relative}
+.bottom-nav a.active::after{
+  content:"";position:absolute;top:2px;inset-inline:50%;transform:translateX(50%);
+  width:18px;height:3px;border-radius:999px;background:var(--c-secondary);
+}
+
+/* نسيج سدو خافت داخل شريط الترحيب — بصمة بصرية مميزة */
+.welcome-band::before{
+  content:"";position:absolute;inset:0;opacity:.08;pointer-events:none;
+  background-image:
+    repeating-linear-gradient(135deg,#fff 0 2px,transparent 2px 15px),
+    repeating-linear-gradient(45deg,#fff 0 2px,transparent 2px 15px);
+}
+.welcome-band h1,.welcome-sub{position:relative;text-shadow:0 1px 6px rgba(0,0,0,.22)}
+
+/* أيقونات الإحصائيات داخل دوائر رملية */
+.stat-card .stat-icon{
+  width:46px;height:46px;margin:0 auto 8px;font-size:1.2rem;line-height:1;
+  background:#f3ead6;border:1px solid var(--c-border);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+}
+
+/* حالات فارغة بروح الصحراء بدل السطر الجاف */
+.empty-state{
+  background:var(--c-surface);border:1.5px dashed var(--c-border);
+  border-radius:var(--radius);padding:38px 16px;font-size:.95rem;
+}
+.empty-state::before{content:"🏜";display:block;font-size:2.1rem;margin-bottom:10px}
+
+/* فاصل زخرفي مستوحى من علامات الديوان */
+.ornament{
+  display:flex;justify-content:center;gap:12px;
+  color:var(--c-secondary);font-size:.72rem;margin:12px 0;
+  user-select:none;
+}
+
+/* تفاعلات ناعمة للرقائق والأيقونات والروابط */
+.icon-btn{transition:background .15s,transform .15s}
+.icon-btn:active{transform:scale(.88)}
+.calx-type,.arc-cat-count,.poet-count,.gath-chip,.cal-left,.event-type{transition:transform .15s}
+.calx-type:hover{transform:translateY(-2px)}
+.section-head a{transition:gap .15s;display:inline-flex;align-items:center;gap:4px}
+.section-head a::after{content:"←";font-size:.85em;transition:transform .15s}
+.section-head a:hover::after{transform:translateX(-3px)}

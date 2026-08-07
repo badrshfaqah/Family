@@ -12,6 +12,7 @@ use Core\View;
       <h1>وفاة <?= View::e($item['name']) ?></h1>
       <p class="obit-verse">﴿يَا أَيَّتُهَا النَّفْسُ الْمُطْمَئِنَّةُ ارْجِعِي إِلَىٰ رَبِّكِ رَاضِيَةً مَّرْضِيَّةً﴾</p>
       <p class="form-hint" style="margin:0">إنا لله وإنا إليه راجعون</p>
+      <div class="ornament" aria-hidden="true" style="color:#8a8478">❖ ✦ ❖</div>
     </div>
 
     <div class="obit-details">
