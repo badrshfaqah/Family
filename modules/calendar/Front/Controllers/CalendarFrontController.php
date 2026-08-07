@@ -112,7 +112,7 @@ final class CalendarFrontController
         }
 
         $linkedEvent = null;
-        if (!empty($item['event_id']) && Database::tableExists('events')) {
+        if (!empty($item['event_id']) && \Core\ModuleManager::isEnabled('events') && Database::tableExists('events')) {
             $linkedEvent = Database::fetchOne(
                 'SELECT id, title, slug, status FROM ' . Database::table('events') . ' WHERE id = ? AND status = "published"',
                 [$item['event_id']]

@@ -49,6 +49,18 @@ a{color:inherit;text-decoration:none}
 }
 .brand.has-logo span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 
+/* الشريط العلوي لأقسام الموقع (شاشات كبيرة) */
+.top-nav{display:none;border-top:1px solid var(--c-border);background:var(--c-surface)}
+.top-nav-in{display:flex;justify-content:center;gap:2px;overflow-x:auto;scrollbar-width:none}
+.top-nav-in::-webkit-scrollbar{display:none}
+.top-nav a{
+  flex:none;padding:11px 15px 9px;font-size:.9rem;font-weight:700;color:var(--c-muted);
+  border-bottom:2.5px solid transparent;transition:color .15s,border-color .15s;
+}
+.top-nav a:hover{color:var(--c-primary)}
+.top-nav a.active{color:var(--c-primary);border-bottom-color:var(--c-secondary)}
+@media (min-width:960px){.top-nav{display:block}}
+
 /* نقشة سدو تراثية */
 .sadu-strip{
   height:8px;
@@ -97,12 +109,21 @@ a{color:inherit;text-decoration:none}
 .mobile-nav.open{display:block}
 .mobile-nav .panel{
   position:absolute;top:0;right:0;height:100%;width:86%;max-width:340px;
-  background:var(--c-surface);padding:18px;overflow-y:auto;
+  background:var(--c-surface);padding:14px;overflow-y:auto;
   animation:slideIn .18s ease-out;
 }
 @keyframes slideIn{from{transform:translateX(100%)}to{transform:translateX(0)}}
-.mobile-nav a{display:block;padding:14px 6px;font-size:1.05rem;border-bottom:1px solid var(--c-border)}
-.mobile-nav .close-btn{margin-inline-start:auto;display:block}
+.mobile-nav .panel-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:2px 6px 12px;margin-bottom:10px;border-bottom:2px solid var(--c-secondary);
+}
+.mobile-nav .panel-head b{font-size:1.1rem;color:var(--c-primary)}
+.mobile-nav .panel a{
+  display:flex;align-items:center;padding:13px 12px;font-size:1rem;font-weight:700;
+  border-radius:12px;margin-bottom:2px;color:var(--c-text);
+}
+.mobile-nav .panel a.active{background:#f3ead6;color:var(--c-primary)}
+.mobile-nav .panel a:active{background:var(--c-bg)}
 
 /* Hero */
 .hero{
@@ -185,10 +206,8 @@ a{color:inherit;text-decoration:none}
 .cal-item.cal-next .cal-date{background:linear-gradient(135deg,var(--c-primary),var(--c-primary-dark))}
 .cal-item.cal-next .cal-left{background:var(--c-secondary);color:#2a220a;border-color:var(--c-secondary)}
 
-/* أيقونات قائمة الموقع */
-.nav-desktop a{display:flex;align-items:center;gap:6px;font-size:.92rem}
-.nav-desktop .nav-icon{font-size:1.05rem;line-height:1}
-.mobile-nav .nav-icon{margin-inline-end:10px}
+/* أيقونات القائمة الجانبية */
+.mobile-nav .nav-icon{margin-inline-end:10px;font-size:1.1rem}
 
 /* الوسط: عمودا الرزنامة (يمين) والجمعات (يسار) */
 .home-cols{display:grid;gap:26px;grid-template-columns:1fr}
@@ -327,17 +346,26 @@ a{color:inherit;text-decoration:none}
     var(--c-primary-dark);
 }
 .site-footer a{color:#d6c9b2}
-.footer-brand{color:#fff;font-weight:800;font-size:1.05rem}
-.footer-brief{color:#b3a488;font-size:.8rem;margin:4px auto 0;max-width:480px;line-height:1.7}
-.footer-links{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin:14px 0 0}
+.footer-brand{color:#fff;font-weight:800;font-size:1.15rem;letter-spacing:.3px}
+.footer-brand::after{
+  content:"";display:block;width:44px;height:2.5px;margin:8px auto 0;
+  background:var(--c-secondary);border-radius:999px;
+}
+.footer-brief{color:#b3a488;font-size:.8rem;margin:8px auto 0;max-width:480px;line-height:1.7}
+.footer-links{display:flex;flex-wrap:wrap;justify-content:center;gap:7px;margin:16px auto 0;max-width:620px}
 .footer-links a{
-  background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);
-  border-radius:999px;padding:6px 13px;font-size:.76rem;font-weight:700;color:#e9e1d2;
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);
+  border-radius:999px;padding:7px 14px;font-size:.78rem;font-weight:700;color:#e9e1d2;
+  transition:border-color .15s,color .15s;
 }
+.footer-links a:hover{border-color:var(--c-secondary);color:#fff}
 .footer-services{
-  display:flex;flex-wrap:wrap;justify-content:center;gap:4px 16px;
-  margin:12px 0 0;font-size:.78rem;
+  display:flex;flex-wrap:wrap;justify-content:center;gap:4px 8px;
+  margin:14px 0 0;font-size:.78rem;
 }
+.footer-services a{padding:2px 8px}
+.footer-services a:hover{color:#fff}
+.footer-services a:not(:last-child)::after{content:"·";margin-inline-start:16px;color:#6e6450}
 .social-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:12px}
 .social-row a{background:rgba(255,255,255,.08);width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center}
 .footer-contact{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 16px;margin-top:10px;font-size:.78rem;color:#b3a488}

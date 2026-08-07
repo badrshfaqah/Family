@@ -62,6 +62,16 @@ $siteMenu = array_values(array_filter([
     ['url' => Url::to('news'), 'icon' => '📰', 'label' => 'الأخبار', 'show' => \Core\ModuleManager::isEnabled('news')],
 ], fn($item) => $item['show']));
 
+// القسم النشط حاليًا (للقائمة العلوية والجانبية والسفلية)
+$navBasePath = rtrim((string) parse_url(Url::to(''), PHP_URL_PATH), '/');
+$navCurrentPath = rtrim((string) parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH), '/');
+$navCurrentRel = trim(substr($navCurrentPath, strlen($navBasePath)), '/');
+$navIsActive = function (string $url) use ($navBasePath, $navCurrentRel): bool {
+    $match = trim(substr(rtrim((string) parse_url($url, PHP_URL_PATH), '/'), strlen($navBasePath)), '/');
+    $match = explode('/', $match)[0];
+    return $match === '' ? $navCurrentRel === '' : str_starts_with($navCurrentRel . '/', $match . '/');
+};
+
 function fam_menu_link(array $item): string
 {
     if (!empty($item['url'])) {
@@ -117,11 +127,6 @@ $metaDescription = $metaDescription ?? Settings::get('seo_default_description', 
       <?php if ($logoUrl): ?><img src="<?= \Core\View::e($logoUrl) ?>" alt="<?= \Core\View::e($shortName) ?>"><?php endif; ?>
       <span><?= \Core\View::e($shortName) ?></span>
     </a>
-    <nav class="nav-desktop">
-      <?php foreach ($siteMenu as $navItem): ?>
-        <a href="<?= \Core\View::e($navItem['url']) ?>"><span class="nav-icon"><?= $navItem['icon'] ?></span><?= \Core\View::e($navItem['label']) ?></a>
-      <?php endforeach; ?>
-    </nav>
     <div class="header-actions">
       <?php $pushKey = \Core\Push::isSupported() ? \Core\Push::publicKey() : ''; ?>
       <?php if ($pushKey !== ''): ?>
@@ -135,15 +140,26 @@ $metaDescription = $metaDescription ?? Settings::get('seo_default_description', 
       <button class="icon-btn nav-mobile-trigger" data-nav-trigger aria-label="القائمة">☰</button>
     </div>
   </div>
+  <nav class="top-nav" aria-label="أقسام الموقع">
+    <div class="container top-nav-in">
+      <a href="<?= Url::to('') ?>" class="<?= $navCurrentRel === '' ? 'active' : '' ?>">الرئيسية</a>
+      <?php foreach ($siteMenu as $navItem): ?>
+        <a href="<?= \Core\View::e($navItem['url']) ?>" class="<?= $navIsActive($navItem['url']) ? 'active' : '' ?>"><?= \Core\View::e($navItem['label']) ?></a>
+      <?php endforeach; ?>
+    </div>
+  </nav>
 </header>
 <div class="sadu-strip" aria-hidden="true"></div>
 
 <div class="mobile-nav" data-mobile-nav>
   <div class="panel">
-    <button class="icon-btn close-btn" data-nav-close aria-label="إغلاق">✕</button>
-    <a href="<?= Url::to('') ?>"><span class="nav-icon">🏠</span>الرئيسية</a>
+    <div class="panel-head">
+      <b><?= \Core\View::e($shortName) ?></b>
+      <button class="icon-btn close-btn" data-nav-close aria-label="إغلاق">✕</button>
+    </div>
+    <a href="<?= Url::to('') ?>" class="<?= $navCurrentRel === '' ? 'active' : '' ?>"><span class="nav-icon">🏠</span>الرئيسية</a>
     <?php foreach ($siteMenu as $navItem): ?>
-      <a href="<?= \Core\View::e($navItem['url']) ?>"><span class="nav-icon"><?= $navItem['icon'] ?></span><?= \Core\View::e($navItem['label']) ?></a>
+      <a href="<?= \Core\View::e($navItem['url']) ?>" class="<?= $navIsActive($navItem['url']) ? 'active' : '' ?>"><span class="nav-icon"><?= $navItem['icon'] ?></span><?= \Core\View::e($navItem['label']) ?></a>
     <?php endforeach; ?>
   </div>
 </div>
