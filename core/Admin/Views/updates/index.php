@@ -1,5 +1,6 @@
 <?php
 /** @var string $repo
+ *  @var bool $hasToken
  *  @var string $currentVersion
  *  @var array|null $latest
  *  @var string $checkError
@@ -33,9 +34,23 @@ use Core\View;
   <div class="form-group">
     <label>مستودع GitHub</label>
     <input class="form-control" dir="ltr" name="repo" value="<?= View::e($repo) ?>" placeholder="owner/repo — مثال: almgrat/family-cms">
-    <div class="form-hint">يقبل الصيغة owner/repo أو رابط GitHub كاملًا. يجب أن يكون المستودع عامًا (Public). عند وجود Releases يُسحب أحدث إصدار منشور، وإلا فأحدث نسخة من الفرع الرئيسي.</div>
+    <div class="form-hint">يقبل الصيغة owner/repo أو رابط GitHub كاملًا. عند وجود Releases يُسحب أحدث إصدار منشور، وإلا فأحدث نسخة من الفرع الرئيسي.</div>
   </div>
-  <button class="btn btn-secondary" type="submit">حفظ المستودع</button>
+  <div class="form-group">
+    <label>مفتاح وصول GitHub (للمستودعات الخاصة) <?= $hasToken ? '— ✅ محفوظ' : '' ?></label>
+    <input class="form-control" dir="ltr" type="password" name="token" autocomplete="off" placeholder="<?= $hasToken ? 'اتركه فارغًا للإبقاء على المفتاح الحالي' : 'github_pat_...' ?>">
+    <div class="form-hint">
+      مطلوب فقط إذا كان المستودع خاصًا (Private): أنشئ Fine-grained token من
+      GitHub → Settings → Developer settings، مقصورًا على هذا المستودع بصلاحية
+      Contents: Read-only فقط.
+    </div>
+    <?php if ($hasToken): ?>
+    <label style="display:flex;gap:6px;align-items:center;font-weight:400;margin-top:8px">
+      <input type="checkbox" name="remove_token" value="1"> حذف المفتاح المحفوظ
+    </label>
+    <?php endif; ?>
+  </div>
+  <button class="btn btn-secondary" type="submit">حفظ الإعدادات</button>
 </form>
 
 <?php if ($repo !== '' && $zipAvailable): ?>

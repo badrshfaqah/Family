@@ -41,6 +41,7 @@ final class UpdatesController
             'pageTitle' => 'تحديث النظام',
             'contentView' => CORE_PATH . '/Admin/Views/updates/index.php',
             'repo' => $repo,
+            'hasToken' => Settings::get('update_github_token', '') !== '',
             'currentVersion' => defined('CORE_VERSION') ? CORE_VERSION : '؟',
             'latest' => $latest,
             'checkError' => $error,
@@ -63,7 +64,18 @@ final class UpdatesController
         }
 
         Settings::set('update_github_repo', $repo);
-        Session::flash('success', $repo === '' ? 'تم مسح إعداد المستودع.' : 'تم حفظ المستودع: ' . $repo);
+
+        // مفتاح الوصول للمستودعات الخاصة: يُحفظ إن أُدخل، ويُمسح بالخيار الصريح فقط
+        if (Request::post('remove_token')) {
+            Settings::set('update_github_token', '');
+        } else {
+            $token = trim((string) Request::post('token', ''));
+            if ($token !== '' && preg_match('/^[\w.\-]{20,255}$/', $token)) {
+                Settings::set('update_github_token', $token);
+            }
+        }
+
+        Session::flash('success', $repo === '' ? 'تم مسح إعداد المستودع.' : 'تم حفظ إعدادات المستودع: ' . $repo);
         Response::redirect(Url::admin('updates'));
     }
 
@@ -250,6 +262,12 @@ final class UpdatesController
 
     private function httpGet(string $url, int $timeout): ?string
     {
+        $headers = ['Accept: application/vnd.github+json'];
+        $token = (string) Settings::get('update_github_token', '');
+        if ($token !== '') {
+            $headers[] = 'Authorization: Bearer ' . $token;
+        }
+
         $ch = curl_init($url);
         curl_setopt_array($ch, [
             CURLOPT_RETURNTRANSFER => true,
@@ -260,7 +278,7 @@ final class UpdatesController
             CURLOPT_PROTOCOLS => CURLPROTO_HTTPS,
             CURLOPT_REDIR_PROTOCOLS => CURLPROTO_HTTPS,
             CURLOPT_USERAGENT => 'Family-CMS-Updater',
-            CURLOPT_HTTPHEADER => ['Accept: application/vnd.github+json'],
+            CURLOPT_HTTPHEADER => $headers,
         ]);
         $body = curl_exec($ch);
         $code = (int) curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
