@@ -69,6 +69,10 @@ $router->get('/logs/users', [LogsController::class, 'userActivity']);
 $router->get('/notifications', [\Core\Admin\Controllers\NotificationsController::class, 'index']);
 $router->post('/notifications/send', [\Core\Admin\Controllers\NotificationsController::class, 'send']);
 
+$router->get('/updates', [\Core\Admin\Controllers\UpdatesController::class, 'index']);
+$router->post('/updates/save-repo', [\Core\Admin\Controllers\UpdatesController::class, 'saveRepo']);
+$router->post('/updates/run', [\Core\Admin\Controllers\UpdatesController::class, 'run']);
+
 $router->get('/media', [MediaController::class, 'index']);
 $router->post('/media/upload', [MediaController::class, 'upload']);
 $router->post('/media/{id}/update', [MediaController::class, 'update']);

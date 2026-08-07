@@ -30,6 +30,12 @@ function fam_gallery_cover_thumb($mediaId)
 
   <div class="form-group"><label>وصف الألبوم</label><textarea class="form-control" name="description" rows="2"><?= View::e($item['description'] ?? '') ?></textarea></div>
 
+  <div class="form-group">
+    <label>رابط فيديو (اختياري)</label>
+    <input class="form-control" dir="ltr" name="video_url" value="<?= View::e($item['video_url'] ?? '') ?>" placeholder="https://youtube.com/watch?v=... أو رابط قوقل درايف">
+    <div class="form-hint">يوتيوب أو قوقل درايف — يظهر الفيديو مشغلًا داخل صفحة الألبوم (مناسب لفيديو زواج أو مناسبة). يمكن جمع فيديو وصور في نفس الألبوم.</div>
+  </div>
+
   <div class="form-row cols-3">
     <div class="form-group">
       <label>نوع الألبوم</label>

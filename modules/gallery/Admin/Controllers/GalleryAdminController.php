@@ -71,6 +71,7 @@ final class GalleryAdminController
             'description' => Security::cleanText(Request::trimmed('description')),
             'cover_media_id' => $coverId,
             'album_type' => $this->resolveAlbumType(),
+            'video_url' => $this->resolveVideoUrl(),
             'year' => Request::int('year') ?: null,
             'city_id' => Request::int('city_id') ?: null,
             'branch_id' => Request::int('branch_id') ?: null,
@@ -135,6 +136,7 @@ final class GalleryAdminController
             'slug' => $slug,
             'description' => Security::cleanText(Request::trimmed('description')),
             'album_type' => $this->resolveAlbumType(),
+            'video_url' => $this->resolveVideoUrl(),
             'year' => Request::int('year') ?: null,
             'city_id' => Request::int('city_id') ?: null,
             'branch_id' => Request::int('branch_id') ?: null,
@@ -287,6 +289,19 @@ final class GalleryAdminController
     {
         $type = Request::post('album_type', 'photo');
         return in_array($type, ['photo', 'video'], true) ? $type : 'photo';
+    }
+
+    /** رابط فيديو الألبوم (يوتيوب أو قوقل درايف أو أي رابط مباشر) — HTTPS فقط */
+    private function resolveVideoUrl(): ?string
+    {
+        $url = Request::trimmed('video_url');
+        if ($url === '') {
+            return null;
+        }
+        if (!filter_var($url, FILTER_VALIDATE_URL) || !str_starts_with($url, 'https://') || strlen($url) > 255) {
+            return null;
+        }
+        return $url;
     }
 
     private function resolveStatus(): string

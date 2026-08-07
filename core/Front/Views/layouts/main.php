@@ -55,6 +55,7 @@ $siteMenu = array_values(array_filter([
     ['url' => Url::to('calendar'), 'icon' => '📅', 'label' => 'الرزنامة', 'show' => \Core\ModuleManager::isEnabled('calendar')],
     ['url' => Url::to('gatherings'), 'icon' => '☕', 'label' => 'الجمعات', 'show' => \Core\ModuleManager::isEnabled('gatherings')],
     ['url' => Url::to('obituaries'), 'icon' => '🕊', 'label' => 'الوفيات', 'show' => \Core\ModuleManager::isEnabled('obituaries')],
+    ['url' => Url::to('poetry'), 'icon' => '🪶', 'label' => 'سماء الشعراء', 'show' => \Core\ModuleManager::isEnabled('poetry')],
     ['url' => Url::to('tree'), 'icon' => '🌳', 'label' => 'شجرة النسب', 'show' => \Core\ModuleManager::isEnabled('family-tree')],
     ['url' => Url::to('gallery'), 'icon' => '🖼', 'label' => 'مكتبة الصور', 'show' => \Core\ModuleManager::isEnabled('gallery')],
     ['url' => Url::to('archive'), 'icon' => '📜', 'label' => 'الأرشيف', 'show' => \Core\ModuleManager::isEnabled('archive')],

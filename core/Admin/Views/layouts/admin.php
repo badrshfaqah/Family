@@ -34,6 +34,7 @@ $systemMenu = [
     ['label' => 'سجل العمليات', 'url' => Url::admin('logs'), 'icon' => '🧾', 'perm' => 'system.logs'],
     ['label' => 'نشاط المستخدمين', 'url' => Url::admin('logs/users'), 'icon' => '👁️', 'perm' => 'system.users'],
     ['label' => 'التنبيهات', 'url' => Url::admin('notifications'), 'icon' => '🔔', 'perm' => 'system.settings'],
+    ['label' => 'تحديث النظام', 'url' => Url::admin('updates'), 'icon' => '⬆️', 'perm' => 'system.modules'],
     ['label' => 'الإعدادات', 'url' => Url::admin('settings'), 'icon' => '⚙️', 'perm' => 'system.settings'],
 ];
 

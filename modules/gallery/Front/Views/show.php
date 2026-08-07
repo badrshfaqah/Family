@@ -17,6 +17,24 @@ use Core\View;
   </div>
   <?php if (!empty($album['description'])): ?><p><?= View::e($album['description']) ?></p><?php endif; ?>
 
+  <?php
+  // تضمين فيديو الألبوم: يوتيوب أو قوقل درايف داخل مشغل، وأي رابط آخر كزر
+  $videoUrl = $album['video_url'] ?? '';
+  $embedUrl = '';
+  if ($videoUrl !== '') {
+      if (preg_match('~(?:youtube\.com/(?:watch\?v=|shorts/|embed/)|youtu\.be/)([\w-]{6,20})~', $videoUrl, $m)) {
+          $embedUrl = 'https://www.youtube-nocookie.com/embed/' . $m[1];
+      } elseif (preg_match('~drive\.google\.com/file/d/([\w-]+)~', $videoUrl, $m)) {
+          $embedUrl = 'https://drive.google.com/file/d/' . $m[1] . '/preview';
+      }
+  }
+  ?>
+  <?php if ($embedUrl !== ''): ?>
+    <div class="album-video"><iframe src="<?= View::e($embedUrl) ?>" title="فيديو الألبوم" loading="lazy" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture"></iframe></div>
+  <?php elseif ($videoUrl !== ''): ?>
+    <p style="margin-top:14px"><a class="btn btn-primary" href="<?= View::e($videoUrl) ?>" target="_blank" rel="noopener">▶ مشاهدة فيديو الألبوم</a></p>
+  <?php endif; ?>
+
   <div class="grid grid-3" style="margin-top:16px">
     <?php foreach ($photos as $photo): ?>
       <a class="card-img" style="border-radius:var(--radius)" href="<?= View::e(Media::url($photo['stored_path'])) ?>" target="_blank" rel="noopener">

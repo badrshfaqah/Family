@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS `{prefix}gallery_albums` (
   `description` VARCHAR(500) NULL,
   `cover_media_id` INT UNSIGNED NULL,
   `album_type` ENUM('photo','video') NOT NULL DEFAULT 'photo',
+  `video_url` VARCHAR(255) NULL,
   `year` SMALLINT UNSIGNED NULL,
   `city_id` INT UNSIGNED NULL,
   `branch_id` INT UNSIGNED NULL,
