@@ -1,5 +1,6 @@
 <?php
 /** @var array $rows
+ *  @var array $coverageMap
  *  @var array $types
  *  @var array $cities
  *  @var string $selectedType
@@ -120,6 +121,7 @@ $todayTs = strtotime(date('Y-m-d'));
                 <span>🏷 <?= View::e($ev['entry_type']) ?></span>
                 <span>🕗 <?= $time ?></span>
                 <?php if (!empty($ev['venue_name'])): ?><span>📍 <?= View::e($ev['venue_name']) ?><?= !empty($ev['city_name']) ? ' — ' . View::e($ev['city_name']) : '' ?></span><?php endif; ?>
+                <?php if (!empty($coverageMap[(int) $ev['id']])): ?><span style="color:var(--c-primary);font-weight:800">📸 تغطية متوفرة</span><?php endif; ?>
               </span>
             </div>
             <span class="cal-left"><?= $leftLabel ?></span>

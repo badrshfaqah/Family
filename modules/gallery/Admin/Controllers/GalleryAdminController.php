@@ -47,6 +47,7 @@ final class GalleryAdminController
             'photos' => [],
             'cities' => $this->cityList(),
             'branches' => $this->branchList(),
+            'calendarEntries' => $this->calendarEntries(),
             'branchesEnabled' => Settings::get('branches_enabled', '0') === '1',
         ]);
     }
@@ -77,6 +78,7 @@ final class GalleryAdminController
             'branch_id' => Request::int('branch_id') ?: null,
             'related_news_id' => Request::int('related_news_id') ?: null,
             'related_event_id' => Request::int('related_event_id') ?: null,
+            'related_calendar_id' => Request::int('related_calendar_id') ?: null,
             'status' => $this->resolveStatus(),
             'sort_order' => Request::int('sort_order', 0),
             'created_by' => Auth::user()['id'] ?? null,
@@ -113,6 +115,7 @@ final class GalleryAdminController
             'photos' => $photos,
             'cities' => $this->cityList(),
             'branches' => $this->branchList(),
+            'calendarEntries' => $this->calendarEntries(),
             'branchesEnabled' => Settings::get('branches_enabled', '0') === '1',
         ]);
     }
@@ -142,6 +145,7 @@ final class GalleryAdminController
             'branch_id' => Request::int('branch_id') ?: null,
             'related_news_id' => Request::int('related_news_id') ?: null,
             'related_event_id' => Request::int('related_event_id') ?: null,
+            'related_calendar_id' => Request::int('related_calendar_id') ?: null,
             'status' => $this->resolveStatus(),
             'sort_order' => Request::int('sort_order', 0),
             'updated_at' => date('Y-m-d H:i:s'),
@@ -270,6 +274,18 @@ final class GalleryAdminController
             Session::flash('error', $e->getMessage());
             return null;
         }
+    }
+
+    /** مناسبات الرزنامة لربط الألبوم بتغطيتها (الأحدث أولًا) */
+    private function calendarEntries(): array
+    {
+        if (!Database::tableExists('calendar_entries')) {
+            return [];
+        }
+        return Database::fetchAll(
+            'SELECT id, title, entry_datetime FROM ' . Database::table('calendar_entries') . "
+             WHERE status = 'published' ORDER BY entry_datetime DESC LIMIT 200"
+        );
     }
 
     private function cityList(): array

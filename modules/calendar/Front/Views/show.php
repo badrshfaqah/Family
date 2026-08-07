@@ -1,5 +1,6 @@
 <?php
 /** @var array $item
+ *  @var array $coverageAlbums
  *  @var array|null $linkedEvent
  */
 use Core\Media;
@@ -44,6 +45,28 @@ $cover = fam_calendar_cover($item['cover_media_id'] ?? null);
       <?php endif; ?>
     </div>
   </article>
+
+  <?php if (!empty($coverageAlbums)): ?>
+  <section style="margin-top:22px">
+    <div class="section-head"><h2>📸 تغطية المناسبة</h2><a href="<?= Url::to('gallery') ?>">مكتبة الصور</a></div>
+    <div class="grid grid-3">
+      <?php foreach ($coverageAlbums as $alb): ?>
+      <a class="card" href="<?= Url::to('gallery/' . $alb['slug']) ?>">
+        <?php if (!empty($alb['cover_path'])): ?>
+          <div class="card-img"><img loading="lazy" src="<?= View::e(Media::url($alb['cover_path'])) ?>" alt=""></div>
+        <?php endif; ?>
+        <div class="card-body">
+          <p class="card-title"><?= View::e($alb['title']) ?></p>
+          <div class="card-meta">
+            <span>🖼 <?= (int) $alb['photos_count'] ?> صورة</span>
+            <?php if (!empty($alb['video_url'])): ?><span>🎬 فيديو</span><?php endif; ?>
+          </div>
+        </div>
+      </a>
+      <?php endforeach; ?>
+    </div>
+  </section>
+  <?php endif; ?>
 
   <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap">
     <a class="btn btn-secondary" target="_blank" rel="noopener" href="https://wa.me/?text=<?= urlencode($item['title'] . ' ' . Url::current()) ?>">واتساب</a>

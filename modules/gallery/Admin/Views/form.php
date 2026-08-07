@@ -3,6 +3,7 @@
  *  @var array $photos
  *  @var array $cities
  *  @var array $branches
+ *  @var array $calendarEntries
  *  @var bool $branchesEnabled
  */
 use Core\Database;
@@ -81,8 +82,19 @@ function fam_gallery_cover_thumb($mediaId)
   </div>
 
   <div class="form-row cols-3">
+    <div class="form-group">
+      <label>تغطية لمناسبة من الرزنامة (اختياري)</label>
+      <select class="form-control" name="related_calendar_id">
+        <option value="">— بدون ربط —</option>
+        <?php foreach (($calendarEntries ?? []) as $ce): ?>
+          <option value="<?= (int) $ce['id'] ?>" <?= (int) ($item['related_calendar_id'] ?? 0) === (int) $ce['id'] ? 'selected' : '' ?>>
+            <?= View::e($ce['title']) ?> — <?= View::e(date('Y/m/d', strtotime($ce['entry_datetime']))) ?>
+          </option>
+        <?php endforeach; ?>
+      </select>
+      <div class="form-hint">عند الربط يظهر الألبوم (صوره وفيديوه) تلقائيًا في صفحة المناسبة، وتظهر شارة 📸 بجانبها في الرزنامة.</div>
+    </div>
     <div class="form-group"><label>معرّف خبر مرتبط (اختياري)</label><input class="form-control" type="number" name="related_news_id" value="<?= View::e((string) ($item['related_news_id'] ?? '')) ?>"></div>
-    <div class="form-group"><label>معرّف مناسبة مرتبطة (اختياري)</label><input class="form-control" type="number" name="related_event_id" value="<?= View::e((string) ($item['related_event_id'] ?? '')) ?>"></div>
     <div class="form-group">
       <label>صورة الغلاف</label>
       <?php $cover = fam_gallery_cover_thumb($item['cover_media_id'] ?? null); if ($cover): ?><img src="<?= View::e($cover) ?>" style="height:60px;border-radius:8px;margin-bottom:8px;display:block"><?php endif; ?>

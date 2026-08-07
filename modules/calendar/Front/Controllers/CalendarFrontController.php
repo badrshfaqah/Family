@@ -73,6 +73,21 @@ final class CalendarFrontController
             $sqlParams
         );
 
+        // المناسبات التي لها تغطية (ألبوم مرتبط) لعرض شارة 📸 في القائمة
+        $coverageMap = [];
+        if ($rows && \Core\ModuleManager::isEnabled('gallery') && Database::tableExists('gallery_albums')) {
+            $ids = array_map(fn($r) => (int) $r['id'], $rows);
+            $placeholders = implode(',', array_fill(0, count($ids), '?'));
+            $covered = Database::fetchAll(
+                'SELECT DISTINCT related_calendar_id FROM ' . Database::table('gallery_albums') . "
+                 WHERE status = 'published' AND related_calendar_id IN ({$placeholders})",
+                $ids
+            );
+            foreach ($covered as $c) {
+                $coverageMap[(int) $c['related_calendar_id']] = true;
+            }
+        }
+
         $types = Database::fetchAll(
             'SELECT DISTINCT entry_type FROM ' . Database::table('calendar_entries') . ' WHERE status = "published" ORDER BY entry_type ASC'
         );
@@ -83,6 +98,7 @@ final class CalendarFrontController
 
         echo View::renderLayout($layout, $view_, [
             'rows' => $rows,
+            'coverageMap' => $coverageMap,
             'types' => array_column($types, 'entry_type'),
             'cities' => $cities,
             'selectedType' => $type,
@@ -111,6 +127,20 @@ final class CalendarFrontController
             return;
         }
 
+        // ألبومات التغطية المرتبطة بالمناسبة (صور وفيديو من المعرض)
+        $coverageAlbums = [];
+        if (\Core\ModuleManager::isEnabled('gallery') && Database::tableExists('gallery_albums')) {
+            $coverageAlbums = Database::fetchAll(
+                'SELECT a.id, a.title, a.slug, a.video_url, a.cover_media_id, m.stored_path AS cover_path,
+                        (SELECT COUNT(*) FROM ' . Database::table('gallery_photos') . ' gp WHERE gp.album_id = a.id) AS photos_count
+                 FROM ' . Database::table('gallery_albums') . ' a
+                 LEFT JOIN ' . Database::table('media') . " m ON m.id = a.cover_media_id
+                 WHERE a.related_calendar_id = ? AND a.status = 'published'
+                 ORDER BY a.id DESC",
+                [(int) $params['id']]
+            );
+        }
+
         $linkedEvent = null;
         if (!empty($item['event_id']) && \Core\ModuleManager::isEnabled('events') && Database::tableExists('events')) {
             $linkedEvent = Database::fetchOne(
@@ -124,6 +154,7 @@ final class CalendarFrontController
 
         echo View::renderLayout($layout, $view, [
             'item' => $item,
+            'coverageAlbums' => $coverageAlbums,
             'linkedEvent' => $linkedEvent,
             'pageTitle' => $item['title'],
             'metaDescription' => $item['notes'] ?? '',

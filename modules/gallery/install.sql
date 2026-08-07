@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS `{prefix}gallery_albums` (
   `branch_id` INT UNSIGNED NULL,
   `related_news_id` INT UNSIGNED NULL,
   `related_event_id` INT UNSIGNED NULL,
+  `related_calendar_id` INT UNSIGNED NULL,
   `status` ENUM('draft','published') NOT NULL DEFAULT 'draft',
   `sort_order` INT NOT NULL DEFAULT 0,
   `created_by` INT UNSIGNED NULL,

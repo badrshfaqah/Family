@@ -56,7 +56,7 @@ $siteMenu = array_values(array_filter([
     ['url' => Url::to('gatherings'), 'icon' => '☕', 'label' => 'الجمعات', 'show' => \Core\ModuleManager::isEnabled('gatherings')],
     ['url' => Url::to('obituaries'), 'icon' => '🕊', 'label' => 'الوفيات', 'show' => \Core\ModuleManager::isEnabled('obituaries')],
     ['url' => Url::to('poetry'), 'icon' => '🪶', 'label' => 'سماء الشعراء', 'show' => \Core\ModuleManager::isEnabled('poetry')],
-    ['url' => Url::to('tree'), 'icon' => '🌳', 'label' => 'شجرة النسب', 'show' => \Core\ModuleManager::isEnabled('family-tree')],
+    ['url' => Url::to('tree'), 'icon' => '🌳', 'label' => 'شجرة النسب', 'show' => \Core\ModuleManager::isEnabled('family-tree'), 'header' => false],
     ['url' => Url::to('gallery'), 'icon' => '🖼', 'label' => 'مكتبة الصور', 'show' => \Core\ModuleManager::isEnabled('gallery')],
     ['url' => Url::to('archive'), 'icon' => '📜', 'label' => 'الأرشيف', 'show' => \Core\ModuleManager::isEnabled('archive')],
     ['url' => Url::to('news'), 'icon' => '📰', 'label' => 'الأخبار', 'show' => \Core\ModuleManager::isEnabled('news')],
@@ -143,7 +143,7 @@ $metaDescription = $metaDescription ?? Settings::get('seo_default_description', 
   <nav class="top-nav" aria-label="أقسام الموقع">
     <div class="container top-nav-in">
       <a href="<?= Url::to('') ?>" class="<?= $navCurrentRel === '' ? 'active' : '' ?>">الرئيسية</a>
-      <?php foreach ($siteMenu as $navItem): ?>
+      <?php foreach ($siteMenu as $navItem): if (($navItem['header'] ?? true) === false) continue; ?>
         <a href="<?= \Core\View::e($navItem['url']) ?>" class="<?= $navIsActive($navItem['url']) ? 'active' : '' ?>"><?= \Core\View::e($navItem['label']) ?></a>
       <?php endforeach; ?>
     </div>
@@ -158,7 +158,7 @@ $metaDescription = $metaDescription ?? Settings::get('seo_default_description', 
       <button class="icon-btn close-btn" data-nav-close aria-label="إغلاق">✕</button>
     </div>
     <a href="<?= Url::to('') ?>" class="<?= $navCurrentRel === '' ? 'active' : '' ?>"><span class="nav-icon">🏠</span>الرئيسية</a>
-    <?php foreach ($siteMenu as $navItem): ?>
+    <?php foreach ($siteMenu as $navItem): if (($navItem['header'] ?? true) === false) continue; ?>
       <a href="<?= \Core\View::e($navItem['url']) ?>" class="<?= $navIsActive($navItem['url']) ? 'active' : '' ?>"><span class="nav-icon"><?= $navItem['icon'] ?></span><?= \Core\View::e($navItem['label']) ?></a>
     <?php endforeach; ?>
   </div>
