@@ -27,7 +27,7 @@ final class PoetryFrontController
         echo View::renderLayout($layout, $view, [
             'poets' => $poets,
             'pageTitle' => 'سماء الشعراء',
-            'metaDescription' => Settings::get('seo_default_description', ''),
+            'metaDescription' => 'شعراء العائلة وقصائدهم — دواوين موثقة بالعامية الأصيلة: وجدانيات وقصائد مناسبات ورثاء.',
         ]);
     }
 
@@ -58,7 +58,13 @@ final class PoetryFrontController
             'poet' => $poet,
             'poems' => $poems,
             'pageTitle' => 'الشاعر ' . $poet['name'],
-            'metaDescription' => Settings::get('seo_default_description', ''),
+            'metaDescription' => mb_substr(($poet['bio'] ?: 'قصائد الشاعر ' . $poet['name']) . ' — ' . count($poems) . ' قصيدة.', 0, 160),
+            'jsonLd' => [
+                '@type' => 'Person',
+                'name' => $poet['name'],
+                'description' => $poet['bio'] ?: null,
+                'jobTitle' => 'شاعر',
+            ],
         ]);
     }
 
@@ -78,10 +84,11 @@ final class PoetryFrontController
         $layout = CORE_PATH . '/Front/Views/layouts/main.php';
         $view = __DIR__ . '/../Views/poem.php';
 
+        $firstLine = trim((string) strtok((string) $poem['content'], "\n"));
         echo View::renderLayout($layout, $view, [
             'poem' => $poem,
             'pageTitle' => $poem['title'] . ' — ' . $poem['poet_name'],
-            'metaDescription' => Settings::get('seo_default_description', ''),
+            'metaDescription' => mb_substr('قصيدة ' . $poem['title'] . ' للشاعر ' . $poem['poet_name'] . ': ' . $firstLine, 0, 160),
         ]);
     }
 }

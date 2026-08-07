@@ -89,20 +89,38 @@ $fontStacks = [
 ];
 $fontStack = $fontStacks[Settings::get('theme_font', 'default')] ?? $fontStacks['default'];
 $pageTitle = $pageTitle ?? $officialName;
-$metaDescription = $metaDescription ?? Settings::get('seo_default_description', '');
+$metaDescription = $metaDescription ?? '';
+if ($metaDescription === '') {
+    $metaDescription = Settings::get('seo_default_description', '') ?: Settings::get('identity_brief', '');
+}
+// عنوان الصفحة مع اسم الموقع (بدون تكرار في الرئيسية)
+$fullTitle = ($pageTitle === $officialName || $pageTitle === $shortName)
+    ? $pageTitle
+    : $pageTitle . ' | ' . $shortName;
+$ogImage = $ogImage ?? ($logoUrl ? Url::origin() . $logoUrl : '');
+$metaRobots = $metaRobots ?? '';
+$jsonLd = $jsonLd ?? null;
 ?><!doctype html>
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title><?= \Core\View::e($pageTitle) ?></title>
+<title><?= \Core\View::e($fullTitle) ?></title>
 <meta name="description" content="<?= \Core\View::e($metaDescription) ?>">
 <link rel="canonical" href="<?= \Core\View::e(Url::current()) ?>">
+<?php if ($metaRobots !== ''): ?><meta name="robots" content="<?= \Core\View::e($metaRobots) ?>"><?php endif; ?>
 <?php if ($logoUrl): ?><link rel="icon" href="<?= \Core\View::e($logoUrl) ?>"><?php endif; ?>
-<meta property="og:title" content="<?= \Core\View::e($pageTitle) ?>">
+<meta property="og:title" content="<?= \Core\View::e($fullTitle) ?>">
 <meta property="og:description" content="<?= \Core\View::e($metaDescription) ?>">
-<meta property="og:type" content="website">
-<?php if ($logoUrl): ?><meta property="og:image" content="<?= \Core\View::e(Url::origin() . $logoUrl) ?>"><?php endif; ?>
+<meta property="og:type" content="<?= \Core\View::e($ogType ?? 'website') ?>">
+<meta property="og:url" content="<?= \Core\View::e(Url::current()) ?>">
+<meta property="og:site_name" content="<?= \Core\View::e($shortName) ?>">
+<meta property="og:locale" content="ar_AR">
+<?php if ($ogImage): ?><meta property="og:image" content="<?= \Core\View::e($ogImage) ?>"><?php endif; ?>
+<meta name="twitter:card" content="<?= $ogImage ? 'summary_large_image' : 'summary' ?>">
+<meta name="twitter:title" content="<?= \Core\View::e($fullTitle) ?>">
+<meta name="twitter:description" content="<?= \Core\View::e($metaDescription) ?>">
+<?php if ($ogImage): ?><meta name="twitter:image" content="<?= \Core\View::e($ogImage) ?>"><?php endif; ?>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap">
@@ -111,6 +129,27 @@ $metaDescription = $metaDescription ?? Settings::get('seo_default_description', 
 <link rel="manifest" href="<?= Url::to('manifest.webmanifest') ?>">
 <meta name="theme-color" content="<?= \Core\View::e($primaryColor) ?>">
 <link rel="apple-touch-icon" href="<?= Url::to('pwa-icon-192.png') ?>">
+<?php
+// بيانات منظمة لمحركات البحث: هوية الموقع + أي بيانات خاصة تمررها الصفحة
+$ldGraph = [
+    [
+        '@type' => 'WebSite',
+        'name' => $shortName,
+        'url' => Url::origin() . Url::to(''),
+        'inLanguage' => 'ar',
+    ],
+    array_filter([
+        '@type' => 'Organization',
+        'name' => $officialName ?: $shortName,
+        'url' => Url::origin() . Url::to(''),
+        'logo' => $logoUrl ? Url::origin() . $logoUrl : null,
+    ]),
+];
+if (is_array($jsonLd) && $jsonLd) {
+    $ldGraph[] = $jsonLd;
+}
+?>
+<script type="application/ld+json"><?= json_encode(['@context' => 'https://schema.org', '@graph' => $ldGraph], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?></script>
 </head>
 <body>
 

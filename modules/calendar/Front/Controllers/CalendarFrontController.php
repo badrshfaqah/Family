@@ -152,12 +152,38 @@ final class CalendarFrontController
         $layout = CORE_PATH . '/Front/Views/layouts/main.php';
         $view = __DIR__ . '/../Views/show.php';
 
+        // وصف ديناميكي وبيانات Event المنظمة لنتائج بحث غنية
+        $descParts = ['مناسبة ' . $item['entry_type'] . ': ' . $item['title']];
+        $descParts[] = 'بتاريخ ' . date('Y/m/d', strtotime($item['entry_datetime']));
+        if (!empty($item['venue_name'])) {
+            $descParts[] = 'في ' . $item['venue_name'];
+        }
+        if (!empty($item['city_name'])) {
+            $descParts[] = $item['city_name'];
+        }
+        $metaDescription = mb_substr(implode(' — ', $descParts), 0, 160);
+
+        $eventLd = array_filter([
+            '@type' => 'Event',
+            'name' => $item['title'],
+            'startDate' => date('c', strtotime($item['entry_datetime'])),
+            'eventStatus' => 'https://schema.org/EventScheduled',
+            'eventAttendanceMode' => 'https://schema.org/OfflineEventAttendanceMode',
+            'description' => $metaDescription,
+            'location' => !empty($item['venue_name']) ? [
+                '@type' => 'Place',
+                'name' => $item['venue_name'],
+                'address' => $item['city_name'] ?? '',
+            ] : null,
+        ]);
+
         echo View::renderLayout($layout, $view, [
             'item' => $item,
             'coverageAlbums' => $coverageAlbums,
             'linkedEvent' => $linkedEvent,
             'pageTitle' => $item['title'],
-            'metaDescription' => $item['notes'] ?? '',
+            'metaDescription' => $metaDescription,
+            'jsonLd' => $eventLd,
         ]);
     }
 }

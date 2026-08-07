@@ -45,10 +45,18 @@ final class ObituariesFrontController
         $layout = CORE_PATH . '/Front/Views/layouts/main.php';
         $view = __DIR__ . '/../Views/show.php';
 
+        $descParts = ['إعلان وفاة ' . $item['name']];
+        if (!empty($item['condolence_venue'])) {
+            $descParts[] = 'العزاء: ' . $item['condolence_venue'];
+        }
+        if (!empty($item['city_name'])) {
+            $descParts[] = $item['city_name'];
+        }
+
         echo View::renderLayout($layout, $view, [
             'item' => $item,
             'pageTitle' => 'وفاة ' . $item['name'],
-            'metaDescription' => Settings::get('seo_default_description', ''),
+            'metaDescription' => mb_substr(implode(' — ', $descParts) . '. إنا لله وإنا إليه راجعون.', 0, 160),
         ]);
     }
 }

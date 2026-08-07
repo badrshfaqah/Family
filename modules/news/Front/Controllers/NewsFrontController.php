@@ -67,11 +67,34 @@ final class NewsFrontController
         $layout = CORE_PATH . '/Front/Views/layouts/main.php';
         $view = __DIR__ . '/../Views/show.php';
 
+        // صورة الغلاف للمشاركة وبيانات Article المنظمة
+        $ogImage = '';
+        if (!empty($item['cover_media_id'])) {
+            $media = Database::fetchOne('SELECT stored_path FROM ' . Database::table('media') . ' WHERE id = ?', [$item['cover_media_id']]);
+            if ($media) {
+                $ogImage = \Core\Support\Url::origin() . \Core\Media::url($media['stored_path']);
+            }
+        }
+
+        $articleLd = array_filter([
+            '@type' => 'NewsArticle',
+            'headline' => $item['title'],
+            'description' => $item['seo_description'] ?: $item['excerpt'],
+            'datePublished' => date('c', strtotime($item['published_at'])),
+            'dateModified' => date('c', strtotime($item['updated_at'] ?: $item['published_at'])),
+            'image' => $ogImage ?: null,
+            'author' => ['@type' => 'Organization', 'name' => $item['author_name'] ?: 'إدارة الموقع'],
+            'inLanguage' => 'ar',
+        ]);
+
         echo View::renderLayout($layout, $view, [
             'item' => $item,
             'related' => $related,
             'pageTitle' => $item['seo_title'] ?: $item['title'],
             'metaDescription' => $item['seo_description'] ?: $item['excerpt'],
+            'ogImage' => $ogImage,
+            'ogType' => 'article',
+            'jsonLd' => $articleLd,
         ]);
     }
 }

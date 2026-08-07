@@ -3,6 +3,7 @@
 namespace Core\Front\Controllers;
 
 use Core\Database;
+use Core\ModuleManager;
 use Core\Support\Url;
 
 final class SitemapController
@@ -13,21 +14,45 @@ final class SitemapController
 
         $urls = [Url::full('') => ['priority' => '1.0']];
 
+        // صفحات الأقسام الرئيسية (للإضافات المفعلة فقط)
+        $sections = [
+            'calendar' => 'calendar', 'gatherings' => 'gatherings', 'news' => 'news',
+            'gallery' => 'gallery', 'archive' => 'archive', 'poetry' => 'poetry',
+            'obituaries' => 'obituaries', 'family-tree' => 'tree',
+        ];
+        foreach ($sections as $module => $route) {
+            if (ModuleManager::isEnabled($module)) {
+                $urls[Url::full($route)] = ['priority' => '0.8'];
+            }
+        }
+        $urls[Url::full('install-app')] = ['priority' => '0.5'];
+        $urls[Url::full('family')] = ['priority' => '0.5'];
+
+        // المحتوى التفصيلي: [الإضافة، الجدول، المسار، الشرط، حقل الرابط]
         $sources = [
-            'news' => ['table' => 'news', 'route' => 'news', 'where' => "status = 'published'"],
-            'events' => ['table' => 'events', 'route' => 'events', 'where' => "status = 'published'"],
-            'pages' => ['table' => 'pages', 'route' => 'p', 'where' => "status = 'published'"],
-            'archive' => ['table' => 'archive_items', 'route' => 'archive', 'where' => "status = 'published'"],
-            'gallery' => ['table' => 'gallery_albums', 'route' => 'gallery', 'where' => "status = 'published'"],
+            ['news', 'news', 'news', "status = 'published'", 'slug'],
+            ['events', 'events', 'events', "status = 'published'", 'slug'],
+            ['pages', 'pages', 'p', "status = 'published'", 'slug'],
+            ['archive', 'archive_items', 'archive', "status = 'published'", 'slug'],
+            ['gallery', 'gallery_albums', 'gallery', "status = 'published'", 'slug'],
+            ['calendar', 'calendar_entries', 'calendar', "status = 'published'", 'id'],
+            ['obituaries', 'obituaries', 'obituaries', "status = 'active'", 'id'],
+            ['poetry', 'poets', 'poetry', "status = 'active'", 'id'],
+            ['poetry', 'poems', 'poems', "status = 'published'", 'id'],
         ];
 
-        foreach ($sources as $conf) {
-            if (!Database::tableExists($conf['table'])) {
+        foreach ($sources as [$module, $table, $route, $where, $key]) {
+            if (!ModuleManager::isEnabled($module) || !Database::tableExists($table)) {
                 continue;
             }
-            $rows = Database::fetchAll("SELECT slug, updated_at FROM " . Database::table($conf['table']) . " WHERE {$conf['where']} LIMIT 5000");
+            $hasUpdated = (bool) Database::fetchOne('SHOW COLUMNS FROM ' . Database::table($table) . " LIKE 'updated_at'");
+            $select = $key . ($hasUpdated ? ', updated_at' : '');
+            $rows = Database::fetchAll("SELECT {$select} FROM " . Database::table($table) . " WHERE {$where} LIMIT 5000");
             foreach ($rows as $row) {
-                $urls[Url::full($conf['route'] . '/' . $row['slug'])] = ['priority' => '0.7', 'lastmod' => $row['updated_at'] ?? null];
+                $urls[Url::full($route . '/' . $row[$key])] = [
+                    'priority' => '0.7',
+                    'lastmod' => $row['updated_at'] ?? null,
+                ];
             }
         }
 
@@ -50,6 +75,8 @@ final class SitemapController
         echo "User-agent: *\n";
         echo "Disallow: {$base}admin/\n";
         echo "Disallow: {$base}install/\n";
+        echo "Disallow: {$base}search\n";
+        echo "Disallow: {$base}push/\n";
         echo "Disallow: {$base}storage/logs/\n";
         echo "Disallow: {$base}storage/backups/\n";
         echo "Disallow: {$base}storage/cache/\n";

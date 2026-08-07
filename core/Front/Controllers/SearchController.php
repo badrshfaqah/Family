@@ -21,7 +21,13 @@ final class SearchController
         $layout = CORE_PATH . '/Front/Views/layouts/main.php';
         $view = ROOT_PATH . '/themes/default/templates/search.php';
 
-        echo View::renderLayout($layout, $view, ['q' => $q, 'type' => $type, 'results' => $results]);
+        echo View::renderLayout($layout, $view, [
+            'q' => $q,
+            'type' => $type,
+            'results' => $results,
+            'pageTitle' => 'البحث',
+            'metaRobots' => 'noindex, follow',
+        ]);
     }
 
     private function search(string $q, string $type): array
