@@ -31,6 +31,20 @@ $heroCover = fam_media_url(Settings::get('identity_cover_media_id', ''));
   <?php if ($section === 'hero'): ?>
 
   <?php
+    $wdNames = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+    $moNames = [1 => 'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+  ?>
+  <section class="welcome-band">
+    <div class="container">
+      <h1><?= \Core\View::e(Terms::phrase('welcome')) ?></h1>
+      <p class="welcome-sub">
+        <?= $wdNames[(int) date('w')] ?> <?= (int) date('j') ?> <?= $moNames[(int) date('n')] ?> <?= date('Y') ?>
+        <?php if (Settings::get('identity_brief')): ?> · <?= \Core\View::e(Settings::get('identity_brief')) ?><?php endif; ?>
+      </p>
+    </div>
+  </section>
+
+  <?php
     // إعلانات الوفيات النشطة: بطاقات صغيرة أعلى بطاقة التسجيل
     $homeObituaries = [];
     if (\Core\ModuleManager::isEnabled('obituaries') && \Core\Database::tableExists('obituaries')) {
@@ -142,10 +156,15 @@ $heroCover = fam_media_url(Settings::get('identity_cover_media_id', ''));
 
   <?php if ($section === 'announcements' && !empty($announcements)): ?>
   <section class="section container">
-    <div class="section-head"><h2>إعلانات</h2></div>
+    <div class="section-head"><h2>📣 إعلانات</h2></div>
     <div class="grid">
       <?php foreach ($announcements as $a): ?>
-      <div class="card"><div class="card-body"><p class="card-title"><?= \Core\View::e($a['title']) ?></p><p><?= \Core\View::e($a['message'] ?? '') ?></p></div></div>
+      <div class="card ann-card">
+        <div class="card-body">
+          <p class="card-title"><?= \Core\View::e($a['title']) ?></p>
+          <p class="ann-msg"><?= \Core\View::e($a['message'] ?? '') ?></p>
+        </div>
+      </div>
       <?php endforeach; ?>
     </div>
   </section>
@@ -155,9 +174,13 @@ $heroCover = fam_media_url(Settings::get('identity_cover_media_id', ''));
   <?php if ($section === 'stats' && !empty($stats)): ?>
   <section class="section container">
     <div class="stats-grid">
-      <?php $labels = ['news' => 'خبر منشور', 'events' => 'مناسبة', 'gatherings' => 'جمعة نشطة', 'gallery' => 'صورة', 'archive' => 'وثيقة', 'directory_count' => 'رقم مسجّل', 'push_subscribers' => 'جهاز مشترك في التنبيهات']; ?>
-      <?php foreach ($stats as $key => $value): ?>
-        <div class="stat-card"><b><?= (int) $value ?></b><span><?= \Core\View::e($labels[$key] ?? $key) ?></span></div>
+      <?php $labels = [
+        'news' => ['📰', 'خبر منشور'], 'events' => ['🎪', 'مناسبة'], 'gatherings' => ['☕', 'جمعة نشطة'],
+        'gallery' => ['🖼', 'صورة'], 'archive' => ['📜', 'وثيقة'], 'directory_count' => ['📱', 'رقم مسجّل'],
+        'push_subscribers' => ['🔔', 'جهاز مشترك في التنبيهات'],
+      ]; ?>
+      <?php foreach ($stats as $key => $value): [$icon, $label] = $labels[$key] ?? ['▪️', $key]; ?>
+        <div class="stat-card"><span class="stat-icon"><?= $icon ?></span><b><?= (int) $value ?></b><span><?= \Core\View::e($label) ?></span></div>
       <?php endforeach; ?>
     </div>
   </section>

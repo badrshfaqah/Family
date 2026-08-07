@@ -41,7 +41,16 @@ final class ArchiveFrontController
             $queryParams
         );
 
-        $categories = Database::fetchAll('SELECT * FROM ' . Database::table('archive_categories') . ' ORDER BY sort_order ASC');
+        // التصنيفات مع عدد المواد المنشورة في كل تصنيف لعرضها كبطاقات بارزة
+        $categories = Database::fetchAll(
+            'SELECT c.*, (SELECT COUNT(*) FROM ' . Database::table('archive_items') . " a2
+                          WHERE a2.category_id = c.id AND a2.status = 'published') AS items_count
+             FROM " . Database::table('archive_categories') . ' c
+             ORDER BY c.sort_order ASC'
+        );
+        $allCount = (int) Database::fetchValue(
+            'SELECT COUNT(*) FROM ' . Database::table('archive_items') . " WHERE status = 'published'"
+        );
 
         $layout = CORE_PATH . '/Front/Views/layouts/main.php';
         $view = __DIR__ . '/../Views/index.php';
@@ -52,6 +61,7 @@ final class ArchiveFrontController
             'perPage' => $perPage,
             'total' => $total,
             'categories' => $categories,
+            'allCount' => $allCount,
             'currentCategory' => $categoryId,
             'pageTitle' => Terms::phrase('archive'),
             'metaDescription' => Settings::get('seo_default_description', ''),

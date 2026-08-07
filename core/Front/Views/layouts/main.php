@@ -54,12 +54,12 @@ $siteMenu = array_values(array_filter([
     ['url' => Url::to('directory/register'), 'icon' => '📱', 'label' => 'جوال القبيلة', 'show' => \Core\ModuleManager::isEnabled('directory')],
     ['url' => Url::to('calendar'), 'icon' => '📅', 'label' => 'الرزنامة', 'show' => \Core\ModuleManager::isEnabled('calendar')],
     ['url' => Url::to('gatherings'), 'icon' => '☕', 'label' => 'الجمعات', 'show' => \Core\ModuleManager::isEnabled('gatherings')],
-    ['url' => Url::to('obituaries'), 'icon' => '🕊', 'label' => 'الوفيات', 'show' => \Core\ModuleManager::isEnabled('obituaries')],
+    ['url' => Url::to('obituaries'), 'icon' => '🕊', 'label' => 'الوفيات', 'show' => \Core\ModuleManager::isEnabled('obituaries'), 'header' => false],
     ['url' => Url::to('poetry'), 'icon' => '🪶', 'label' => 'سماء الشعراء', 'show' => \Core\ModuleManager::isEnabled('poetry')],
     ['url' => Url::to('tree'), 'icon' => '🌳', 'label' => 'شجرة النسب', 'show' => \Core\ModuleManager::isEnabled('family-tree'), 'header' => false],
     ['url' => Url::to('gallery'), 'icon' => '🖼', 'label' => 'مكتبة الصور', 'show' => \Core\ModuleManager::isEnabled('gallery')],
-    ['url' => Url::to('archive'), 'icon' => '📜', 'label' => 'الأرشيف', 'show' => \Core\ModuleManager::isEnabled('archive')],
-    ['url' => Url::to('news'), 'icon' => '📰', 'label' => 'الأخبار', 'show' => \Core\ModuleManager::isEnabled('news')],
+    ['url' => Url::to('archive'), 'icon' => '📜', 'label' => 'الأرشيف', 'show' => \Core\ModuleManager::isEnabled('archive'), 'header' => false],
+    ['url' => Url::to('news'), 'icon' => '📰', 'label' => 'الأخبار', 'show' => \Core\ModuleManager::isEnabled('news'), 'header' => false],
 ], fn($item) => $item['show']));
 
 // القسم النشط حاليًا (للقائمة العلوية والجانبية والسفلية)

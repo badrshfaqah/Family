@@ -22,17 +22,24 @@ $totalPages = max(1, (int) ceil($total / $perPage));
 ?>
 <div class="container section">
   <div class="breadcrumbs"><a href="<?= Url::to('') ?>">الرئيسية</a> / <?= View::e(Terms::phrase('archive')) ?></div>
-  <h1><?= View::e(Terms::phrase('archive')) ?></h1>
+  <h1>📜 <?= View::e(Terms::phrase('archive')) ?></h1>
+  <p class="form-hint">ذاكرة القبيلة الموثقة — تصفح حسب التصنيف</p>
 
   <?php if (!empty($categories)): ?>
-  <form method="get" style="margin:14px 0">
-    <select class="form-control" name="category_id" data-auto-submit style="max-width:220px">
-      <option value="">كل التصنيفات</option>
-      <?php foreach ($categories as $c): ?>
-        <option value="<?= $c['id'] ?>" <?= (int) $currentCategory === (int) $c['id'] ? 'selected' : '' ?>><?= View::e($c['name']) ?></option>
-      <?php endforeach; ?>
-    </select>
-  </form>
+  <div class="arc-cats">
+    <a class="arc-cat <?= !$currentCategory ? 'active' : '' ?>" href="<?= Url::to('archive') ?>">
+      <span class="arc-cat-icon">🗂</span>
+      <b>الكل</b>
+      <span class="arc-cat-count"><?= (int) ($allCount ?? 0) ?> مادة</span>
+    </a>
+    <?php foreach ($categories as $c): ?>
+    <a class="arc-cat <?= (int) $currentCategory === (int) $c['id'] ? 'active' : '' ?>" href="<?= Url::to('archive?category_id=' . (int) $c['id']) ?>">
+      <span class="arc-cat-icon">📜</span>
+      <b><?= View::e($c['name']) ?></b>
+      <span class="arc-cat-count"><?= (int) ($c['items_count'] ?? 0) ?> مادة</span>
+    </a>
+    <?php endforeach; ?>
+  </div>
   <?php endif; ?>
 
   <div class="grid grid-3">
@@ -40,9 +47,9 @@ $totalPages = max(1, (int) ceil($total / $perPage));
       <a class="card" href="<?= Url::to('archive/' . $item['slug']) ?>">
         <div class="card-img"><img loading="lazy" src="<?= View::e(fam_archive_cover($item['cover_media_id'])) ?>" alt=""></div>
         <div class="card-body">
-          <?php if (!empty($item['category_name'])): ?><span class="card-meta"><?= View::e($item['category_name']) ?></span><?php endif; ?>
+          <?php if (!empty($item['category_name'])): ?><span class="arc-chip"><?= View::e($item['category_name']) ?></span><?php endif; ?>
           <p class="card-title"><?= View::e($item['title']) ?></p>
-          <?php if (!empty($item['period_label'])): ?><div class="card-meta"><span><?= View::e($item['period_label']) ?></span></div><?php endif; ?>
+          <?php if (!empty($item['period_label'])): ?><div class="card-meta"><span>🕰 <?= View::e($item['period_label']) ?></span></div><?php endif; ?>
         </div>
       </a>
     <?php endforeach; ?>
@@ -52,7 +59,7 @@ $totalPages = max(1, (int) ceil($total / $perPage));
   <?php if ($totalPages > 1): ?>
   <div style="display:flex;gap:6px;margin-top:20px;flex-wrap:wrap">
     <?php for ($p = 1; $p <= $totalPages; $p++): ?>
-      <a class="btn btn-sm <?= $p === $page ? 'btn-primary' : 'btn-outline' ?>" style="<?= $p === $page ? '' : 'color:var(--c-text);border-color:var(--c-border)' ?>" href="<?= Url::to('archive?page=' . $p) ?>"><?= $p ?></a>
+      <a class="btn btn-sm <?= $p === $page ? 'btn-primary' : 'btn-outline' ?>" style="<?= $p === $page ? '' : 'color:var(--c-text);border-color:var(--c-border)' ?>" href="<?= Url::to('archive?page=' . $p . ($currentCategory ? '&category_id=' . (int) $currentCategory : '')) ?>"><?= $p ?></a>
     <?php endfor; ?>
   </div>
   <?php endif; ?>
