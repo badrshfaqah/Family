@@ -126,7 +126,6 @@ $siteName = Settings::get('identity_short_name', '') ?: Settings::get('identity_
             data-place="<?= View::e($placeLabel) ?>"
             data-site="<?= View::e($siteName) ?>"
             data-url="<?= View::e(Url::current()) ?>"
-            data-poster="<?= View::e($posterUrl) ?>"
             data-person="<?= View::e($personUrl) ?>">مشاركة كصورة 🖼</button>
     <button class="btn btn-sm btn-primary" data-share-native data-url="<?= View::e(Url::current()) ?>" data-title="<?= View::e($item['title']) ?>" data-text="<?= View::e($shareText) ?>">مشاركة 📤</button>
   </div>

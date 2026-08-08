@@ -337,6 +337,57 @@
     return lines;
   }
 
+  function cardHexToRgba(hex, alpha) {
+    var h = String(hex).replace('#', '');
+    if (h.length === 3) h = h[0] + h[0] + h[1] + h[1] + h[2] + h[2];
+    var n = parseInt(h, 16);
+    if (isNaN(n)) return 'rgba(0,0,0,' + alpha + ')';
+    return 'rgba(' + ((n >> 16) & 255) + ',' + ((n >> 8) & 255) + ',' + (n & 255) + ',' + alpha + ')';
+  }
+
+  function cardDiamond(ctx, cx, cy, size) {
+    ctx.beginPath();
+    ctx.moveTo(cx, cy - size);
+    ctx.lineTo(cx + size, cy);
+    ctx.lineTo(cx, cy + size);
+    ctx.lineTo(cx - size, cy);
+    ctx.closePath();
+  }
+
+  // شريط بنقش السدو (كما في هوية الموقع): أرضية بلون الهوية وصف معينات ذهبية
+  function cardSaduBand(ctx, W, y, h, primary, secondary) {
+    ctx.fillStyle = primary;
+    ctx.fillRect(0, y, W, h);
+    var cy = y + h / 2, size = h * 0.3;
+    ctx.fillStyle = secondary;
+    for (var x = 17; x < W + 17; x += 34) {
+      cardDiamond(ctx, x, cy, size);
+      ctx.fill();
+    }
+  }
+
+  // فاصل زخرفي: خطان رفيعان يلتقيان بمعين ذهبي
+  function cardOrnamentDivider(ctx, cx, cy, halfSpan, secondary) {
+    ctx.strokeStyle = secondary;
+    ctx.lineWidth = 1.6;
+    ctx.beginPath();
+    ctx.moveTo(cx - halfSpan, cy);
+    ctx.lineTo(cx - 30, cy);
+    ctx.moveTo(cx + 30, cy);
+    ctx.lineTo(cx + halfSpan, cy);
+    ctx.stroke();
+    ctx.fillStyle = secondary;
+    cardDiamond(ctx, cx, cy, 9);
+    ctx.fill();
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = cardHexToRgba(secondary, 0.6);
+    cardDiamond(ctx, cx - halfSpan - 16, cy, 5);
+    ctx.stroke();
+    cardDiamond(ctx, cx + halfSpan + 16, cy, 5);
+    ctx.stroke();
+  }
+
+  // بطاقة دعوة احترافية بهوية الموقع — بدون البوستر (خلفية مصممة وليست صورة)
   function buildEventCard(d) {
     var rootStyle = getComputedStyle(document.documentElement);
     var primary = (rootStyle.getPropertyValue('--c-primary') || '').trim() || '#0f6e5e';
@@ -349,30 +400,34 @@
 
     var fontsReady = (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve();
 
-    return Promise.all([loadCardImage(d.poster), loadCardImage(d.person), fontsReady]).then(function (loaded) {
-      var poster = loaded[0], person = loaded[1];
-      var personRadius = 130;
+    return Promise.all([loadCardImage(d.person), fontsReady]).then(function (loaded) {
+      var person = loaded[0];
 
       var rows = [];
-      if (d.date) rows.push('🗓 ' + d.date);
-      if (d.time) rows.push('🕗 ' + d.time);
-      if (d.place) rows.push('📍 ' + d.place);
+      if (d.date) rows.push('🗓  ' + d.date);
+      if (d.time) rows.push('🕗  ' + d.time);
+      if (d.place) rows.push('📍  ' + d.place);
 
-      // حساب الارتفاع أولًا (نفس مقادير الرسم بالأسفل) لأن تغيير قياس الكانفس يصفّر حالته
+      // مقادير التخطيط (تُستخدم في حساب الارتفاع ثم في الرسم بنفس القيم)
+      var personR = 145;
+      var personBlock = person ? (2 * (personR + 14) + 24) : 0;   // الدائرة بإطارها + تنفس
+      var chipBlock = d.type ? 96 : 0;
+      var titleLineH = 84;
+      var dividerBlock = 72;
+      var rowH = 80;
+      var panelBlock = rows.length ? rows.length * rowH + 48 : 0;
+
       var scratch = document.createElement('canvas').getContext('2d');
       scratch.font = cardFont(58, 800);
-      var titleLines = wrapCardText(scratch, d.title, W - 160).slice(0, 3);
+      var titleLines = wrapCardText(scratch, d.title, W - 280).slice(0, 3);
+      var titleBlock = titleLines.length * titleLineH + 6;
 
-      var H = 130                                             // الشريط العلوي
-        + (poster ? 430 : 0)                                  // البوستر
-        + (person ? (poster ? 20 : 60) + personRadius * 2 + 40 - (poster ? personRadius : 0) : 0)
-        + 40                                                  // تنفس قبل الرقاقة
-        + (d.type ? 100 : 0)                                  // رقاقة النوع
-        + titleLines.length * 86 + 10                         // العنوان
-        + 76                                                  // الفاصل الزخرفي
-        + rows.length * 78                                    // صفوف التفاصيل
-        + 60 + 100;                                           // تنفس + شريط الرابط
-      H = Math.max(H, 1080);
+      var total = personBlock + chipBlock + titleBlock + dividerBlock + panelBlock;
+      var contentTop = 216, bottomReserve = 210;
+      var H = 1350;
+      if (total > H - contentTop - bottomReserve) {
+        H = contentTop + bottomReserve + total;
+      }
 
       var canvas = document.createElement('canvas');
       canvas.width = W;
@@ -381,79 +436,178 @@
       ctx.textAlign = 'center';
       try { ctx.direction = 'rtl'; } catch (e) {}
 
-      ctx.fillStyle = '#fdfaf3';
+      // خلفية كريمية بتدرج دافئ + توهج خفيف بلون الهوية أعلى البطاقة
+      var bg = ctx.createLinearGradient(0, 0, 0, H);
+      bg.addColorStop(0, '#fdfaf1');
+      bg.addColorStop(1, '#f5eedb');
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, W, H);
+      var glow = ctx.createRadialGradient(W / 2, 0, 60, W / 2, 0, H * 0.55);
+      glow.addColorStop(0, cardHexToRgba(primary, 0.07));
+      glow.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = glow;
       ctx.fillRect(0, 0, W, H);
 
-      ctx.fillStyle = primary;
-      ctx.fillRect(0, 0, W, 130);
-      ctx.fillStyle = '#ffffff';
-      ctx.font = cardFont(44, 800);
-      ctx.fillText(d.site || '', W / 2, 84, W - 120);
-
-      var y = 130;
-
-      if (poster) {
-        drawCardCover(ctx, poster, 0, y, W, 430);
-        y += 430;
+      // نقش نقاط خافت جدًا بلون الهوية
+      ctx.fillStyle = cardHexToRgba(primary, 0.04);
+      for (var px = 30; px < W; px += 46) {
+        for (var py = 56; py < H - 44; py += 46) {
+          ctx.beginPath();
+          ctx.arc(px, py, 2.2, 0, Math.PI * 2);
+          ctx.fill();
+        }
       }
 
+      // شريطا سدو علوي وسفلي
+      cardSaduBand(ctx, W, 0, 30, primary, secondary);
+      cardSaduBand(ctx, W, H - 30, 30, primary, secondary);
+
+      // إطار ذهبي مزدوج
+      ctx.strokeStyle = secondary;
+      ctx.lineWidth = 3;
+      cardRoundRect(ctx, 48, 76, W - 96, H - 152, 26);
+      ctx.stroke();
+      ctx.lineWidth = 1.2;
+      ctx.strokeStyle = cardHexToRgba(secondary, 0.7);
+      cardRoundRect(ctx, 61, 89, W - 122, H - 178, 18);
+      ctx.stroke();
+
+      // معينان صغيران يكسران خط الإطار في منتصفه علويًا وسفليًا
+      ctx.fillStyle = '#fdfaf1';
+      ctx.beginPath();
+      ctx.arc(W / 2, 76, 20, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(W / 2, H - 76, 20, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = secondary;
+      cardDiamond(ctx, W / 2, 76, 11);
+      ctx.fill();
+      cardDiamond(ctx, W / 2, H - 76, 11);
+      ctx.fill();
+
+      // اسم الموقع وتحته زخرفة
+      ctx.fillStyle = primary;
+      ctx.font = cardFont(38, 800);
+      ctx.fillText(d.site || '', W / 2, 152, W - 280);
+      cardOrnamentDivider(ctx, W / 2, 180, 140, secondary);
+
+      // توسيط المحتوى عموديًا داخل الإطار
+      var y = contentTop + Math.max(0, (H - contentTop - bottomReserve - total) / 2);
+
+      // صورة صاحب المناسبة: دائرة بظل ناعم وإطار ذهبي مزدوج
       if (person) {
-        // دائرة بإطار ذهبي، متداخلة مع حافة البوستر عند وجوده
-        var cy = poster ? y + 20 : y + 60 + personRadius;
+        var cy2 = y + personR + 14;
+        ctx.save();
+        ctx.shadowColor = 'rgba(38,48,40,.28)';
+        ctx.shadowBlur = 26;
+        ctx.shadowOffsetY = 10;
         ctx.beginPath();
-        ctx.arc(W / 2, cy, personRadius + 10, 0, Math.PI * 2);
+        ctx.arc(W / 2, cy2, personR + 14, 0, Math.PI * 2);
         ctx.fillStyle = '#ffffff';
         ctx.fill();
-        ctx.lineWidth = 6;
+        ctx.restore();
+        ctx.lineWidth = 4;
         ctx.strokeStyle = secondary;
+        ctx.beginPath();
+        ctx.arc(W / 2, cy2, personR + 14, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.lineWidth = 1.5;
+        ctx.strokeStyle = cardHexToRgba(secondary, 0.7);
+        ctx.beginPath();
+        ctx.arc(W / 2, cy2, personR + 6, 0, Math.PI * 2);
         ctx.stroke();
         ctx.save();
         ctx.beginPath();
-        ctx.arc(W / 2, cy, personRadius, 0, Math.PI * 2);
+        ctx.arc(W / 2, cy2, personR, 0, Math.PI * 2);
         ctx.clip();
-        drawCardCover(ctx, person, W / 2 - personRadius, cy - personRadius, personRadius * 2, personRadius * 2);
+        drawCardCover(ctx, person, W / 2 - personR, cy2 - personR, personR * 2, personR * 2);
         ctx.restore();
-        y = cy + personRadius + 40;
+        y = cy2 + personR + 14 + 24;
       }
 
-      y += 40;
-
+      // رقاقة النوع بتدرج ذهبي
       if (d.type) {
-        ctx.font = cardFont(34, 800);
-        var chipW = ctx.measureText(d.type).width + 76;
-        cardRoundRect(ctx, (W - chipW) / 2, y, chipW, 64, 32);
-        ctx.fillStyle = secondary;
+        ctx.font = cardFont(33, 800);
+        var chipW = ctx.measureText(d.type).width + 84;
+        var chipG = ctx.createLinearGradient(0, y, 0, y + 62);
+        chipG.addColorStop(0, '#e0bd6d');
+        chipG.addColorStop(1, secondary);
+        cardRoundRect(ctx, (W - chipW) / 2, y, chipW, 62, 31);
+        ctx.fillStyle = chipG;
         ctx.fill();
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = 'rgba(122,94,35,.45)';
+        ctx.stroke();
         ctx.fillStyle = '#2a220a';
-        ctx.fillText(d.type, W / 2, y + 44);
-        y += 100;
+        ctx.fillText(d.type, W / 2, y + 43);
+        y += 96;
       }
 
-      ctx.fillStyle = '#1f2b26';
+      // العنوان
+      ctx.fillStyle = '#20302a';
       ctx.font = cardFont(58, 800);
       titleLines.forEach(function (line) {
         ctx.fillText(line, W / 2, y + 58);
-        y += 86;
+        y += titleLineH;
       });
-      y += 10;
+      y += 6;
 
-      ctx.fillStyle = secondary;
-      ctx.font = cardFont(30, 700);
-      ctx.fillText('❖ ✦ ❖', W / 2, y + 30);
-      y += 76;
+      // فاصل زخرفي
+      cardOrnamentDivider(ctx, W / 2, y + 30, 170, secondary);
+      y += dividerBlock;
 
-      ctx.fillStyle = '#3c463f';
-      ctx.font = cardFont(40, 700);
-      rows.forEach(function (row) {
-        ctx.fillText(row, W / 2, y + 40, W - 140);
-        y += 78;
-      });
+      // لوحة التفاصيل: صندوق شفاف بحد ذهبي وفواصل منقطة
+      if (rows.length) {
+        var panelX = 140, panelW = W - 280, panelH = rows.length * rowH + 44;
+        ctx.save();
+        ctx.shadowColor = 'rgba(120,100,50,.10)';
+        ctx.shadowBlur = 18;
+        ctx.shadowOffsetY = 6;
+        cardRoundRect(ctx, panelX, y, panelW, panelH, 22);
+        ctx.fillStyle = 'rgba(255,255,255,.6)';
+        ctx.fill();
+        ctx.restore();
+        ctx.lineWidth = 1.5;
+        ctx.strokeStyle = cardHexToRgba(secondary, 0.55);
+        cardRoundRect(ctx, panelX, y, panelW, panelH, 22);
+        ctx.stroke();
 
-      ctx.fillStyle = primary;
-      ctx.fillRect(0, H - 100, W, 100);
-      ctx.fillStyle = '#ffffff';
-      ctx.font = cardFont(30, 700);
-      ctx.fillText((d.url || '').replace(/^https?:\/\//, ''), W / 2, H - 38, W - 120);
+        ctx.fillStyle = '#31413a';
+        ctx.font = cardFont(40, 700);
+        rows.forEach(function (row, i) {
+          var ry = y + 22 + i * rowH;
+          ctx.fillText(row, W / 2, ry + 54, panelW - 70);
+          if (i < rows.length - 1) {
+            ctx.save();
+            ctx.strokeStyle = cardHexToRgba(secondary, 0.45);
+            ctx.setLineDash([2, 8]);
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(panelX + 44, ry + rowH);
+            ctx.lineTo(panelX + panelW - 44, ry + rowH);
+            ctx.stroke();
+            ctx.restore();
+          }
+        });
+        y += panelBlock;
+      }
+
+      // رابط الصفحة داخل كبسولة بيضاء بحد ذهبي
+      var urlText = (d.url || '').replace(/^https?:\/\//, '').replace(/\/$/, '');
+      if (urlText) {
+        ctx.font = cardFont(28, 700);
+        var uw = Math.min(ctx.measureText(urlText).width + 96, W - 280);
+        var uy = H - 168;
+        cardRoundRect(ctx, (W - uw) / 2, uy, uw, 58, 29);
+        ctx.fillStyle = '#ffffff';
+        ctx.fill();
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = secondary;
+        ctx.stroke();
+        ctx.fillStyle = primary;
+        ctx.fillText(urlText, W / 2, uy + 39, uw - 60);
+      }
 
       return new Promise(function (resolve, reject) {
         canvas.toBlob(function (blob) {
