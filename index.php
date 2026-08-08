@@ -18,6 +18,9 @@ if (Settings::get('maintenance_mode', '0') === '1' && !\Core\Auth::check()) {
     exit;
 }
 
+// تسجيل الزيارة لإحصائيات لوحة التحكم (مجهّلة الهوية، ولا تؤثر على الصفحة)
+\Core\Analytics::track();
+
 $router = new Router();
 
 require CORE_PATH . '/Front/routes.php';

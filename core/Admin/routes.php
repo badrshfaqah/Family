@@ -65,6 +65,7 @@ $router->post('/backup/{id}/delete', [BackupController::class, 'delete']);
 
 $router->get('/logs', [LogsController::class, 'index']);
 $router->get('/logs/users', [LogsController::class, 'userActivity']);
+$router->get('/stats', [\Core\Admin\Controllers\StatsController::class, 'index']);
 
 $router->get('/notifications', [\Core\Admin\Controllers\NotificationsController::class, 'index']);
 $router->post('/notifications/send', [\Core\Admin\Controllers\NotificationsController::class, 'send']);

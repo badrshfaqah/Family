@@ -15,6 +15,7 @@ $currentPath = \Core\Support\Request::path();
 
 $coreMenu = [
     ['label' => 'الرئيسية', 'url' => Url::admin(''), 'icon' => '🏠', 'perm' => null],
+    ['label' => 'الإحصائيات', 'url' => Url::admin('stats'), 'icon' => '📊', 'perm' => 'reports.view'],
     ['label' => 'الوسائط', 'url' => Url::admin('media'), 'icon' => '🖼️', 'perm' => 'content.media'],
     ['label' => 'القوائم', 'url' => Url::admin('menus'), 'icon' => '📋', 'perm' => 'content.pages'],
     ['label' => 'المدن', 'url' => Url::admin('cities'), 'icon' => '🏙️', 'perm' => 'content.pages'],
