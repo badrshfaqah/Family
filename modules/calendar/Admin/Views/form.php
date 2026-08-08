@@ -61,10 +61,20 @@ function fam_calendar_media_thumb($mediaId)
 
   <div class="form-row cols-2">
     <div class="form-group">
-      <label>صورة اختيارية</label>
+      <label>بوستر المناسبة (اختياري)</label>
       <?php $cover = fam_calendar_media_thumb($entryRow['cover_media_id'] ?? null); if ($cover): ?><img src="<?= View::e($cover) ?>" style="height:70px;border-radius:8px;margin-bottom:8px"><?php endif; ?>
       <input class="form-control" type="file" name="cover" accept="image/*">
+      <div class="form-hint">يظهر أعلى صفحة المناسبة وفي معاينة الرابط عند المشاركة.</div>
     </div>
+    <div class="form-group">
+      <label>صورة صاحب المناسبة (اختياري)</label>
+      <?php $personThumb = fam_calendar_media_thumb($entryRow['person_media_id'] ?? null); if ($personThumb): ?><img src="<?= View::e($personThumb) ?>" style="height:70px;border-radius:8px;margin-bottom:8px"><?php endif; ?>
+      <input class="form-control" type="file" name="person_photo" accept="image/*">
+      <div class="form-hint">صورة العريس أو الخريج مثلًا — تظهر داخل البطاقة المولّدة عند "المشاركة كصورة".</div>
+    </div>
+  </div>
+
+  <div class="form-row cols-2">
     <?php if ($events): ?>
     <div class="form-group">
       <label>ربط بصفحة مناسبة موجودة (اختياري)</label>

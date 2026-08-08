@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS `{prefix}calendar_entries` (
   `maps_url` VARCHAR(255) NULL,
   `notes` VARCHAR(500) NULL,
   `cover_media_id` INT UNSIGNED NULL,
+  `person_media_id` INT UNSIGNED NULL,
   `event_id` INT UNSIGNED NULL,
   `status` ENUM('draft','published','cancelled') NOT NULL DEFAULT 'draft',
   `created_by` INT UNSIGNED NULL,

@@ -152,6 +152,17 @@ final class CalendarFrontController
         $layout = CORE_PATH . '/Front/Views/layouts/main.php';
         $view = __DIR__ . '/../Views/show.php';
 
+        // بوستر المناسبة وصورة صاحبها (تُستخدم في الصفحة وبطاقة المشاركة كصورة)
+        $mediaUrl = function ($mediaId): string {
+            if (!$mediaId) {
+                return '';
+            }
+            $row = Database::fetchOne('SELECT stored_path FROM ' . Database::table('media') . ' WHERE id = ?', [(int) $mediaId]);
+            return $row ? \Core\Media::url($row['stored_path']) : '';
+        };
+        $posterUrl = $mediaUrl($item['cover_media_id'] ?? null);
+        $personUrl = $mediaUrl($item['person_media_id'] ?? null);
+
         // وصف ديناميكي وبيانات Event المنظمة لنتائج بحث غنية
         $descParts = ['مناسبة ' . $item['entry_type'] . ': ' . $item['title']];
         $descParts[] = 'بتاريخ ' . date('Y/m/d', strtotime($item['entry_datetime']));
@@ -177,12 +188,21 @@ final class CalendarFrontController
             ] : null,
         ]);
 
+        if ($posterUrl) {
+            $eventLd['image'] = [\Core\Support\Url::origin() . $posterUrl];
+        }
+
         echo View::renderLayout($layout, $view, [
             'item' => $item,
             'coverageAlbums' => $coverageAlbums,
             'linkedEvent' => $linkedEvent,
+            'posterUrl' => $posterUrl,
+            'personUrl' => $personUrl,
             'pageTitle' => $item['title'],
             'metaDescription' => $metaDescription,
+            // معاينة غنية عند مشاركة الرابط (واتساب وغيره): البوستر + التفاصيل
+            'ogImage' => $posterUrl ? \Core\Support\Url::origin() . $posterUrl : null,
+            'ogType' => 'article',
             'jsonLd' => $eventLd,
         ]);
     }

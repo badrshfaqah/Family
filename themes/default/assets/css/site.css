@@ -742,8 +742,9 @@ a{color:inherit;text-decoration:none}
   background:var(--c-surface);border:1px solid var(--c-border);border-radius:var(--radius);
   box-shadow:var(--shadow);
 }
-.event-cover{aspect-ratio:16/8;background:#eef0ec;overflow:hidden}
-.event-cover img{width:100%;height:100%;object-fit:cover}
+/* بوستر المناسبة: العرض ثابت بعرض الصفحة والارتفاع متغير حسب الصورة (بدون قص) */
+.event-poster{background:#eef0ec}
+.event-poster img{display:block;width:100%;height:auto}
 .event-body{padding:22px 18px 20px}
 .event-head{margin-bottom:16px}
 .event-chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
@@ -792,6 +793,19 @@ a{color:inherit;text-decoration:none}
 @media (min-width:720px){
   .share-label{width:auto}
   .event-body{padding:26px 26px 24px}
+}
+
+/* على الشاشات الكبيرة: البوستر بجوار جدول التفاصيل */
+@media (min-width:900px){
+  .event-page.has-poster{
+    max-width:1020px;
+    display:grid;grid-template-columns:minmax(0,420px) minmax(0,1fr);
+    align-items:start;
+  }
+  .event-page.has-poster .event-poster{
+    border-inline-end:1px solid var(--c-border);
+    align-self:stretch;
+  }
 }
 
 /* فيديو الألبوم */

@@ -149,7 +149,7 @@ if (is_array($jsonLd) && $jsonLd) {
     $ldGraph[] = $jsonLd;
 }
 ?>
-<script type="application/ld+json"><?= json_encode(['@context' => 'https://schema.org', '@graph' => $ldGraph], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?></script>
+<script type="application/ld+json" nonce="<?= \Core\Support\Security::cspNonce() ?>"><?= json_encode(['@context' => 'https://schema.org', '@graph' => $ldGraph], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?></script>
 </head>
 <body>
 
