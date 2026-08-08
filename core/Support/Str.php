@@ -5,14 +5,29 @@ namespace Core\Support;
 final class Str
 {
     /** يحول نصًا عربيًا أو إنجليزيًا إلى رابط مختصر آمن (slug) */
+    /** نقحرة الحروف العربية إلى لاتينية لروابط قابلة للمشاركة بلا ترميز %XX */
+    private const AR_TO_LATIN = [
+        'ا' => 'a', 'أ' => 'a', 'إ' => 'i', 'آ' => 'a', 'ء' => '', 'ؤ' => 'o', 'ئ' => 'e',
+        'ب' => 'b', 'ت' => 't', 'ث' => 'th', 'ج' => 'j', 'ح' => 'h', 'خ' => 'kh',
+        'د' => 'd', 'ذ' => 'th', 'ر' => 'r', 'ز' => 'z', 'س' => 's', 'ش' => 'sh',
+        'ص' => 's', 'ض' => 'd', 'ط' => 't', 'ظ' => 'th', 'ع' => 'a', 'غ' => 'gh',
+        'ف' => 'f', 'ق' => 'q', 'ك' => 'k', 'ل' => 'l', 'م' => 'm', 'ن' => 'n',
+        'ه' => 'h', 'ة' => 'h', 'و' => 'w', 'ي' => 'y', 'ى' => 'a',
+        '٠' => '0', '١' => '1', '٢' => '2', '٣' => '3', '٤' => '4',
+        '٥' => '5', '٦' => '6', '٧' => '7', '٨' => '8', '٩' => '9',
+    ];
+
     public static function slug(string $text, string $fallbackPrefix = 'item'): string
     {
         $text = trim($text);
         $text = preg_replace('/[\x{200B}-\x{200F}\x{FEFF}]/u', '', $text) ?? $text;
+        // إزالة التشكيل ثم نقحرة العربية إلى لاتينية (روابط تُنسخ وتُشارك بدون رموز مشفرة)
+        $text = preg_replace('/[\x{064B}-\x{065F}\x{0640}]/u', '', $text) ?? $text;
+        $text = strtr($text, self::AR_TO_LATIN);
         // استبدال المسافات والفواصل بشرطة
         $text = preg_replace('/[\s_]+/u', '-', $text) ?? $text;
-        // إبقاء الحروف العربية والإنجليزية والأرقام والشرطة فقط
-        $text = preg_replace('/[^\p{Arabic}a-zA-Z0-9\-]+/u', '', $text) ?? $text;
+        // إبقاء الحروف الإنجليزية والأرقام والشرطة فقط
+        $text = preg_replace('/[^a-zA-Z0-9\-]+/u', '', $text) ?? $text;
         $text = preg_replace('/-+/', '-', $text) ?? $text;
         $text = trim($text, '-');
         $text = mb_strtolower($text);

@@ -128,9 +128,8 @@ final class CalendarFrontController
         }
 
         // ألبومات التغطية المرتبطة بالمناسبة (صور وفيديو من المعرض)
-        // توحيد الرابط على صيغته الوصفية بتحويل دائم (301) لمنع ازدواجية الفهرسة
-        $slugPart = \Core\Support\Str::slug($item['title'], '');
-        $expected = '/calendar/' . (int) $item['id'] . ($slugPart !== '' ? '-' . $slugPart : '');
+        // توحيد الرابط على الصيغة الرقمية النظيفة بتحويل دائم (301) — لا رموز مشفرة عند المشاركة
+        $expected = '/calendar/' . (int) $item['id'];
         if (\Core\Support\Request::path() !== $expected) {
             header('Location: ' . \Core\Support\Url::full(ltrim($expected, '/')), true, 301);
             exit;

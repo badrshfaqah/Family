@@ -45,9 +45,8 @@ final class PoetryFrontController
         }
 
 
-        // توحيد الرابط على صيغته الوصفية بتحويل دائم (301) لمنع ازدواجية الفهرسة
-        $slugPart = \Core\Support\Str::slug('الشاعر ' . $poet['name'], '');
-        $expected = '/poetry/' . (int) $poet['id'] . ($slugPart !== '' ? '-' . $slugPart : '');
+        // توحيد الرابط على الصيغة الرقمية النظيفة بتحويل دائم (301) — لا رموز مشفرة عند المشاركة
+        $expected = '/poetry/' . (int) $poet['id'];
         if (\Core\Support\Request::path() !== $expected) {
             header('Location: ' . \Core\Support\Url::full(ltrim($expected, '/')), true, 301);
             exit;
@@ -94,9 +93,8 @@ final class PoetryFrontController
         $view = __DIR__ . '/../Views/poem.php';
 
 
-        // توحيد الرابط على صيغته الوصفية بتحويل دائم (301) لمنع ازدواجية الفهرسة
-        $slugPart = \Core\Support\Str::slug($poem['title'], '');
-        $expected = '/poems/' . (int) $poem['id'] . ($slugPart !== '' ? '-' . $slugPart : '');
+        // توحيد الرابط على الصيغة الرقمية النظيفة بتحويل دائم (301) — لا رموز مشفرة عند المشاركة
+        $expected = '/poems/' . (int) $poem['id'];
         if (\Core\Support\Request::path() !== $expected) {
             header('Location: ' . \Core\Support\Url::full(ltrim($expected, '/')), true, 301);
             exit;

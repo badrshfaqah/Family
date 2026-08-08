@@ -46,9 +46,8 @@ final class ObituariesFrontController
         $view = __DIR__ . '/../Views/show.php';
 
         $descParts = ['إعلان وفاة ' . $item['name']];
-        // توحيد الرابط على صيغته الوصفية بتحويل دائم (301) لمنع ازدواجية الفهرسة
-        $slugPart = \Core\Support\Str::slug('وفاة ' . $item['name'], '');
-        $expected = '/obituaries/' . (int) $item['id'] . ($slugPart !== '' ? '-' . $slugPart : '');
+        // توحيد الرابط على الصيغة الرقمية النظيفة بتحويل دائم (301) — لا رموز مشفرة عند المشاركة
+        $expected = '/obituaries/' . (int) $item['id'];
         if (\Core\Support\Request::path() !== $expected) {
             header('Location: ' . \Core\Support\Url::full(ltrim($expected, '/')), true, 301);
             exit;
