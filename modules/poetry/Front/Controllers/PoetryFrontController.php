@@ -44,6 +44,15 @@ final class PoetryFrontController
             Response::redirect(Url::to('poetry'));
         }
 
+
+        // توحيد الرابط على صيغته الوصفية بتحويل دائم (301) لمنع ازدواجية الفهرسة
+        $slugPart = \Core\Support\Str::slug('الشاعر ' . $poet['name'], '');
+        $expected = '/poetry/' . (int) $poet['id'] . ($slugPart !== '' ? '-' . $slugPart : '');
+        if (\Core\Support\Request::path() !== $expected) {
+            header('Location: ' . \Core\Support\Url::full(ltrim($expected, '/')), true, 301);
+            exit;
+        }
+
         $poems = Database::fetchAll(
             'SELECT id, title, occasion, content FROM ' . Database::table('poems') . "
              WHERE poet_id = ? AND status = 'published'
@@ -83,6 +92,15 @@ final class PoetryFrontController
 
         $layout = CORE_PATH . '/Front/Views/layouts/main.php';
         $view = __DIR__ . '/../Views/poem.php';
+
+
+        // توحيد الرابط على صيغته الوصفية بتحويل دائم (301) لمنع ازدواجية الفهرسة
+        $slugPart = \Core\Support\Str::slug($poem['title'], '');
+        $expected = '/poems/' . (int) $poem['id'] . ($slugPart !== '' ? '-' . $slugPart : '');
+        if (\Core\Support\Request::path() !== $expected) {
+            header('Location: ' . \Core\Support\Url::full(ltrim($expected, '/')), true, 301);
+            exit;
+        }
 
         $firstLine = trim((string) strtok((string) $poem['content'], "\n"));
         echo View::renderLayout($layout, $view, [

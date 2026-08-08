@@ -128,6 +128,14 @@ final class CalendarFrontController
         }
 
         // ألبومات التغطية المرتبطة بالمناسبة (صور وفيديو من المعرض)
+        // توحيد الرابط على صيغته الوصفية بتحويل دائم (301) لمنع ازدواجية الفهرسة
+        $slugPart = \Core\Support\Str::slug($item['title'], '');
+        $expected = '/calendar/' . (int) $item['id'] . ($slugPart !== '' ? '-' . $slugPart : '');
+        if (\Core\Support\Request::path() !== $expected) {
+            header('Location: ' . \Core\Support\Url::full(ltrim($expected, '/')), true, 301);
+            exit;
+        }
+
         $coverageAlbums = [];
         if (\Core\ModuleManager::isEnabled('gallery') && Database::tableExists('gallery_albums')) {
             $coverageAlbums = Database::fetchAll(

@@ -61,7 +61,7 @@ $heroCover = fam_media_url(Settings::get('identity_cover_media_id', ''));
     <div class="container">
       <div class="obit-list">
         <?php foreach ($homeObituaries as $ob): ?>
-        <a class="obit-card" href="<?= Url::to('obituaries/' . $ob['id']) ?>">
+        <a class="obit-card" href="<?= Url::pretty('obituaries', (int) $ob['id'], 'وفاة ' . $ob['name']) ?>">
           <span class="obit-icon">🕊</span>
           <span class="obit-body">
             <b>وفاة <?= \Core\View::e($ob['name']) ?></b>
@@ -112,7 +112,7 @@ $heroCover = fam_media_url(Settings::get('identity_cover_media_id', ''));
             else { $leftLabel = 'باقي ' . $daysLeft . ' يوم'; }
             $time = date('g:i', $ts) . ' ' . (date('a', $ts) === 'pm' ? 'م' : 'ص');
           ?>
-          <a class="cal-item<?= $i === 0 ? ' cal-next' : '' ?>" href="<?= Url::to('calendar/' . $ev['id']) ?>">
+          <a class="cal-item<?= $i === 0 ? ' cal-next' : '' ?>" href="<?= Url::pretty('calendar', (int) $ev['id'], $ev['title']) ?>">
             <div class="cal-date">
               <span><?= $arDays[(int) date('w', $ts)] ?></span>
               <b><?= (int) date('j', $ts) ?></b>

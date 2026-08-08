@@ -14,7 +14,7 @@ use Core\View;
   <?php else: ?>
     <div class="poets-grid">
       <?php foreach ($poets as $p): ?>
-      <a class="poet-card" href="<?= Url::to('poetry/' . $p['id']) ?>">
+      <a class="poet-card" href="<?= Url::pretty('poetry', (int) $p['id'], 'الشاعر ' . $p['name']) ?>">
         <span class="poet-photo">
           <?php if (!empty($p['photo_path'])): ?>
             <img loading="lazy" src="<?= View::e(Media::url($p['photo_path'])) ?>" alt="<?= View::e($p['name']) ?>">

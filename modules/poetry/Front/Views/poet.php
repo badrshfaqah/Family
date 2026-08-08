@@ -32,7 +32,7 @@ use Core\View;
         $lines = preg_split('/\r\n|\r|\n/', trim($po['content']));
         $preview = implode("\n", array_slice(array_filter($lines, fn($l) => trim($l) !== ''), 0, 2));
       ?>
-      <a class="poem-card" href="<?= Url::to('poems/' . $po['id']) ?>">
+      <a class="poem-card" href="<?= Url::pretty('poems', (int) $po['id'], $po['title']) ?>">
         <span class="poem-mark">🪶</span>
         <b class="poem-title"><?= View::e($po['title']) ?></b>
         <?php if (!empty($po['occasion'])): ?><span class="poem-occasion"><?= View::e($po['occasion']) ?></span><?php endif; ?>

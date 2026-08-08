@@ -13,7 +13,7 @@ use Core\View;
   <?php else: ?>
     <div class="obit-list">
       <?php foreach ($rows as $r): ?>
-      <a class="obit-card" href="<?= Url::to('obituaries/' . $r['id']) ?>">
+      <a class="obit-card" href="<?= Url::pretty('obituaries', (int) $r['id'], 'وفاة ' . $r['name']) ?>">
         <span class="obit-icon">🕊</span>
         <span class="obit-body">
           <b>وفاة <?= View::e($r['name']) ?></b>

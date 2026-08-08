@@ -71,7 +71,7 @@ $todayTs = strtotime(date('Y-m-d'));
         <div class="calx-cell<?= $dayEntries ? ' has-events' : '' ?>">
           <div class="d"><?= $d ?></div>
           <?php foreach (array_slice($dayEntries, 0, 2) as $e): ?>
-            <a href="<?= Url::to('calendar/' . $e['id']) ?>"><?= View::e($e['title']) ?></a>
+            <a href="<?= Url::pretty('calendar', (int) $e['id'], $e['title']) ?>"><?= View::e($e['title']) ?></a>
           <?php endforeach; ?>
           <?php if (count($dayEntries) > 2): ?><span>+<?= count($dayEntries) - 2 ?></span><?php endif; ?>
         </div>
@@ -109,7 +109,7 @@ $todayTs = strtotime(date('Y-m-d'));
             $time = date('g:i', $ts) . ' ' . (date('a', $ts) === 'pm' ? 'م' : 'ص');
             $isNext = !$isPast && $ev === $rows[0];
           ?>
-          <a class="cal-item<?= $isNext ? ' cal-next' : '' ?><?= $isPast ? ' cal-past' : '' ?>" href="<?= Url::to('calendar/' . $ev['id']) ?>">
+          <a class="cal-item<?= $isNext ? ' cal-next' : '' ?><?= $isPast ? ' cal-past' : '' ?>" href="<?= Url::pretty('calendar', (int) $ev['id'], $ev['title']) ?>">
             <div class="cal-date">
               <span><?= $arDays[(int) date('w', $ts)] ?></span>
               <b><?= (int) date('j', $ts) ?></b>

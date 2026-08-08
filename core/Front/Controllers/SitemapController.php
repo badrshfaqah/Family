@@ -28,28 +28,32 @@ final class SitemapController
         $urls[Url::full('install-app')] = ['priority' => '0.5'];
         $urls[Url::full('family')] = ['priority' => '0.5'];
 
-        // المحتوى التفصيلي: [الإضافة، الجدول، المسار، الشرط، حقل الرابط]
+        // المحتوى التفصيلي: [الإضافة، الجدول، المسار، الشرط، حقل الرابط، حقل العنوان الوصفي، بادئة العنوان]
         $sources = [
-            ['news', 'news', 'news', "status = 'published'", 'slug'],
-            ['events', 'events', 'events', "status = 'published'", 'slug'],
-            ['pages', 'pages', 'p', "status = 'published'", 'slug'],
-            ['archive', 'archive_items', 'archive', "status = 'published'", 'slug'],
-            ['gallery', 'gallery_albums', 'gallery', "status = 'published'", 'slug'],
-            ['calendar', 'calendar_entries', 'calendar', "status = 'published'", 'id'],
-            ['obituaries', 'obituaries', 'obituaries', "status = 'active'", 'id'],
-            ['poetry', 'poets', 'poetry', "status = 'active'", 'id'],
-            ['poetry', 'poems', 'poems', "status = 'published'", 'id'],
+            ['news', 'news', 'news', "status = 'published'", 'slug', null, ''],
+            ['events', 'events', 'events', "status = 'published'", 'slug', null, ''],
+            ['pages', 'pages', 'p', "status = 'published'", 'slug', null, ''],
+            ['archive', 'archive_items', 'archive', "status = 'published'", 'slug', null, ''],
+            ['gallery', 'gallery_albums', 'gallery', "status = 'published'", 'slug', null, ''],
+            ['calendar', 'calendar_entries', 'calendar', "status = 'published'", 'id', 'title', ''],
+            ['obituaries', 'obituaries', 'obituaries', "status = 'active'", 'id', 'name', 'وفاة '],
+            ['poetry', 'poets', 'poetry', "status = 'active'", 'id', 'name', 'الشاعر '],
+            ['poetry', 'poems', 'poems', "status = 'published'", 'id', 'title', ''],
         ];
 
-        foreach ($sources as [$module, $table, $route, $where, $key]) {
+        foreach ($sources as [$module, $table, $route, $where, $key, $titleCol, $titlePrefix]) {
             if (!ModuleManager::isEnabled($module) || !Database::tableExists($table)) {
                 continue;
             }
             $hasUpdated = (bool) Database::fetchOne('SHOW COLUMNS FROM ' . Database::table($table) . " LIKE 'updated_at'");
-            $select = $key . ($hasUpdated ? ', updated_at' : '');
+            $select = $key . ($titleCol ? ', ' . $titleCol : '') . ($hasUpdated ? ', updated_at' : '');
             $rows = Database::fetchAll("SELECT {$select} FROM " . Database::table($table) . " WHERE {$where} LIMIT 5000");
             foreach ($rows as $row) {
-                $urls[Url::full($route . '/' . $row[$key])] = [
+                // المسارات الرقمية تُنشر بصيغتها الوصفية (معرف-عنوان) لتطابق روابط الموقع
+                $loc = $titleCol
+                    ? Url::prettyFull($route, (int) $row[$key], $titlePrefix . $row[$titleCol])
+                    : Url::full($route . '/' . $row[$key]);
+                $urls[$loc] = [
                     'priority' => '0.7',
                     'lastmod' => $row['updated_at'] ?? null,
                 ];

@@ -93,4 +93,21 @@ final class Url
     {
         return self::origin() . self::to($path);
     }
+
+    /**
+     * رابط وصفي صديق لمحركات البحث للمسارات الرقمية: /calendar/4-عنوان-المناسبة
+     * المعرّف يبقى أول المقطع فتستمر الروابط القديمة بالعمل، والعنوان يضيف
+     * كلمات مفتاحية يفهمها الزائر ومحرك البحث.
+     */
+    public static function pretty(string $route, int $id, string $title): string
+    {
+        $slug = Str::slug($title, '');
+        return self::to($route . '/' . $id . ($slug !== '' ? '-' . $slug : ''));
+    }
+
+    /** النسخة المطلقة من الرابط الوصفي (للخريطة والمشاركة) */
+    public static function prettyFull(string $route, int $id, string $title): string
+    {
+        return self::origin() . self::pretty($route, $id, $title);
+    }
 }
