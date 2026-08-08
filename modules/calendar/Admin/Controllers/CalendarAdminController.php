@@ -69,7 +69,8 @@ final class CalendarAdminController
             'venue_name' => Security::cleanText(Request::trimmed('venue_name')),
             'maps_url' => Security::cleanText(Request::trimmed('maps_url')),
             'notes' => Security::cleanText(Request::trimmed('notes')),
-            'cover_media_id' => $this->handleCoverUpload(),
+            'cover_media_id' => $this->handleImageUpload('cover'),
+            'person_media_id' => $this->handleImageUpload('person_photo'),
             'event_id' => $this->resolveEventId(),
             'status' => $this->resolveStatus(),
             'created_by' => Auth::user()['id'] ?? null,
@@ -126,9 +127,13 @@ final class CalendarAdminController
             'updated_at' => date('Y-m-d H:i:s'),
         ];
 
-        $coverId = $this->handleCoverUpload();
+        $coverId = $this->handleImageUpload('cover');
         if ($coverId) {
             $data['cover_media_id'] = $coverId;
+        }
+        $personId = $this->handleImageUpload('person_photo');
+        if ($personId) {
+            $data['person_media_id'] = $personId;
         }
 
         Database::update('calendar_entries', $data, ['id' => $id]);
@@ -202,9 +207,9 @@ final class CalendarAdminController
         return $ts ? date('Y-m-d H:i:s', $ts) : null;
     }
 
-    private function handleCoverUpload(): ?int
+    private function handleImageUpload(string $field): ?int
     {
-        $file = Request::file('cover');
+        $file = Request::file($field);
         if (!$file) {
             return null;
         }
