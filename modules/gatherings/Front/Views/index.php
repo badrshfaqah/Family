@@ -11,7 +11,10 @@ foreach ($rows as $item) {
 ?>
 <div class="container section">
   <div class="breadcrumbs"><a href="<?= Url::to('') ?>">الرئيسية</a> / الجمعات</div>
-  <h1>☕ الجمعات</h1>
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+    <h1 style="margin:0">☕ الجمعات</h1>
+    <a class="btn btn-primary btn-sm" href="<?= Url::to('gatherings/suggest') ?>">＋ أضف جمعتك</a>
+  </div>
 
   <?php if (empty($rows)): ?>
     <div class="empty-state">لا توجد جمعات نشطة حاليًا.</div>

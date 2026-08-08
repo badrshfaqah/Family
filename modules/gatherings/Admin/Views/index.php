@@ -1,12 +1,40 @@
 <?php
-/** @var array $rows */
+/** @var array $rows
+ *  @var array $pending */
 use Core\Support\Csrf;
 use Core\Support\Url;
 use Core\View;
 
-$statusLabels = ['active' => 'نشطة', 'paused' => 'متوقفة مؤقتًا', 'ended' => 'منتهية'];
+$statusLabels = ['active' => 'نشطة', 'paused' => 'متوقفة مؤقتًا', 'ended' => 'منتهية', 'pending' => 'بانتظار الموافقة'];
 $statusBadge = ['active' => 'badge-green', 'paused' => 'badge-gray', 'ended' => 'badge-gray'];
 ?>
+<?php if (!empty($pending)): ?>
+<div style="background:#fff8ec;border:1.5px solid #e0b95a;border-radius:12px;padding:14px 16px;margin-bottom:18px">
+  <p style="margin:0 0 10px;font-weight:800">⏳ مقترحات الزوار بانتظار الموافقة (<?= count($pending) ?>)</p>
+  <?php foreach ($pending as $pd): ?>
+  <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;background:#fff;border:1px solid #eadfc5;border-radius:10px;padding:10px 12px;margin-bottom:8px">
+    <div style="flex:1;min-width:220px">
+      <b><?= View::e($pd['title']) ?></b>
+      <div style="color:#8b8574;font-size:.8rem;margin-top:2px">
+        🗓 <?= View::e($pd['recurrence_label'] ?? '') ?><?php if (!empty($pd['start_time'])): ?> · 🕗 <?= View::e(substr($pd['start_time'], 0, 5)) ?><?php endif; ?>
+        <?php if (!empty($pd['city_name'])): ?> · 🏙 <?= View::e($pd['city_name']) ?><?php endif; ?>
+        <?php if (!empty($pd['venue'])): ?> · 📍 <?= View::e($pd['venue']) ?><?php endif; ?>
+      </div>
+      <div style="color:#5d5745;font-size:.78rem;margin-top:4px">
+        👤 المرسل: <b><?= View::e($pd['submitted_name'] ?? '؟') ?></b>
+        · 📱 <span dir="ltr"><?= View::e($pd['submitted_phone'] ?? '؟') ?></span>
+      </div>
+      <?php if (!empty($pd['description'])): ?><div style="color:#777;font-size:.78rem;margin-top:3px">📝 <?= View::e($pd['description']) ?></div><?php endif; ?>
+    </div>
+    <div style="display:flex;gap:6px;flex:none">
+      <form method="post" action="<?= Url::admin('gatherings/' . $pd['id'] . '/approve') ?>"><?= Csrf::field() ?><button class="btn btn-primary btn-sm" type="submit">✅ اعتماد ونشر</button></form>
+      <form method="post" action="<?= Url::admin('gatherings/' . $pd['id'] . '/reject') ?>"><?= Csrf::field() ?><button class="btn btn-danger btn-sm" type="submit" data-confirm="رفض هذا الاقتراح وحذفه نهائيًا؟">رفض</button></form>
+    </div>
+  </div>
+  <?php endforeach; ?>
+</div>
+<?php endif; ?>
+
 <div style="display:flex;justify-content:flex-end;gap:8px;margin-bottom:14px">
   <a class="btn btn-primary" href="<?= Url::admin('gatherings/create') ?>">+ إضافة جمعة</a>
 </div>

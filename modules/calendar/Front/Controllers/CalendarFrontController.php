@@ -111,6 +111,88 @@ final class CalendarFrontController
         ]);
     }
 
+    /** نموذج اقتراح مناسبة من الزوار — تُنشر بعد موافقة الإدارة */
+    public function suggestForm(array $params): void
+    {
+        $cities = Database::tableExists('cities')
+            ? Database::fetchAll('SELECT id, name FROM ' . Database::table('cities') . " WHERE status = 'active' ORDER BY sort_order ASC, name ASC")
+            : [];
+
+        echo View::renderLayout(CORE_PATH . '/Front/Views/layouts/main.php', __DIR__ . '/../Views/suggest.php', [
+            'cities' => $cities,
+            'captcha' => \Core\Support\Captcha::generateAnswer(),
+            'success' => \Core\Support\Session::flash('calendar_suggest_success'),
+            'error' => \Core\Support\Session::flash('calendar_suggest_error'),
+            'pageTitle' => 'أضف مناسبة للرزنامة',
+            'metaDescription' => 'اقترح مناسبة لتظهر في رزنامة الموقع بعد اعتماد الإدارة.',
+            'metaRobots' => 'noindex, follow',
+        ]);
+    }
+
+    public function suggestSubmit(array $params): void
+    {
+        $back = \Core\Support\Url::to('calendar/suggest');
+
+        if (!\Core\Support\Csrf::verify(Request::post('csrf_token'))) {
+            \Core\Support\Session::flash('calendar_suggest_error', 'انتهت صلاحية الجلسة، أعد المحاولة.');
+            \Core\Support\Response::redirect($back);
+        }
+
+        $throttleKey = 'calendar_suggest:' . Request::ip();
+        if (\Core\Support\RateLimiter::tooManyAttempts($throttleKey, 5, 30)) {
+            \Core\Support\Session::flash('calendar_suggest_error', 'تم إيقاف الإرسال مؤقتًا لكثرة المحاولات — حاول بعد نصف ساعة.');
+            \Core\Support\Response::redirect($back);
+        }
+        \Core\Support\RateLimiter::hit($throttleKey);
+
+        $errors = [];
+        if (!\Core\Support\Captcha::verify(Request::post('captcha_answer'))) {
+            $errors[] = 'إجابة رمز التحقق غير صحيحة.';
+        }
+
+        $title = \Core\Support\Security::cleanText(Request::trimmed('title'));
+        $type = \Core\Support\Security::cleanText(Request::trimmed('entry_type'));
+        $name = \Core\Support\Security::cleanText(Request::trimmed('submitted_name'));
+        $phone = \Core\Support\Security::cleanText(Request::trimmed('submitted_phone'));
+        $datetimeRaw = Request::trimmed('entry_datetime');
+        $ts = $datetimeRaw !== '' ? strtotime($datetimeRaw) : false;
+
+        if ($title === '' || $type === '') {
+            $errors[] = 'عنوان المناسبة ونوعها مطلوبان.';
+        }
+        if ($ts === false) {
+            $errors[] = 'حدد تاريخ المناسبة ووقتها.';
+        } elseif ($ts < time() - 3600) {
+            $errors[] = 'تاريخ المناسبة يجب أن يكون قادمًا.';
+        }
+        if ($name === '' || $phone === '') {
+            $errors[] = 'اسمك ورقم جوالك مطلوبان لتتواصل معك الإدارة عند الحاجة.';
+        }
+
+        if ($errors) {
+            \Core\Support\Session::flash('calendar_suggest_error', implode(' ', $errors));
+            \Core\Support\Response::redirect($back);
+        }
+
+        Database::insert('calendar_entries', [
+            'title' => $title,
+            'entry_type' => mb_substr($type, 0, 60),
+            'entry_datetime' => date('Y-m-d H:i:s', $ts),
+            'city_id' => Request::int('city_id') ?: null,
+            'venue_name' => \Core\Support\Security::cleanText(Request::trimmed('venue_name')) ?: null,
+            'notes' => \Core\Support\Security::cleanText(Request::trimmed('notes')) ?: null,
+            'status' => 'pending',
+            'submitted_name' => mb_substr($name, 0, 150),
+            'submitted_phone' => mb_substr($phone, 0, 30),
+            'created_at' => date('Y-m-d H:i:s'),
+            'updated_at' => date('Y-m-d H:i:s'),
+        ]);
+
+        \Core\ActivityLog::record('calendar_suggest', 'اقتراح مناسبة من زائر: ' . $title);
+        \Core\Support\Session::flash('calendar_suggest_success', 'استلمنا اقتراحك بنجاح 🎉 — سيظهر في الرزنامة فور اعتماده من الإدارة.');
+        \Core\Support\Response::redirect($back);
+    }
+
     public function show(array $params): void
     {
         $id = (int) ($params['id'] ?? 0);

@@ -30,11 +30,50 @@ final class CalendarAdminController
              ORDER BY ce.entry_datetime DESC'
         );
 
+        $pending = Database::fetchAll(
+            'SELECT ce.*, c.name AS city_name FROM ' . Database::table('calendar_entries') . " ce
+             LEFT JOIN " . Database::table('cities') . " c ON c.id = ce.city_id
+             WHERE ce.status = 'pending' ORDER BY ce.id DESC"
+        );
+
         echo View::render(CORE_PATH . '/Admin/Views/layouts/admin.php', [
             'pageTitle' => 'رزنامة المناسبات',
             'contentView' => __DIR__ . '/../Views/index.php',
             'rows' => $rows,
+            'pending' => $pending,
         ]);
+    }
+
+    /** اعتماد مناسبة مقترحة من زائر ونشرها */
+    public function approve(array $params): void
+    {
+        Auth::requirePermission('content.calendar');
+        Csrf::verifyRequestOrFail();
+
+        $id = (int) $params['id'];
+        $item = Database::fetchOne('SELECT * FROM ' . Database::table('calendar_entries') . " WHERE id = ? AND status = 'pending'", [$id]);
+        if ($item) {
+            Database::update('calendar_entries', ['status' => 'published', 'updated_at' => date('Y-m-d H:i:s')], ['id' => $id]);
+            ActivityLog::record('calendar_approve', 'اعتماد مناسبة مقترحة: ' . $item['title'] . ' (من: ' . ($item['submitted_name'] ?? '؟') . ')', 'calendar_entries', $id);
+            Session::flash('success', 'تم اعتماد المناسبة ونشرها في الرزنامة.');
+        }
+        Response::redirect(Url::admin('calendar'));
+    }
+
+    /** رفض مناسبة مقترحة وحذفها */
+    public function reject(array $params): void
+    {
+        Auth::requirePermission('content.calendar');
+        Csrf::verifyRequestOrFail();
+
+        $id = (int) $params['id'];
+        $item = Database::fetchOne('SELECT title FROM ' . Database::table('calendar_entries') . " WHERE id = ? AND status = 'pending'", [$id]);
+        if ($item) {
+            Database::delete('calendar_entries', ['id' => $id]);
+            ActivityLog::record('calendar_reject', 'رفض مناسبة مقترحة: ' . $item['title'], 'calendar_entries', $id);
+            Session::flash('success', 'تم رفض الاقتراح وحذفه.');
+        }
+        Response::redirect(Url::admin('calendar'));
     }
 
     public function create(array $params): void

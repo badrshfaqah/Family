@@ -28,4 +28,82 @@ final class GatheringsFrontController
             'metaDescription' => Settings::get('seo_default_description', ''),
         ]);
     }
+
+    /** نموذج اقتراح جمعة من الزوار — تُنشر بعد موافقة الإدارة */
+    public function suggestForm(array $params): void
+    {
+        $cities = Database::tableExists('cities')
+            ? Database::fetchAll('SELECT id, name FROM ' . Database::table('cities') . " WHERE status = 'active' ORDER BY sort_order ASC, name ASC")
+            : [];
+
+        echo View::renderLayout(CORE_PATH . '/Front/Views/layouts/main.php', __DIR__ . '/../Views/suggest.php', [
+            'cities' => $cities,
+            'captcha' => \Core\Support\Captcha::generateAnswer(),
+            'success' => \Core\Support\Session::flash('gathering_suggest_success'),
+            'error' => \Core\Support\Session::flash('gathering_suggest_error'),
+            'pageTitle' => 'أضف جمعة',
+            'metaDescription' => 'اقترح جمعة دورية لتظهر في صفحة الجمعات بعد اعتماد الإدارة.',
+            'metaRobots' => 'noindex, follow',
+        ]);
+    }
+
+    public function suggestSubmit(array $params): void
+    {
+        $back = \Core\Support\Url::to('gatherings/suggest');
+
+        if (!\Core\Support\Csrf::verify(\Core\Support\Request::post('csrf_token'))) {
+            \Core\Support\Session::flash('gathering_suggest_error', 'انتهت صلاحية الجلسة، أعد المحاولة.');
+            \Core\Support\Response::redirect($back);
+        }
+
+        $throttleKey = 'gathering_suggest:' . \Core\Support\Request::ip();
+        if (\Core\Support\RateLimiter::tooManyAttempts($throttleKey, 5, 30)) {
+            \Core\Support\Session::flash('gathering_suggest_error', 'تم إيقاف الإرسال مؤقتًا لكثرة المحاولات — حاول بعد نصف ساعة.');
+            \Core\Support\Response::redirect($back);
+        }
+        \Core\Support\RateLimiter::hit($throttleKey);
+
+        $errors = [];
+        if (!\Core\Support\Captcha::verify(\Core\Support\Request::post('captcha_answer'))) {
+            $errors[] = 'إجابة رمز التحقق غير صحيحة.';
+        }
+
+        $title = \Core\Support\Security::cleanText(\Core\Support\Request::trimmed('title'));
+        $label = \Core\Support\Security::cleanText(\Core\Support\Request::trimmed('recurrence_label'));
+        $name = \Core\Support\Security::cleanText(\Core\Support\Request::trimmed('submitted_name'));
+        $phone = \Core\Support\Security::cleanText(\Core\Support\Request::trimmed('submitted_phone'));
+
+        if ($title === '' || $label === '') {
+            $errors[] = 'اسم الجمعة وموعدها الدوري مطلوبان.';
+        }
+        if ($name === '' || $phone === '') {
+            $errors[] = 'اسمك ورقم جوالك مطلوبان لتتواصل معك الإدارة عند الحاجة.';
+        }
+
+        if ($errors) {
+            \Core\Support\Session::flash('gathering_suggest_error', implode(' ', $errors));
+            \Core\Support\Response::redirect($back);
+        }
+
+        $time = \Core\Support\Request::trimmed('start_time');
+        Database::insert('gatherings', [
+            'title' => mb_substr($title, 0, 150),
+            'description' => \Core\Support\Security::cleanText(\Core\Support\Request::trimmed('description')) ?: null,
+            'city_id' => \Core\Support\Request::int('city_id') ?: null,
+            'venue' => \Core\Support\Security::cleanText(\Core\Support\Request::trimmed('venue')) ?: null,
+            'start_time' => preg_match('/^\d{2}:\d{2}$/', $time) ? $time . ':00' : null,
+            'recurrence_type' => 'custom',
+            'recurrence_label' => mb_substr($label, 0, 200),
+            'starts_on' => date('Y-m-d'),
+            'status' => 'pending',
+            'submitted_name' => mb_substr($name, 0, 150),
+            'submitted_phone' => mb_substr($phone, 0, 30),
+            'created_at' => date('Y-m-d H:i:s'),
+            'updated_at' => date('Y-m-d H:i:s'),
+        ]);
+
+        \Core\ActivityLog::record('gathering_suggest', 'اقتراح جمعة من زائر: ' . $title);
+        \Core\Support\Session::flash('gathering_suggest_success', 'استلمنا اقتراح الجمعة بنجاح ☕ — ستظهر في الصفحة فور اعتمادها من الإدارة.');
+        \Core\Support\Response::redirect($back);
+    }
 }

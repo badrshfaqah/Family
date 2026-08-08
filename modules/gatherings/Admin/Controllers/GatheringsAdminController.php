@@ -27,11 +27,50 @@ final class GatheringsAdminController
              ORDER BY g.id DESC'
         );
 
+        $pending = Database::fetchAll(
+            'SELECT g.*, c.name AS city_name FROM ' . Database::table('gatherings') . " g
+             LEFT JOIN " . Database::table('cities') . " c ON c.id = g.city_id
+             WHERE g.status = 'pending' ORDER BY g.id DESC"
+        );
+
         echo View::render(CORE_PATH . '/Admin/Views/layouts/admin.php', [
             'pageTitle' => 'الجمعات',
             'contentView' => __DIR__ . '/../Views/index.php',
             'rows' => $rows,
+            'pending' => $pending,
         ]);
+    }
+
+    /** اعتماد جمعة مقترحة من زائر ونشرها */
+    public function approve(array $params): void
+    {
+        Auth::requirePermission('content.gatherings');
+        Csrf::verifyRequestOrFail();
+
+        $id = (int) $params['id'];
+        $item = Database::fetchOne('SELECT * FROM ' . Database::table('gatherings') . " WHERE id = ? AND status = 'pending'", [$id]);
+        if ($item) {
+            Database::update('gatherings', ['status' => 'active', 'updated_at' => date('Y-m-d H:i:s')], ['id' => $id]);
+            ActivityLog::record('gathering_approve', 'اعتماد جمعة مقترحة: ' . $item['title'] . ' (من: ' . ($item['submitted_name'] ?? '؟') . ')', 'gatherings', $id);
+            Session::flash('success', 'تم اعتماد الجمعة ونشرها.');
+        }
+        Response::redirect(Url::admin('gatherings'));
+    }
+
+    /** رفض جمعة مقترحة وحذفها */
+    public function reject(array $params): void
+    {
+        Auth::requirePermission('content.gatherings');
+        Csrf::verifyRequestOrFail();
+
+        $id = (int) $params['id'];
+        $item = Database::fetchOne('SELECT title FROM ' . Database::table('gatherings') . " WHERE id = ? AND status = 'pending'", [$id]);
+        if ($item) {
+            Database::delete('gatherings', ['id' => $id]);
+            ActivityLog::record('gathering_reject', 'رفض جمعة مقترحة: ' . $item['title'], 'gatherings', $id);
+            Session::flash('success', 'تم رفض الاقتراح وحذفه.');
+        }
+        Response::redirect(Url::admin('gatherings'));
     }
 
     public function create(array $params): void

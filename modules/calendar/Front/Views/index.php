@@ -30,7 +30,10 @@ $todayTs = strtotime(date('Y-m-d'));
 ?>
 <div class="container section">
   <div class="breadcrumbs"><a href="<?= Url::to('') ?>">الرئيسية</a> / رزنامة المناسبات</div>
-  <h1>📅 رزنامة المناسبات</h1>
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+    <h1 style="margin:0">📅 رزنامة المناسبات</h1>
+    <a class="btn btn-primary btn-sm" href="<?= Url::to('calendar/suggest') ?>">＋ أضف مناسبتك</a>
+  </div>
 
   <div class="calx-tabs">
     <a class="calx-tab <?= $viewMode === 'list' && $when === 'upcoming' ? 'active' : '' ?>" href="?<?= fam_calendar_query(['view' => 'list', 'when' => 'upcoming'], $baseQuery) ?>">القادمة</a>
