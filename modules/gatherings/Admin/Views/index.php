@@ -16,7 +16,7 @@ $statusBadge = ['active' => 'badge-green', 'paused' => 'badge-gray', 'ended' => 
     <div style="flex:1;min-width:220px">
       <b><?= View::e($pd['title']) ?></b>
       <div style="color:#8b8574;font-size:.8rem;margin-top:2px">
-        🗓 <?= View::e($pd['recurrence_label'] ?? '') ?><?php if (!empty($pd['start_time'])): ?> · 🕗 <?= View::e(substr($pd['start_time'], 0, 5)) ?><?php endif; ?>
+        🗓 <?= View::e($pd['recurrence_label'] ?? '') ?><?php $pdPeriod = \Modules\Gatherings\Support\RecurrenceLabel::periodLabel($pd['time_period'] ?? null); ?><?php if ($pdPeriod !== ''): ?> · 🕗 <?= View::e($pdPeriod) ?><?php elseif (!empty($pd['start_time'])): ?> · 🕗 <?= View::e(substr($pd['start_time'], 0, 5)) ?><?php endif; ?>
         <?php if (!empty($pd['city_name'])): ?> · 🏙 <?= View::e($pd['city_name']) ?><?php endif; ?>
         <?php if (!empty($pd['venue'])): ?> · 📍 <?= View::e($pd['venue']) ?><?php endif; ?>
       </div>
@@ -40,10 +40,16 @@ $statusBadge = ['active' => 'badge-green', 'paused' => 'badge-gray', 'ended' => 
 </div>
 <div class="table-wrap">
   <table>
-    <thead><tr><th>اسم الجمعة</th><th>المدينة</th><th>التكرار</th><th>الحالة</th><th>تاريخ البداية</th><th></th></tr></thead>
+    <thead><tr><th style="width:70px">الترتيب</th><th>اسم الجمعة</th><th>المدينة</th><th>التكرار</th><th>الحالة</th><th>تاريخ البداية</th><th></th></tr></thead>
     <tbody>
-    <?php foreach ($rows as $r): ?>
+    <?php $rowCount = count($rows); foreach ($rows as $i => $r): ?>
       <tr>
+        <td>
+          <div style="display:flex;gap:4px">
+            <form method="post" action="<?= Url::admin('gatherings/' . $r['id'] . '/move') ?>"><?= Csrf::field() ?><input type="hidden" name="dir" value="up"><button class="btn btn-secondary btn-sm" type="submit" title="رفع للأعلى" <?= $i === 0 ? 'disabled style="opacity:.35"' : '' ?>>▲</button></form>
+            <form method="post" action="<?= Url::admin('gatherings/' . $r['id'] . '/move') ?>"><?= Csrf::field() ?><input type="hidden" name="dir" value="down"><button class="btn btn-secondary btn-sm" type="submit" title="إنزال للأسفل" <?= $i === $rowCount - 1 ? 'disabled style="opacity:.35"' : '' ?>>▼</button></form>
+          </div>
+        </td>
         <td><?= View::e($r['title']) ?></td>
         <td><?= View::e($r['city_name'] ?? '—') ?></td>
         <td><?= View::e($r['recurrence_label'] ?? '') ?></td>
@@ -55,7 +61,7 @@ $statusBadge = ['active' => 'badge-green', 'paused' => 'badge-gray', 'ended' => 
         </td>
       </tr>
     <?php endforeach; ?>
-    <?php if (empty($rows)): ?><tr><td colspan="6" class="form-hint">لا توجد جمعات بعد.</td></tr><?php endif; ?>
+    <?php if (empty($rows)): ?><tr><td colspan="7" class="form-hint">لا توجد جمعات بعد.</td></tr><?php endif; ?>
     </tbody>
   </table>
 </div>

@@ -24,7 +24,7 @@ final class GatheringsAdminController
         $rows = Database::fetchAll(
             'SELECT g.*, c.name AS city_name FROM ' . Database::table('gatherings') . ' g
              LEFT JOIN ' . Database::table('cities') . ' c ON c.id = g.city_id
-             ORDER BY g.id DESC'
+             ORDER BY g.sort_order ASC, g.id DESC'
         );
 
         $pending = Database::fetchAll(
@@ -163,6 +163,35 @@ final class GatheringsAdminController
         Response::redirect(Url::admin('gatherings'));
     }
 
+    /** رفع أو إنزال جمعة درجة واحدة في ترتيب العرض */
+    public function move(array $params): void
+    {
+        Auth::requirePermission('content.gatherings');
+        Csrf::verifyRequestOrFail();
+
+        $id = (int) $params['id'];
+        $dir = Request::post('dir') === 'down' ? 'down' : 'up';
+
+        // إعادة ترقيم كامل القائمة بترتيبها الظاهر ثم مبادلة الجمعة مع جارتها —
+        // يضمن عمل الرفع/الإنزال حتى مع القيم المكررة أو الفجوات في sort_order
+        $rows = Database::fetchAll('SELECT id FROM ' . Database::table('gatherings') . ' ORDER BY sort_order ASC, id DESC');
+        $ids = array_column($rows, 'id');
+        $index = array_search($id, array_map('intval', $ids), true);
+
+        if ($index !== false) {
+            $swapWith = $dir === 'up' ? $index - 1 : $index + 1;
+            if (isset($ids[$swapWith])) {
+                [$ids[$index], $ids[$swapWith]] = [$ids[$swapWith], $ids[$index]];
+                foreach ($ids as $pos => $rowId) {
+                    Database::update('gatherings', ['sort_order' => $pos + 1], ['id' => $rowId]);
+                }
+                ActivityLog::record('gatherings_move', ($dir === 'up' ? 'رفع' : 'إنزال') . ' ترتيب جمعة رقم: ' . $id, 'gatherings', $id);
+            }
+        }
+
+        Response::redirect(Url::admin('gatherings'));
+    }
+
     private function collectData(string $title, string $startsOn, ?int $coverId): array
     {
         $type = Request::post('recurrence_type', 'weekly');
@@ -182,10 +211,13 @@ final class GatheringsAdminController
         }
 
         $customText = $type === 'custom' ? Security::cleanText(Request::trimmed('recurrence_custom_text')) : null;
-        $startTime = Request::trimmed('start_time') ?: null;
-        $endTime = Request::trimmed('end_time') ?: null;
 
-        $label = RecurrenceLabel::build($type, $days, $ordinal, $customText, $startTime, $endTime);
+        $timePeriod = Request::post('time_period', '');
+        if (!isset(RecurrenceLabel::PERIODS[$timePeriod])) {
+            $timePeriod = null;
+        }
+
+        $label = RecurrenceLabel::build($type, $days, $ordinal, $customText, $timePeriod);
 
         // رابط الخريطة: من يلصقه بدون https:// يتحول لرابط داخلي مكسور عند العرض
         $mapUrl = Security::cleanText(Request::trimmed('map_url'));
@@ -199,8 +231,9 @@ final class GatheringsAdminController
             'city_id' => Request::int('city_id') ?: null,
             'venue' => Security::cleanText(Request::trimmed('venue')),
             'map_url' => $mapUrl,
-            'start_time' => $startTime,
-            'end_time' => $endTime,
+            'start_time' => null,
+            'end_time' => null,
+            'time_period' => $timePeriod,
             'recurrence_type' => $type,
             'recurrence_days' => implode(',', $days),
             'recurrence_ordinal' => $ordinal,

@@ -140,7 +140,7 @@ $heroCover = fam_media_url(Settings::get('identity_cover_media_id', ''));
           <div class="gath-card">
             <div class="gath-icon">☕</div>
             <div class="gath-body">
-              <p class="gath-title"><?= \Core\View::e($g['title']) ?></p>
+              <p class="gath-title"><a class="gath-title-link" href="<?= Url::to('gatherings/' . $g['id']) ?>"><?= \Core\View::e($g['title']) ?></a></p>
               <?php if (!empty($g['recurrence_label'])): ?><span class="gath-chip">🗓 <?= \Core\View::e($g['recurrence_label']) ?></span><?php endif; ?>
               <?php if (!empty($g['venue'])): ?><span class="gath-meta">📍 <?= \Core\View::e($g['venue']) ?><?= !empty($g['city_name']) ? ' — ' . \Core\View::e($g['city_name']) : '' ?></span><?php endif; ?>
               <?php if (!empty($g['map_url'])): ?><a class="gath-map" href="<?= \Core\View::e($g['map_url']) ?>" target="_blank" rel="noopener">🗺 الموقع على الخريطة ←</a><?php endif; ?>

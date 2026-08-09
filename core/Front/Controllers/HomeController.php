@@ -80,7 +80,7 @@ final class HomeController
         return Database::fetchAll(
             'SELECT g.*, c.name AS city_name FROM ' . Database::table('gatherings') . ' g
              LEFT JOIN ' . Database::table('cities') . ' c ON c.id = g.city_id
-             WHERE g.status = "active" ORDER BY g.id DESC LIMIT ' . (int) $limit
+             WHERE g.status = "active" ORDER BY g.sort_order ASC, g.id DESC LIMIT ' . (int) $limit
         );
     }
 
