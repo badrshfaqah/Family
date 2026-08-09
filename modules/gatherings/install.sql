@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS `{prefix}gatherings` (
   `map_url` VARCHAR(255) NULL,
   `start_time` TIME NULL,
   `end_time` TIME NULL,
-  `time_period` VARCHAR(30) NULL,
+  `time_period` VARCHAR(120) NULL,
   `recurrence_type` ENUM('daily','weekly','monthly','specific_weekdays','custom') NOT NULL DEFAULT 'weekly',
   `recurrence_days` VARCHAR(100) NULL,
   `recurrence_ordinal` TINYINT UNSIGNED NULL,

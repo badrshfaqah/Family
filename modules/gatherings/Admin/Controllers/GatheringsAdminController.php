@@ -212,10 +212,11 @@ final class GatheringsAdminController
 
         $customText = $type === 'custom' ? Security::cleanText(Request::trimmed('recurrence_custom_text')) : null;
 
-        $timePeriod = Request::post('time_period', '');
-        if (!isset(RecurrenceLabel::PERIODS[$timePeriod])) {
-            $timePeriod = null;
-        }
+        $periodsInput = Request::post('time_period', []);
+        $periodsInput = is_array($periodsInput) ? $periodsInput : [$periodsInput];
+        // الإبقاء على ترتيب الفترات الزمني الطبيعي (الصباح فالظهر...) مهما كان ترتيب التحديد
+        $periods = array_values(array_intersect(array_keys(RecurrenceLabel::PERIODS), $periodsInput));
+        $timePeriod = $periods ? implode(',', $periods) : null;
 
         $label = RecurrenceLabel::build($type, $days, $ordinal, $customText, $timePeriod);
 

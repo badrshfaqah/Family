@@ -19,10 +19,20 @@ final class RecurrenceLabel
         'after_isha' => 'بعد صلاة العشاء',
     ];
 
-    /** التسمية العربية لفترة محفوظة، أو نص فارغ إن لم تكن معروفة */
-    public static function periodLabel(?string $period): string
+    /**
+     * التسمية العربية لفترة أو أكثر محفوظة (CSV مثل "morning,after_isha")،
+     * مثل: "الصباح وبعد صلاة العشاء" — أو نص فارغ إن لم تكن معروفة.
+     */
+    public static function periodLabel(?string $periods): string
     {
-        return self::PERIODS[$period ?? ''] ?? '';
+        $keys = array_filter(array_map('trim', explode(',', (string) $periods)));
+        $labels = [];
+        foreach (array_keys(self::PERIODS) as $key) {
+            if (in_array($key, $keys, true)) {
+                $labels[] = self::PERIODS[$key];
+            }
+        }
+        return implode(' و', $labels);
     }
 
     /** أسماء الأيام المجردة (بدون "ال") لتُستخدم بعد "كل يوم" أو "أول/ثاني.." */
