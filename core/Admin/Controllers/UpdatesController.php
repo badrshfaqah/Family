@@ -37,6 +37,13 @@ final class UpdatesController
             }
         }
 
+        $pendingMigrations = 0;
+        try {
+            $pendingMigrations = \Core\Database\Migrator::pendingCount();
+        } catch (\Throwable $e) {
+            // لا نعطل شاشة التحديث إن تعذر فحص الترحيلات
+        }
+
         echo View::render(CORE_PATH . '/Admin/Views/layouts/admin.php', [
             'pageTitle' => 'تحديث النظام',
             'contentView' => CORE_PATH . '/Admin/Views/updates/index.php',
@@ -46,7 +53,30 @@ final class UpdatesController
             'latest' => $latest,
             'checkError' => $error,
             'zipAvailable' => class_exists('ZipArchive'),
+            'pendingMigrations' => $pendingMigrations,
         ]);
+    }
+
+    /** تطبيق ترحيلات بنية قاعدة البيانات يدويًا (جداول/أعمدة جديدة) دون تحديث الملفات */
+    public function migrate(array $params): void
+    {
+        $this->requireSystemAdmin();
+        Csrf::verifyRequestOrFail();
+
+        try {
+            $applied = \Core\Database\Migrator::migrate();
+        } catch (\Throwable $e) {
+            Session::flash('error', 'تعذر تحديث جداول قاعدة البيانات: ' . $e->getMessage());
+            Response::redirect(Url::admin('updates'));
+        }
+
+        if ($applied) {
+            ActivityLog::record('db_migrate', 'تحديث جداول قاعدة البيانات يدويًا: طُبق ' . count($applied) . ' ترحيل (' . implode('، ', $applied) . ')');
+            Session::flash('success', 'تم تحديث جداول قاعدة البيانات بنجاح — طُبق ' . count($applied) . ' ترحيل جديد.');
+        } else {
+            Session::flash('success', 'جداول قاعدة البيانات محدثة بالفعل — لا توجد ترحيلات جديدة.');
+        }
+        Response::redirect(Url::admin('updates'));
     }
 
     public function saveRepo(array $params): void

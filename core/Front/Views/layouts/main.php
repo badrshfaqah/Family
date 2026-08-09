@@ -288,7 +288,7 @@ $bottomNav = [
       <?php if (Settings::get('contact_email')): ?><span dir="ltr">✉️ <?= \Core\View::e(Settings::get('contact_email')) ?></span><?php endif; ?>
     </div>
     <?php endif; ?>
-    <div class="copyright">© <?= date('Y') ?> <?= \Core\View::e($shortName) ?> — جميع الحقوق محفوظة — برنامج العائلة — تطوير <a href="https://almgrat.com" target="_blank" rel="noopener">المجرات</a></div>
+    <div class="copyright">© <?= date('Y') ?> <?= \Core\View::e($shortName) ?> — جميع الحقوق محفوظة — برنامج العائلة — تطوير <a href="https://almgrat.com" target="_blank" rel="noopener">المجرات</a> — الإصدار <?= CORE_VERSION ?></div>
   </div>
 </footer>
 
