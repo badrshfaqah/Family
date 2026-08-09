@@ -61,7 +61,7 @@ final class SettingsController
             $order = array_filter(array_map('trim', explode(',', (string) $order)));
             $visibleKeys = Request::post('visible', []);
             $visible = [];
-            foreach (['hero', 'next_event', 'coming_soon', 'ticker', 'news', 'events', 'calendar_mini', 'gatherings', 'announcements', 'gallery', 'quick_links', 'stats'] as $key) {
+            foreach (['hero', 'next_event', 'coming_soon', 'ticker', 'news', 'events', 'calendar_mini', 'gatherings', 'announcements', 'gallery', 'quick_links'] as $key) {
                 $visible[$key] = in_array($key, (array) $visibleKeys, true);
             }
             Settings::set('home_sections_order', array_values($order));

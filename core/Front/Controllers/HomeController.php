@@ -24,7 +24,6 @@ final class HomeController
             'gatherings' => ModuleManager::isEnabled('gatherings') ? $this->activeGatherings($itemsCount) : [],
             'announcements' => ModuleManager::isEnabled('announcements') ? $this->activeAnnouncements() : [],
             'gallery' => ModuleManager::isEnabled('gallery') ? $this->galleryPicks(8) : [],
-            'stats' => $this->stats(),
         ];
 
         $layout = CORE_PATH . '/Front/Views/layouts/main.php';
@@ -110,28 +109,4 @@ final class HomeController
         );
     }
 
-    private function stats(): array
-    {
-        $stats = [];
-        $map = [
-            'news' => ['table' => 'news', 'where' => "status = 'published'"],
-            'events' => ['table' => 'events', 'where' => "status = 'published'"],
-            'gatherings' => ['table' => 'gatherings', 'where' => "status = 'active'"],
-            'gallery' => ['table' => 'gallery_photos', 'where' => '1=1'],
-            'archive' => ['table' => 'archive_items', 'where' => "status = 'published'"],
-            'directory_count' => ['table' => 'directory_contacts', 'where' => "status = 'active'"],
-            'push_subscribers' => ['table' => 'push_subscriptions', 'where' => '1=1'],
-        ];
-
-        foreach ($map as $key => $conf) {
-            if (!Database::tableExists($conf['table'])) {
-                continue;
-            }
-            $stats[$key] = (int) Database::fetchValue(
-                'SELECT COUNT(*) FROM ' . Database::table($conf['table']) . ' WHERE ' . $conf['where']
-            );
-        }
-
-        return $stats;
-    }
 }
