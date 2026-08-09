@@ -104,7 +104,13 @@ final class DirectoryAdminController
         $data['created_by'] = Auth::user()['id'] ?? null;
         $data['updated_at'] = date('Y-m-d H:i:s');
 
-        Database::insert('directory_contacts', $data);
+        try {
+            Database::insert('directory_contacts', $data);
+        } catch (\Throwable $e) {
+            \Core\Support\Logger::exception($e);
+            Session::flash('error', 'تعذر إضافة رقم الجوال لخلل تقني، الرجاء المحاولة مجددًا أو مراجعة سجل الأخطاء.');
+            Response::redirect(Url::admin('directory/create'));
+        }
 
         ActivityLog::record('directory_create', 'إضافة جهة اتصال: ' . $data['name'] . ' (' . Str::maskPhone($data['phone']) . ')');
         Session::flash('success', 'تمت إضافة جهة الاتصال.');

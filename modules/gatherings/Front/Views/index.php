@@ -30,6 +30,7 @@ foreach ($rows as $item) {
             <?php if (!empty($item['recurrence_label'])): ?><span class="gath-chip">🗓 <?= View::e($item['recurrence_label']) ?></span><?php endif; ?>
             <?php if (!empty($item['venue'])): ?><span class="gath-meta">📍 <?= View::e($item['venue']) ?></span><?php endif; ?>
             <?php if (!empty($item['description'])): ?><span class="gath-meta"><?= View::e($item['description']) ?></span><?php endif; ?>
+            <?php if (!empty($item['map_url'])): ?><a class="gath-map" href="<?= View::e($item['map_url']) ?>" target="_blank" rel="noopener">🗺 الموقع على الخريطة ←</a><?php endif; ?>
           </div>
         </div>
         <?php endforeach; ?>

@@ -5,6 +5,7 @@
  *  @var array|null $latest
  *  @var string $checkError
  *  @var bool $zipAvailable
+ *  @var int $pendingMigrations
  */
 use Core\Support\Csrf;
 use Core\Support\Url;
@@ -27,6 +28,22 @@ use Core\View;
 </div>
 
 <?php if ($checkError): ?><div class="alert alert-error"><?= View::e($checkError) ?></div><?php endif; ?>
+
+<form method="post" action="<?= Url::admin('updates/migrate') ?>" class="card-box" style="max-width:560px;margin-bottom:18px">
+  <?= Csrf::field() ?>
+  <p style="margin:0 0 6px"><b>🗄 تحديث جداول قاعدة البيانات</b></p>
+  <p class="form-hint" style="margin:0 0 14px">
+    يضيف الجداول والأعمدة الجديدة التي تتطلبها النسخة الحالية من الملفات دون المساس ببياناتك.
+    استخدمه إذا رفعت ملفات النظام يدويًا (FTP / لوحة الاستضافة) بدل التحديث الذاتي،
+    أو ظهرت أخطاء تدل على جداول أو أعمدة ناقصة.
+    <?php if ($pendingMigrations > 0): ?>
+      <br><b style="color:#b45309">يوجد <?= (int) $pendingMigrations ?> ترحيل غير مطبق على قاعدة البيانات.</b>
+    <?php else: ?>
+      <br>✅ جداول قاعدة البيانات محدثة مع النسخة الحالية.
+    <?php endif; ?>
+  </p>
+  <button class="btn btn-secondary" type="submit">🗄 تحديث الجداول الآن</button>
+</form>
 <?php if (!$zipAvailable): ?><div class="alert alert-error">امتداد zip غير متوفر على الخادم — التحديث الذاتي يتطلبه لفك الحزمة.</div><?php endif; ?>
 
 <form method="post" action="<?= Url::admin('updates/save-repo') ?>" class="card-box" style="max-width:560px;margin-bottom:18px">

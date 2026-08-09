@@ -113,7 +113,7 @@ final class DirectoryFrontController
             $branchId = Request::int('branch_id') ?: null;
         }
 
-        Database::insert('directory_contacts', [
+        $record = [
             'name' => $name,
             'phone' => $phone,
             'city_id' => $cityId,
@@ -126,7 +126,21 @@ final class DirectoryFrontController
             'registered_at' => date('Y-m-d H:i:s'),
             'created_by' => null,
             'updated_at' => date('Y-m-d H:i:s'),
-        ]);
+        ];
+
+        try {
+            Database::insert('directory_contacts', $record);
+        } catch (\Throwable $e) {
+            // غالبًا بنية قاعدة بيانات قديمة (عمود ناقص): نطبّق الترحيلات ونعيد المحاولة مرة واحدة
+            try {
+                \Core\Database\Migrator::migrate();
+                Database::insert('directory_contacts', $record);
+            } catch (\Throwable $e2) {
+                \Core\Support\Logger::exception($e2);
+                Session::flash('directory_error', 'تعذر إضافة رقم الجوال لخلل تقني مؤقت، الرجاء المحاولة لاحقًا أو التواصل مع إدارة الموقع.');
+                Response::redirect(Url::to('directory/register'));
+            }
+        }
 
         Session::flash('directory_success', 'تم استلام طلبك بنجاح.');
         Response::redirect(Url::to('directory/register'));
