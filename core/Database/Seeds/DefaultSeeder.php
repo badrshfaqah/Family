@@ -88,16 +88,12 @@ final class DefaultSeeder
 
             'home_sections_order' => json_encode([
                 'hero', 'next_event', 'coming_soon', 'ticker', 'news', 'events',
-                'calendar_mini', 'gatherings', 'announcements', 'gallery', 'quick_links', 'stats',
+                'calendar_mini', 'gatherings', 'announcements', 'gallery', 'quick_links',
             ], JSON_UNESCAPED_UNICODE),
             'home_sections_visible' => json_encode([
                 'hero' => true, 'next_event' => true, 'coming_soon' => true, 'ticker' => true,
                 'news' => true, 'events' => true, 'calendar_mini' => true, 'gatherings' => true,
-                'announcements' => true, 'gallery' => true, 'quick_links' => true, 'stats' => true,
-            ], JSON_UNESCAPED_UNICODE),
-            'home_stats_visible' => json_encode([
-                'news' => true, 'events' => true, 'gatherings' => true, 'gallery' => true,
-                'archive' => true, 'directory_count' => true,
+                'announcements' => true, 'gallery' => true, 'quick_links' => true,
             ], JSON_UNESCAPED_UNICODE),
             'home_items_count' => '6',
             'ticker_enabled' => '1',

@@ -170,20 +170,4 @@ $heroCover = fam_media_url(Settings::get('identity_cover_media_id', ''));
   <?php endif; ?>
 
 
-  <?php if ($section === 'stats' && !empty($stats)): ?>
-  <section class="section container">
-    <div class="section-head"><h2>موقعنا بالأرقام</h2></div>
-    <div class="stats-grid">
-      <?php $labels = [
-        'news' => ['📰', 'خبر منشور'], 'events' => ['🎪', 'مناسبة'], 'gatherings' => ['☕', 'جمعة نشطة'],
-        'gallery' => ['🖼', 'صورة'], 'archive' => ['📜', 'وثيقة'], 'directory_count' => ['📱', 'رقم مسجّل'],
-        'push_subscribers' => ['🔔', 'جهاز مشترك في التنبيهات'],
-      ]; ?>
-      <?php foreach ($stats as $key => $value): [$icon, $label] = $labels[$key] ?? ['▪️', $key]; ?>
-        <div class="stat-card"><span class="stat-icon"><?= $icon ?></span><b><?= (int) $value ?></b><span><?= \Core\View::e($label) ?></span></div>
-      <?php endforeach; ?>
-    </div>
-  </section>
-  <?php endif; ?>
-
 <?php endforeach; ?>

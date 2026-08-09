@@ -14,7 +14,7 @@ $sectionLabels = [
     'hero' => 'المنطقة الرئيسية (Hero)', 'next_event' => 'المناسبة القادمة', 'coming_soon' => 'قسم قريبًا',
     'ticker' => 'الشريط المتحرك', 'news' => 'آخر الأخبار', 'events' => 'آخر المناسبات',
     'calendar_mini' => 'رزنامة مختصرة', 'gatherings' => 'الجمعات النشطة', 'announcements' => 'إعلانات الإدارة',
-    'gallery' => 'صور من المعرض', 'quick_links' => 'روابط سريعة', 'stats' => 'بطاقات إحصائية',
+    'gallery' => 'صور من المعرض', 'quick_links' => 'روابط سريعة',
 ];
 ?>
 <form method="post" action="<?= Url::admin('settings/homepage/save') ?>" class="card-box">
