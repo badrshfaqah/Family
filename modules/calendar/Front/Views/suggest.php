@@ -41,8 +41,8 @@ use Core\View;
         </select>
       </div>
       <div class="form-group">
-        <label>التاريخ والوقت</label>
-        <input class="form-control" type="datetime-local" name="entry_datetime" required>
+        <label>التاريخ</label>
+        <input class="form-control" type="date" name="entry_datetime" required>
       </div>
     </div>
 

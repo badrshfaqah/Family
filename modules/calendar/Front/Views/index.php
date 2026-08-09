@@ -109,7 +109,6 @@ $todayTs = strtotime(date('Y-m-d'));
             elseif ($daysLeft === 2) { $leftLabel = 'باقي يومين'; }
             elseif ($daysLeft <= 10) { $leftLabel = 'باقي ' . $daysLeft . ' أيام'; }
             else { $leftLabel = 'باقي ' . $daysLeft . ' يوم'; }
-            $time = date('g:i', $ts) . ' ' . (date('a', $ts) === 'pm' ? 'م' : 'ص');
             $isNext = !$isPast && $ev === $rows[0];
           ?>
           <a class="cal-item<?= $isNext ? ' cal-next' : '' ?><?= $isPast ? ' cal-past' : '' ?>" href="<?= Url::pretty('calendar', (int) $ev['id'], $ev['title']) ?>">
@@ -122,7 +121,6 @@ $todayTs = strtotime(date('Y-m-d'));
               <p class="cal-title"><?= View::e($ev['title']) ?></p>
               <span class="cal-meta">
                 <span>🏷 <?= View::e($ev['entry_type']) ?></span>
-                <span>🕗 <?= $time ?></span>
                 <?php if (!empty($ev['venue_name'])): ?><span>📍 <?= View::e($ev['venue_name']) ?><?= !empty($ev['city_name']) ? ' — ' . View::e($ev['city_name']) : '' ?></span><?php endif; ?>
                 <?php if (!empty($coverageMap[(int) $ev['id']])): ?><span style="color:var(--c-primary);font-weight:800">📸 تغطية متوفرة</span><?php endif; ?>
               </span>

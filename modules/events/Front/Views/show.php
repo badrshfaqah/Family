@@ -65,7 +65,7 @@ if (!empty($item['excerpt'])) {
       <?php if (!empty($item['event_type'])): ?><span class="card-meta"><?= View::e($item['event_type']) ?></span><?php endif; ?>
       <h1 style="margin:8px 0"><?= View::e($item['title']) ?></h1>
       <div class="card-meta" style="margin-bottom:16px">
-        <?php if (!empty($item['starts_at'])): ?><span>🗓 <?= View::e(date('Y/m/d H:i', strtotime($item['starts_at']))) ?><?php if (!empty($item['ends_at'])): ?> – <?= View::e(date('Y/m/d H:i', strtotime($item['ends_at']))) ?><?php endif; ?></span><?php endif; ?>
+        <?php if (!empty($item['starts_at'])): ?><span>🗓 <?= View::e(date('Y/m/d', strtotime($item['starts_at']))) ?><?php if (!empty($item['ends_at'])): ?> – <?= View::e(date('Y/m/d', strtotime($item['ends_at']))) ?><?php endif; ?></span><?php endif; ?>
         <?php if (!empty($item['city_name'])): ?><span>📍 <?= View::e($item['city_name']) ?></span><?php endif; ?>
         <?php if (!empty($item['venue_name'])): ?><span><?= View::e($item['venue_name']) ?></span><?php endif; ?>
       </div>

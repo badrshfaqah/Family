@@ -54,7 +54,7 @@ final class HomeController
         return Database::fetchOne(
             'SELECT ce.*, c.name AS city_name FROM ' . Database::table('calendar_entries') . ' ce
              LEFT JOIN ' . Database::table('cities') . ' c ON c.id = ce.city_id
-             WHERE ce.entry_datetime >= NOW() AND ce.status = "published"
+             WHERE ce.entry_datetime >= CURDATE() AND ce.status = "published"
              ORDER BY ce.entry_datetime ASC LIMIT 1'
         );
     }
@@ -67,7 +67,7 @@ final class HomeController
         return Database::fetchAll(
             'SELECT ce.*, c.name AS city_name FROM ' . Database::table('calendar_entries') . ' ce
              LEFT JOIN ' . Database::table('cities') . ' c ON c.id = ce.city_id
-             WHERE ce.entry_datetime >= NOW() AND ce.status = "published"
+             WHERE ce.entry_datetime >= CURDATE() AND ce.status = "published"
              ORDER BY ce.entry_datetime ASC LIMIT ' . (int) $limit
         );
     }
@@ -80,7 +80,7 @@ final class HomeController
         return Database::fetchAll(
             'SELECT g.*, c.name AS city_name FROM ' . Database::table('gatherings') . ' g
              LEFT JOIN ' . Database::table('cities') . ' c ON c.id = g.city_id
-             WHERE g.status = "active" ORDER BY g.id DESC LIMIT ' . (int) $limit
+             WHERE g.status = "active" ORDER BY g.sort_order ASC, g.id DESC LIMIT ' . (int) $limit
         );
     }
 

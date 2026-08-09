@@ -3,12 +3,27 @@
 namespace Modules\Gatherings\Support;
 
 /**
- * يبني نصًا عربيًا مختصرًا يصف موعد تكرار الجمعة (مثل "كل يوم جمعة، من 8:00 م")
- * اعتمادًا على نوع التكرار وأيامه وأوقاته، ليُحفظ جاهزًا في عمود recurrence_label.
+ * يبني نصًا عربيًا مختصرًا يصف موعد تكرار الجمعة (مثل "كل يوم جمعة، بعد صلاة المغرب")
+ * اعتمادًا على نوع التكرار وأيامه وفترة وقته، ليُحفظ جاهزًا في عمود recurrence_label.
  */
 final class RecurrenceLabel
 {
     public const TYPES = ['daily', 'weekly', 'monthly', 'specific_weekdays', 'custom'];
+
+    /** فترات وقت الجمعة المتاحة (بدل وقت البداية والنهاية) */
+    public const PERIODS = [
+        'morning' => 'الصباح',
+        'after_dhuhr' => 'بعد صلاة الظهر',
+        'after_asr' => 'بعد صلاة العصر',
+        'after_maghrib' => 'بعد صلاة المغرب',
+        'after_isha' => 'بعد صلاة العشاء',
+    ];
+
+    /** التسمية العربية لفترة محفوظة، أو نص فارغ إن لم تكن معروفة */
+    public static function periodLabel(?string $period): string
+    {
+        return self::PERIODS[$period ?? ''] ?? '';
+    }
 
     /** أسماء الأيام المجردة (بدون "ال") لتُستخدم بعد "كل يوم" أو "أول/ثاني.." */
     private const DAY_NAMES = [0 => 'أحد', 1 => 'اثنين', 2 => 'ثلاثاء', 3 => 'أربعاء', 4 => 'خميس', 5 => 'جمعة', 6 => 'سبت'];
@@ -26,8 +41,7 @@ final class RecurrenceLabel
         array $days,
         ?int $ordinal,
         ?string $customText,
-        ?string $startTime,
-        ?string $endTime
+        ?string $timePeriod
     ): string {
         $days = array_values(array_unique(array_filter($days, fn($d) => $d >= 0 && $d <= 6)));
         sort($days);
@@ -41,7 +55,7 @@ final class RecurrenceLabel
             default => 'غير محدد',
         };
 
-        $timeSuffix = self::timeSuffix($startTime, $endTime);
+        $timeSuffix = self::periodLabel($timePeriod);
 
         return $timeSuffix !== '' ? $label . '، ' . $timeSuffix : $label;
     }
@@ -82,35 +96,4 @@ final class RecurrenceLabel
         return $prefix . ' ' . $dayName . ' من كل شهر';
     }
 
-    private static function timeSuffix(?string $startTime, ?string $endTime): string
-    {
-        $startTime = trim((string) $startTime);
-        $endTime = trim((string) $endTime);
-
-        if ($startTime === '') {
-            return '';
-        }
-
-        $suffix = 'من ' . self::formatTime12($startTime);
-        if ($endTime !== '') {
-            $suffix .= ' حتى ' . self::formatTime12($endTime);
-        }
-
-        return $suffix;
-    }
-
-    private static function formatTime12(string $time): string
-    {
-        $parts = explode(':', $time);
-        $hour = (int) ($parts[0] ?? 0);
-        $minute = (int) ($parts[1] ?? 0);
-
-        $period = $hour >= 12 ? 'م' : 'ص';
-        $hour12 = $hour % 12;
-        if ($hour12 === 0) {
-            $hour12 = 12;
-        }
-
-        return sprintf('%d:%02d %s', $hour12, $minute, $period);
-    }
 }

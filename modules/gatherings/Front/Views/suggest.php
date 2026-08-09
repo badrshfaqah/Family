@@ -36,8 +36,13 @@ use Core\View;
         <input class="form-control" name="recurrence_label" maxlength="150" placeholder="مثال: كل خميس بعد المغرب" required>
       </div>
       <div class="form-group">
-        <label>وقت البداية (اختياري)</label>
-        <input class="form-control" type="time" name="start_time">
+        <label>وقت الجمعة (اختياري)</label>
+        <select class="form-control" name="time_period">
+          <option value="">— اختر —</option>
+          <?php foreach (\Modules\Gatherings\Support\RecurrenceLabel::PERIODS as $pKey => $pLabel): ?>
+            <option value="<?= $pKey ?>"><?= View::e($pLabel) ?></option>
+          <?php endforeach; ?>
+        </select>
       </div>
     </div>
 

@@ -40,7 +40,6 @@ function fam_calendar_media_thumb($mediaId)
 
   <div class="form-row cols-2">
     <div class="form-group"><label>التاريخ</label><input class="form-control" type="date" name="entry_date" value="<?= View::e($entryRow['entry_datetime'] ?? '' ? date('Y-m-d', strtotime($entryRow['entry_datetime'])) : '') ?>" required></div>
-    <div class="form-group"><label>الوقت</label><input class="form-control" type="time" name="entry_time" value="<?= View::e($entryRow['entry_datetime'] ?? '' ? date('H:i', strtotime($entryRow['entry_datetime'])) : '') ?>"></div>
   </div>
 
   <div class="form-row cols-3">

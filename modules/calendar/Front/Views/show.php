@@ -15,7 +15,6 @@ $arMonths = [1 => 'يناير', 'فبراير', 'مارس', 'أبريل', 'ما�
 
 $ts = strtotime($item['entry_datetime']);
 $dateLabel = $arDays[(int) date('w', $ts)] . ' ' . (int) date('j', $ts) . ' ' . $arMonths[(int) date('n', $ts)] . ' ' . date('Y', $ts);
-$timeLabel = date('g:i', $ts) . ' ' . (date('a', $ts) === 'pm' ? 'مساءً' : 'صباحًا');
 
 $daysLeft = (int) floor((strtotime(date('Y-m-d', $ts)) - strtotime(date('Y-m-d'))) / 86400);
 if ($daysLeft < 0) { $stateChip = ['label' => 'انتهت', 'past' => true]; }
@@ -36,7 +35,6 @@ if (!empty($item['venue_name'])) {
 $shareLines = [
     '📌 ' . $item['entry_type'] . ': ' . $item['title'],
     '🗓 ' . $dateLabel,
-    '🕗 ' . $timeLabel,
 ];
 if ($placeLabel !== '') {
     $shareLines[] = '📍 ' . $placeLabel;
@@ -66,7 +64,6 @@ $siteName = Settings::get('identity_short_name', '') ?: Settings::get('identity_
 
       <div class="info-rows">
         <div class="info-row"><span class="info-label">🗓 اليوم والتاريخ</span><span><?= $dateLabel ?></span></div>
-        <div class="info-row"><span class="info-label">🕗 الوقت</span><span><?= $timeLabel ?></span></div>
         <?php if (!empty($item['venue_name'])): ?>
           <div class="info-row"><span class="info-label">📍 المكان</span><span><?= View::e($item['venue_name']) ?><?= !empty($item['city_name']) ? ' — ' . View::e($item['city_name']) : '' ?></span></div>
         <?php elseif (!empty($item['city_name'])): ?>
@@ -122,7 +119,7 @@ $siteName = Settings::get('identity_short_name', '') ?: Settings::get('identity_
             data-title="<?= View::e($item['title']) ?>"
             data-type="<?= View::e($item['entry_type']) ?>"
             data-date="<?= View::e($dateLabel) ?>"
-            data-time="<?= View::e($timeLabel) ?>"
+            data-time=""
             data-place="<?= View::e($placeLabel) ?>"
             data-site="<?= View::e($siteName) ?>"
             data-url="<?= View::e(Url::current()) ?>"

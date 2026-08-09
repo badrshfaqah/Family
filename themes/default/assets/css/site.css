@@ -262,6 +262,8 @@ a{color:inherit;text-decoration:none}
   text-decoration:none;
 }
 .gath-map:hover{text-decoration:underline}
+.gath-title-link{color:inherit;text-decoration:none}
+.gath-title-link:hover{color:var(--c-primary)}
 
 /* بطاقات الوفيات */
 .obit-band{padding:14px 0 0}

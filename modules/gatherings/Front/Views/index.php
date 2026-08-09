@@ -26,11 +26,12 @@ foreach ($rows as $item) {
         <div class="gath-card">
           <div class="gath-icon">☕</div>
           <div class="gath-body">
-            <p class="gath-title"><?= View::e($item['title']) ?></p>
+            <p class="gath-title"><a class="gath-title-link" href="<?= Url::to('gatherings/' . $item['id']) ?>"><?= View::e($item['title']) ?></a></p>
             <?php if (!empty($item['recurrence_label'])): ?><span class="gath-chip">🗓 <?= View::e($item['recurrence_label']) ?></span><?php endif; ?>
             <?php if (!empty($item['venue'])): ?><span class="gath-meta">📍 <?= View::e($item['venue']) ?></span><?php endif; ?>
             <?php if (!empty($item['description'])): ?><span class="gath-meta"><?= View::e($item['description']) ?></span><?php endif; ?>
             <?php if (!empty($item['map_url'])): ?><a class="gath-map" href="<?= View::e($item['map_url']) ?>" target="_blank" rel="noopener">🗺 الموقع على الخريطة ←</a><?php endif; ?>
+            <a class="gath-map" href="<?= Url::to('gatherings/' . $item['id']) ?>">☕ صفحة الجمعة والتفاصيل ←</a>
           </div>
         </div>
         <?php endforeach; ?>

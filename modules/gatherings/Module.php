@@ -31,6 +31,7 @@ final class Module extends AbstractModule
         $router->get('/gatherings/{id}/edit', [GatheringsAdminController::class, 'edit']);
         $router->post('/gatherings/{id}/update', [GatheringsAdminController::class, 'update']);
         $router->post('/gatherings/{id}/delete', [GatheringsAdminController::class, 'delete']);
+        $router->post('/gatherings/{id}/move', [GatheringsAdminController::class, 'move']);
         $router->post('/gatherings/{id}/approve', [GatheringsAdminController::class, 'approve']);
         $router->post('/gatherings/{id}/reject', [GatheringsAdminController::class, 'reject']);
     }
@@ -40,6 +41,7 @@ final class Module extends AbstractModule
         $router->get('/gatherings', [GatheringsFrontController::class, 'index']);
         $router->get('/gatherings/suggest', [GatheringsFrontController::class, 'suggestForm']);
         $router->post('/gatherings/suggest', [GatheringsFrontController::class, 'suggestSubmit']);
+        $router->get('/gatherings/{id}', [GatheringsFrontController::class, 'show']);
     }
 
     public function adminMenu(): array
