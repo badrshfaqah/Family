@@ -10,21 +10,52 @@ final class GatheringsFrontController
 {
     public function index(array $params): void
     {
+        // تصفية اختيارية بمدينة واحدة (?city=ID) — للدخول على جمعات مدينة من الرئيسية
+        $cityId = (int) \Core\Support\Request::get('city', 0);
+
+        $where = "g.status = 'active'";
+        $sqlParams = [];
+        if ($cityId > 0) {
+            $where .= ' AND g.city_id = ?';
+            $sqlParams[] = $cityId;
+        }
+
         // كل الجمعات النشطة دفعة واحدة بالترتيب اليدوي الذي يحدده المدير
         $rows = Database::fetchAll(
             'SELECT g.*, c.name AS city_name FROM ' . Database::table('gatherings') . ' g
              LEFT JOIN ' . Database::table('cities') . " c ON c.id = g.city_id
-             WHERE g.status = 'active'
+             WHERE {$where}
              ORDER BY g.sort_order ASC, g.id DESC
-             LIMIT 200"
+             LIMIT 200",
+            $sqlParams
         );
+
+        // مدن الجمعات النشطة لشريط التصفية أعلى الصفحة
+        $cities = Database::tableExists('cities') ? Database::fetchAll(
+            'SELECT c.id, c.name, COUNT(*) AS cnt FROM ' . Database::table('gatherings') . ' g
+             JOIN ' . Database::table('cities') . " c ON c.id = g.city_id
+             WHERE g.status = 'active'
+             GROUP BY c.id, c.name, c.sort_order
+             ORDER BY c.sort_order ASC, c.name ASC"
+        ) : [];
+
+        $selectedCityName = '';
+        foreach ($cities as $c) {
+            if ((int) $c['id'] === $cityId) {
+                $selectedCityName = $c['name'];
+                break;
+            }
+        }
 
         $layout = CORE_PATH . '/Front/Views/layouts/main.php';
         $view = __DIR__ . '/../Views/index.php';
 
         echo View::renderLayout($layout, $view, [
             'rows' => $rows,
-            'pageTitle' => 'الجمعات',
+            'cities' => $cities,
+            'selectedCityId' => $cityId,
+            'selectedCityName' => $selectedCityName,
+            'pageTitle' => $selectedCityName !== '' ? 'جمعات ' . $selectedCityName : 'الجمعات',
             'metaDescription' => Settings::get('seo_default_description', ''),
         ]);
     }

@@ -21,7 +21,8 @@ final class HomeController
             'news' => ModuleManager::isEnabled('news') ? $this->latestNews($itemsCount) : [],
             'nextEvent' => ModuleManager::isEnabled('calendar') ? $this->nextCalendarEntry() : null,
             'comingSoon' => ModuleManager::isEnabled('calendar') ? $this->comingSoon($itemsCount) : [],
-            'gatherings' => ModuleManager::isEnabled('gatherings') ? $this->activeGatherings($itemsCount) : [],
+            'gatherings' => ModuleManager::isEnabled('gatherings') ? $this->activeGatherings() : [],
+            'gatheringCities' => ModuleManager::isEnabled('gatherings') ? $this->gatheringCities() : [],
             'announcements' => ModuleManager::isEnabled('announcements') ? $this->activeAnnouncements() : [],
             'gallery' => ModuleManager::isEnabled('gallery') ? $this->galleryPicks(8) : [],
         ];
@@ -71,7 +72,8 @@ final class HomeController
         );
     }
 
-    private function activeGatherings(int $limit): array
+    /** 6 جمعات نشطة بترتيب عشوائي في كل زيارة — لضمان ظهور الجميع في الرئيسية بالتناوب */
+    private function activeGatherings(): array
     {
         if (!Database::tableExists('gatherings')) {
             return [];
@@ -79,7 +81,22 @@ final class HomeController
         return Database::fetchAll(
             'SELECT g.*, c.name AS city_name FROM ' . Database::table('gatherings') . ' g
              LEFT JOIN ' . Database::table('cities') . ' c ON c.id = g.city_id
-             WHERE g.status = "active" ORDER BY g.sort_order ASC, g.id DESC LIMIT ' . (int) $limit
+             WHERE g.status = "active" ORDER BY RAND() LIMIT 6'
+        );
+    }
+
+    /** المدن التي فيها جمعات نشطة مع عددها، للدخول على جمعات كل مدينة من الرئيسية */
+    private function gatheringCities(): array
+    {
+        if (!Database::tableExists('gatherings') || !Database::tableExists('cities')) {
+            return [];
+        }
+        return Database::fetchAll(
+            'SELECT c.id, c.name, COUNT(*) AS cnt FROM ' . Database::table('gatherings') . ' g
+             JOIN ' . Database::table('cities') . ' c ON c.id = g.city_id
+             WHERE g.status = "active"
+             GROUP BY c.id, c.name, c.sort_order
+             ORDER BY c.sort_order ASC, c.name ASC'
         );
     }
 
