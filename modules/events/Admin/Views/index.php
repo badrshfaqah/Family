@@ -19,7 +19,7 @@ $statusBadge = ['draft' => 'badge-gray', 'published' => 'badge-green', 'archived
         <td><?= View::e($r['title']) ?></td>
         <td><?= View::e($r['event_type'] ?? '—') ?></td>
         <td><?= View::e($r['city_name'] ?? '—') ?></td>
-        <td><?= View::e($r['starts_at'] ? date('Y/m/d H:i', strtotime($r['starts_at'])) : '—') ?></td>
+        <td><?= View::e($r['starts_at'] ? date('Y/m/d', strtotime($r['starts_at'])) : '—') ?></td>
         <td><span class="badge <?= $statusBadge[$r['status']] ?>"><?= $statusLabels[$r['status']] ?></span></td>
         <td><?= $r['is_featured'] ? '✓' : '—' ?></td>
         <td><?= $r['is_pinned'] ? '✓' : '—' ?></td>

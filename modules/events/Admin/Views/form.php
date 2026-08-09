@@ -23,7 +23,7 @@ function fam_event_media_thumb($mediaId)
 
 function fam_datetime_local($value)
 {
-    return $value ? date('Y-m-d\TH:i', strtotime($value)) : '';
+    return $value ? date('Y-m-d', strtotime($value)) : '';
 }
 ?>
 <form method="post" action="<?= $action ?>" class="card-box" enctype="multipart/form-data">
@@ -64,8 +64,8 @@ function fam_datetime_local($value)
   </div>
 
   <div class="form-row cols-2">
-    <div class="form-group"><label>تاريخ ووقت البداية</label><input class="form-control" type="datetime-local" name="starts_at" value="<?= fam_datetime_local($eventItem['starts_at'] ?? null) ?>"></div>
-    <div class="form-group"><label>تاريخ ووقت النهاية (عند الحاجة)</label><input class="form-control" type="datetime-local" name="ends_at" value="<?= fam_datetime_local($eventItem['ends_at'] ?? null) ?>"></div>
+    <div class="form-group"><label>تاريخ البداية</label><input class="form-control" type="date" name="starts_at" value="<?= fam_datetime_local($eventItem['starts_at'] ?? null) ?>"></div>
+    <div class="form-group"><label>تاريخ النهاية (عند الحاجة)</label><input class="form-control" type="date" name="ends_at" value="<?= fam_datetime_local($eventItem['ends_at'] ?? null) ?>"></div>
   </div>
 
   <div class="form-row cols-2">

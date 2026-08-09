@@ -55,10 +55,10 @@ final class CalendarFrontController
             $orderSql = 'ce.entry_datetime ASC';
         } else {
             if ($when === 'upcoming') {
-                $where[] = 'ce.entry_datetime >= NOW()';
+                $where[] = 'ce.entry_datetime >= CURDATE()';
                 $orderSql = 'ce.entry_datetime ASC';
             } else {
-                $where[] = 'ce.entry_datetime < NOW()';
+                $where[] = 'ce.entry_datetime < CURDATE()';
                 $orderSql = 'ce.entry_datetime DESC';
             }
         }
@@ -161,8 +161,8 @@ final class CalendarFrontController
             $errors[] = 'عنوان المناسبة ونوعها مطلوبان.';
         }
         if ($ts === false) {
-            $errors[] = 'حدد تاريخ المناسبة ووقتها.';
-        } elseif ($ts < time() - 3600) {
+            $errors[] = 'حدد تاريخ المناسبة.';
+        } elseif ($ts < strtotime('today')) {
             $errors[] = 'تاريخ المناسبة يجب أن يكون قادمًا.';
         }
         if ($name === '' || $phone === '') {

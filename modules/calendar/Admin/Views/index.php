@@ -16,7 +16,7 @@ $statusBadge = ['draft' => 'badge-gray', 'published' => 'badge-green', 'cancelle
     <div style="flex:1;min-width:220px">
       <b><?= View::e($pd['title']) ?></b>
       <div style="color:#8b8574;font-size:.8rem;margin-top:2px">
-        🏷 <?= View::e($pd['entry_type']) ?> · 🗓 <?= View::e(date('Y/m/d H:i', strtotime($pd['entry_datetime']))) ?>
+        🏷 <?= View::e($pd['entry_type']) ?> · 🗓 <?= View::e(date('Y/m/d', strtotime($pd['entry_datetime']))) ?>
         <?php if (!empty($pd['city_name'])): ?> · 🏙 <?= View::e($pd['city_name']) ?><?php endif; ?>
         <?php if (!empty($pd['venue_name'])): ?> · 📍 <?= View::e($pd['venue_name']) ?><?php endif; ?>
       </div>
@@ -46,7 +46,7 @@ $statusBadge = ['draft' => 'badge-gray', 'published' => 'badge-green', 'cancelle
       <tr>
         <td><?= View::e($r['title']) ?></td>
         <td><?= View::e($r['entry_type']) ?></td>
-        <td><?= View::e(date('Y/m/d H:i', strtotime($r['entry_datetime']))) ?></td>
+        <td><?= View::e(date('Y/m/d', strtotime($r['entry_datetime']))) ?></td>
         <td><?= View::e($r['city_name'] ?? '—') ?></td>
         <td><?= View::e($r['event_title'] ?? '—') ?></td>
         <td><span class="badge <?= $statusBadge[$r['status']] ?>"><?= $statusLabels[$r['status']] ?></span></td>

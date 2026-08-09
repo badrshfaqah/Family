@@ -110,7 +110,6 @@ $heroCover = fam_media_url(Settings::get('identity_cover_media_id', ''));
             elseif ($daysLeft === 2) { $leftLabel = 'باقي يومين'; }
             elseif ($daysLeft <= 10) { $leftLabel = 'باقي ' . $daysLeft . ' أيام'; }
             else { $leftLabel = 'باقي ' . $daysLeft . ' يوم'; }
-            $time = date('g:i', $ts) . ' ' . (date('a', $ts) === 'pm' ? 'م' : 'ص');
           ?>
           <a class="cal-item<?= $i === 0 ? ' cal-next' : '' ?>" href="<?= Url::pretty('calendar', (int) $ev['id'], $ev['title']) ?>">
             <div class="cal-date">
@@ -121,7 +120,6 @@ $heroCover = fam_media_url(Settings::get('identity_cover_media_id', ''));
             <div class="cal-info">
               <p class="cal-title"><?= \Core\View::e($ev['title']) ?></p>
               <span class="cal-meta">
-                <span>🕗 <?= $time ?></span>
                 <?php if (!empty($ev['venue_name'])): ?><span>📍 <?= \Core\View::e($ev['venue_name']) ?><?= !empty($ev['city_name']) ? ' — ' . \Core\View::e($ev['city_name']) : '' ?></span><?php endif; ?>
               </span>
             </div>
