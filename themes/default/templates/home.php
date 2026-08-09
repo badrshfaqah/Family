@@ -133,15 +133,35 @@ $heroCover = fam_media_url(Settings::get('identity_cover_media_id', ''));
       <?php if (!empty($gatherings)): ?>
       <div class="home-col">
         <div class="section-head"><h2>☕ الجمعات</h2><a href="<?= Url::to('gatherings') ?>">عرض الكل</a></div>
+
+        <?php if (!empty($gatheringCities)): ?>
+        <div class="gath-cities">
+          <?php foreach ($gatheringCities as $gc): ?>
+            <a class="gath-city-chip" href="<?= Url::to('gatherings') ?>?city=<?= (int) $gc['id'] ?>">📍 <?= \Core\View::e($gc['name']) ?> <b><?= (int) $gc['cnt'] ?></b></a>
+          <?php endforeach; ?>
+        </div>
+        <?php endif; ?>
+
         <div class="gath-list">
-          <?php foreach ($gatherings as $g): ?>
+          <?php foreach ($gatherings as $g):
+            // فصل الأيام عن الأوقات لعرض كل منهما بسطر واضح
+            $gPeriod = class_exists('\Modules\Gatherings\Support\RecurrenceLabel')
+                ? \Modules\Gatherings\Support\RecurrenceLabel::periodLabel($g['time_period'] ?? null) : '';
+            $gDays = (string) ($g['recurrence_label'] ?? '');
+            if ($gPeriod !== '' && str_ends_with($gDays, '، ' . $gPeriod)) {
+                $gDays = substr($gDays, 0, -strlen('، ' . $gPeriod));
+            }
+          ?>
           <div class="gath-card">
             <div class="gath-icon">☕</div>
             <div class="gath-body">
               <p class="gath-title"><a class="gath-title-link" href="<?= Url::to('gatherings/' . $g['id']) ?>"><?= \Core\View::e($g['title']) ?></a></p>
-              <?php if (!empty($g['recurrence_label'])): ?><span class="gath-chip">🗓 <?= \Core\View::e($g['recurrence_label']) ?></span><?php endif; ?>
-              <?php if (!empty($g['venue'])): ?><span class="gath-meta">📍 <?= \Core\View::e($g['venue']) ?><?= !empty($g['city_name']) ? ' — ' . \Core\View::e($g['city_name']) : '' ?></span><?php endif; ?>
-              <?php if (!empty($g['map_url'])): ?><a class="gath-map" href="<?= \Core\View::e($g['map_url']) ?>" target="_blank" rel="noopener">🗺 الموقع على الخريطة ←</a><?php endif; ?>
+              <?php if ($gDays !== ''): ?><span class="gath-detail">🗓 <?= \Core\View::e($gDays) ?></span><?php endif; ?>
+              <?php if ($gPeriod !== ''): ?><span class="gath-detail">🕗 <?= \Core\View::e($gPeriod) ?></span><?php endif; ?>
+              <?php if (!empty($g['venue']) || !empty($g['city_name'])): ?>
+                <span class="gath-meta">📍 <?= \Core\View::e(trim(($g['venue'] ?? '') . (!empty($g['venue']) && !empty($g['city_name']) ? ' — ' : '') . ($g['city_name'] ?? ''))) ?></span>
+              <?php endif; ?>
+              <a class="gath-map" href="<?= Url::to('gatherings/' . $g['id']) ?>">☕ صفحة الجمعة ←</a>
             </div>
           </div>
           <?php endforeach; ?>
