@@ -36,13 +36,15 @@ use Core\View;
         <input class="form-control" name="recurrence_label" maxlength="150" placeholder="مثال: كل خميس بعد المغرب" required>
       </div>
       <div class="form-group">
-        <label>وقت الجمعة (اختياري)</label>
-        <select class="form-control" name="time_period">
-          <option value="">— اختر —</option>
+        <label>وقت الجمعة (اختياري — يمكن اختيار أكثر من فترة)</label>
+        <div class="chip-select">
           <?php foreach (\Modules\Gatherings\Support\RecurrenceLabel::PERIODS as $pKey => $pLabel): ?>
-            <option value="<?= $pKey ?>"><?= View::e($pLabel) ?></option>
+            <label class="chip">
+              <input type="checkbox" name="time_period[]" value="<?= $pKey ?>">
+              <span><?= View::e($pLabel) ?></span>
+            </label>
           <?php endforeach; ?>
-        </select>
+        </div>
       </div>
     </div>
 

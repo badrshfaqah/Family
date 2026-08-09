@@ -26,7 +26,7 @@ $ordinalLabels = [1 => 'الأول', 2 => 'الثاني', 3 => 'الثالث', 4
 $type = $gathering['recurrence_type'] ?? 'weekly';
 $ordinal = (int) ($gathering['recurrence_ordinal'] ?? 1);
 $status = $gathering['status'] ?? 'active';
-$timePeriod = $gathering['time_period'] ?? '';
+$selectedPeriods = array_filter(array_map('trim', explode(',', (string) ($gathering['time_period'] ?? ''))));
 ?>
 <form method="post" action="<?= $action ?>" class="card-box" enctype="multipart/form-data">
   <?= Csrf::field() ?>
@@ -61,13 +61,15 @@ $timePeriod = $gathering['time_period'] ?? '';
   </div>
 
   <div class="form-group">
-    <label>وقت الجمعة</label>
-    <select class="form-control" name="time_period">
-      <option value="">بدون تحديد</option>
+    <label>وقت الجمعة (يمكن اختيار أكثر من فترة)</label>
+    <div style="display:flex;flex-wrap:wrap;gap:12px">
       <?php foreach (\Modules\Gatherings\Support\RecurrenceLabel::PERIODS as $pKey => $pLabel): ?>
-        <option value="<?= $pKey ?>" <?= $timePeriod === $pKey ? 'selected' : '' ?>><?= View::e($pLabel) ?></option>
+        <label style="display:flex;gap:6px;align-items:center">
+          <input type="checkbox" name="time_period[]" value="<?= $pKey ?>" <?= in_array($pKey, $selectedPeriods, true) ? 'checked' : '' ?>>
+          <?= View::e($pLabel) ?>
+        </label>
       <?php endforeach; ?>
-    </select>
+    </div>
   </div>
 
   <h3 style="font-size:.95rem;margin-top:10px">التكرار</h3>

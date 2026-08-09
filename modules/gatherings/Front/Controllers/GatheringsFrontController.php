@@ -114,10 +114,10 @@ final class GatheringsFrontController
             \Core\Support\Response::redirect($back);
         }
 
-        $timePeriod = \Core\Support\Request::post('time_period', '');
-        if (!isset(\Modules\Gatherings\Support\RecurrenceLabel::PERIODS[$timePeriod])) {
-            $timePeriod = null;
-        }
+        $periodsInput = \Core\Support\Request::post('time_period', []);
+        $periodsInput = is_array($periodsInput) ? $periodsInput : [$periodsInput];
+        $periods = array_values(array_intersect(array_keys(\Modules\Gatherings\Support\RecurrenceLabel::PERIODS), $periodsInput));
+        $timePeriod = $periods ? implode(',', $periods) : null;
         $periodLabel = \Modules\Gatherings\Support\RecurrenceLabel::periodLabel($timePeriod);
 
         Database::insert('gatherings', [
