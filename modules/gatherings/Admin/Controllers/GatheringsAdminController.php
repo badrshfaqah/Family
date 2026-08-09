@@ -187,12 +187,18 @@ final class GatheringsAdminController
 
         $label = RecurrenceLabel::build($type, $days, $ordinal, $customText, $startTime, $endTime);
 
+        // رابط الخريطة: من يلصقه بدون https:// يتحول لرابط داخلي مكسور عند العرض
+        $mapUrl = Security::cleanText(Request::trimmed('map_url'));
+        if ($mapUrl !== '' && !preg_match('~^https?://~i', $mapUrl)) {
+            $mapUrl = 'https://' . $mapUrl;
+        }
+
         $data = [
             'title' => $title,
             'description' => Security::cleanText(Request::trimmed('description')),
             'city_id' => Request::int('city_id') ?: null,
             'venue' => Security::cleanText(Request::trimmed('venue')),
-            'map_url' => Security::cleanText(Request::trimmed('map_url')),
+            'map_url' => $mapUrl,
             'start_time' => $startTime,
             'end_time' => $endTime,
             'recurrence_type' => $type,
