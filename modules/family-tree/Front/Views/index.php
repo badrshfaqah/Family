@@ -66,7 +66,6 @@ $renderNode = function (array $n, bool $isRoot) use (&$renderNode, $byParent, $p
 
   <div class="breadcrumbs"><a href="<?= Url::to('') ?>">الرئيسية</a> / <?= View::e(Terms::phrase('tree')) ?></div>
   <h1>🌳 <?= View::e(Terms::phrase('tree')) ?></h1>
-  <p class="form-hint">تسلسل نسب مبسّط، دون أي بيانات شخصية حساسة (لا أرقام جوال ولا صور فردية ولا تواريخ ميلاد).</p>
 
   <div class="family-tree-actions" style="display:flex;gap:10px;margin:14px 0;flex-wrap:wrap">
     <a class="btn btn-sm <?= $viewMode === 'tree' ? 'btn-primary' : 'btn-outline-dark' ?>" href="<?= Url::to('tree') ?>"><?= $treeImageUrl ? 'الصورة' : 'الخريطة' ?></a>

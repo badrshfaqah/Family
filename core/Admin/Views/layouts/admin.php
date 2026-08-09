@@ -16,6 +16,7 @@ $currentPath = \Core\Support\Request::path();
 $coreMenu = [
     ['label' => 'الرئيسية', 'url' => Url::admin(''), 'icon' => '🏠', 'perm' => null],
     ['label' => 'الإحصائيات', 'url' => Url::admin('stats'), 'icon' => '📊', 'perm' => 'reports.view'],
+    ['label' => 'الرسائل' . (($newMsgs = (\Core\Database::tableExists('contact_messages') ? (int) \Core\Database::fetchValue('SELECT COUNT(*) FROM ' . \Core\Database::table('contact_messages') . " WHERE status = 'new'") : 0)) > 0 ? " ({$newMsgs})" : ''), 'url' => Url::admin('messages'), 'icon' => '✉️', 'perm' => 'system.settings'],
     ['label' => 'الوسائط', 'url' => Url::admin('media'), 'icon' => '🖼️', 'perm' => 'content.media'],
     ['label' => 'القوائم', 'url' => Url::admin('menus'), 'icon' => '📋', 'perm' => 'content.pages'],
     ['label' => 'المدن', 'url' => Url::admin('cities'), 'icon' => '🏙️', 'perm' => 'content.pages'],

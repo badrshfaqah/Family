@@ -34,6 +34,8 @@ $router->get('/sw.js', [PwaController::class, 'serviceWorker']);
 $router->get('/pwa-icon-{size}.png', [PwaController::class, 'icon']);
 $router->get('/install-app', [PwaController::class, 'installApp']);
 $router->post('/push/subscribe', [PwaController::class, 'pushSubscribe']);
+$router->get('/contact', [\Core\Front\Controllers\ContactController::class, 'form']);
+$router->post('/contact', [\Core\Front\Controllers\ContactController::class, 'submit']);
 
 $router->setNotFound(function () {
     NotFound::render();

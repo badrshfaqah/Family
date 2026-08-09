@@ -263,6 +263,7 @@ $bottomNav = [
       <?php if (\Core\ModuleManager::isEnabled('directory')): ?>
         <a href="<?= Url::to('directory/manage-subscription') ?>">🗑 حذف رقم قديم</a>
       <?php endif; ?>
+      <a href="<?= Url::to('contact') ?>">✉️ راسل الإدارة</a>
       <a href="<?= Url::to('family') ?>">ℹ️ عن البرنامج</a>
     </div>
 

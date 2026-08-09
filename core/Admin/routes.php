@@ -67,6 +67,10 @@ $router->get('/logs', [LogsController::class, 'index']);
 $router->get('/logs/users', [LogsController::class, 'userActivity']);
 $router->get('/stats', [\Core\Admin\Controllers\StatsController::class, 'index']);
 
+$router->get('/messages', [\Core\Admin\Controllers\MessagesController::class, 'index']);
+$router->post('/messages/{id}/read', [\Core\Admin\Controllers\MessagesController::class, 'markRead']);
+$router->post('/messages/{id}/delete', [\Core\Admin\Controllers\MessagesController::class, 'delete']);
+
 $router->get('/notifications', [\Core\Admin\Controllers\NotificationsController::class, 'index']);
 $router->post('/notifications/send', [\Core\Admin\Controllers\NotificationsController::class, 'send']);
 
