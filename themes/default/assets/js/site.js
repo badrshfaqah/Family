@@ -395,6 +395,18 @@
     return (weight || 700) + ' ' + size + 'px Tajawal, "Segoe UI", Tahoma, Arial, sans-serif';
   }
 
+  // على iOS Safari تحديدًا، document.fonts.ready لا يضمن تحميل وزن خط لم يُستخدم
+  // بعد في الصفحة، فيظهر نص الكانفاس فارغًا؛ نطلب تحميل كل وزن صراحةً قبل الرسم
+  function ensureCardFontsLoaded() {
+    if (!document.fonts || !document.fonts.load) return Promise.resolve();
+    var loads = [400, 700, 800].map(function (weight) {
+      try { return document.fonts.load(weight + ' 16px Tajawal'); } catch (e) { return Promise.resolve(); }
+    });
+    var settle = Promise.all(loads).catch(function () {});
+    var timeout = new Promise(function (resolve) { setTimeout(resolve, 1500); });
+    return Promise.race([settle, timeout]);
+  }
+
   function cardThemeColors() {
     var rootStyle = getComputedStyle(document.documentElement);
     return {
@@ -410,7 +422,7 @@
     var secondary = theme.secondary;
     var W = 1080;
 
-    var fontsReady = (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve();
+    var fontsReady = ensureCardFontsLoaded();
 
     return Promise.all([loadCardImage(d.person), fontsReady]).then(function (loaded) {
       var person = loaded[0];
@@ -637,7 +649,7 @@
     var W = 1080;
     var verse = 'يَا أَيَّتُهَا النَّفْسُ الْمُطْمَئِنَّةُ ارْجِعِي إِلَىٰ رَبِّكِ رَاضِيَةً مَّرْضِيَّةً';
 
-    var fontsReady = (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve();
+    var fontsReady = ensureCardFontsLoaded();
 
     return fontsReady.then(function () {
       var rows = [];
