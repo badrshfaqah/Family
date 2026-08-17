@@ -641,7 +641,7 @@
     });
   }
 
-  // بطاقة تعزية بهوية الموقع: يمامة، «انتقل إلى رحمة الله»، اسم المتوفى، والآية
+  // بطاقة تعزية بهوية الموقع: الآية في الأعلى، ثم «انتقل إلى رحمة الله» واسم المتوفى
   function buildObituaryCard(d) {
     var theme = cardThemeColors();
     var primary = theme.primary;
@@ -671,9 +671,8 @@
       var verseLines = wrapCardText(scratch, verse, W - 320);
       var verseBlock = verseLines.length * verseLineH + 40;
 
-      var doveBlock = 130;
       var eulogyBlock = 78;
-      var total = doveBlock + eulogyBlock + nameBlock + verseBlock + dividerBlock + panelBlock;
+      var total = verseBlock + eulogyBlock + nameBlock + dividerBlock + panelBlock;
       var contentTop = 216, bottomReserve = 210;
       var H = 1250;
       if (total > H - contentTop - bottomReserve) {
@@ -739,9 +738,13 @@
 
       var y = contentTop + Math.max(0, (H - contentTop - bottomReserve - total) / 2);
 
-      ctx.font = cardFont(72, 400);
-      ctx.fillText('🕊', W / 2, y + 70);
-      y += doveBlock;
+      ctx.fillStyle = primary;
+      ctx.font = cardFont(34, 700);
+      verseLines.forEach(function (line) {
+        ctx.fillText(line, W / 2, y + 44, W - 260);
+        y += verseLineH;
+      });
+      y += 40;
 
       ctx.fillStyle = secondary;
       ctx.font = cardFont(40, 800);
@@ -755,14 +758,6 @@
         y += nameLineH;
       });
       y += 6;
-
-      ctx.fillStyle = primary;
-      ctx.font = cardFont(34, 700);
-      verseLines.forEach(function (line) {
-        ctx.fillText(line, W / 2, y + 44, W - 260);
-        y += verseLineH;
-      });
-      y += 40;
 
       cardOrnamentDivider(ctx, W / 2, y + 30, 170, secondary);
       y += dividerBlock;
