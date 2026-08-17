@@ -1,7 +1,11 @@
 <?php
 /** @var array $item */
+use Core\Settings;
 use Core\Support\Url;
 use Core\View;
+
+$siteName = Settings::get('identity_short_name', '') ?: Settings::get('identity_official_name', '');
+$venueLabel = trim(implode(' — ', array_filter([$item['condolence_venue'] ?? '', $item['condolence_times'] ?? ''])));
 ?>
 <div class="container section">
   <div class="breadcrumbs"><a href="<?= Url::to('') ?>">الرئيسية</a> / <a href="<?= Url::to('obituaries') ?>">الوفيات</a> / <?= View::e($item['name']) ?></div>
@@ -9,7 +13,8 @@ use Core\View;
   <div class="obit-show">
     <div class="obit-show-head">
       <span class="obit-show-icon">🕊</span>
-      <h1>وفاة <?= View::e($item['name']) ?></h1>
+      <p class="obit-show-eulogy">انتقل إلى رحمة الله</p>
+      <h1><?= View::e($item['name']) ?></h1>
       <p class="obit-verse">﴿يَا أَيَّتُهَا النَّفْسُ الْمُطْمَئِنَّةُ ارْجِعِي إِلَىٰ رَبِّكِ رَاضِيَةً مَّرْضِيَّةً﴾</p>
       <p class="form-hint" style="margin:0">إنا لله وإنا إليه راجعون</p>
       <div class="ornament" aria-hidden="true" style="color:#8a8478">❖ ✦ ❖</div>
@@ -36,5 +41,15 @@ use Core\View;
     <?php if (!empty($item['details'])): ?>
       <div class="obit-extra"><?= nl2br(View::e($item['details'])) ?></div>
     <?php endif; ?>
+
+    <div class="share-row">
+      <button class="btn btn-sm btn-outline-dark" data-share-card="obituary"
+              data-name="<?= View::e($item['name']) ?>"
+              data-date="<?= $item['deceased_on'] ? View::e(date('Y/m/d', strtotime($item['deceased_on']))) : '' ?>"
+              data-city="<?= View::e($item['city_name'] ?? '') ?>"
+              data-venue="<?= View::e($venueLabel) ?>"
+              data-site="<?= View::e($siteName) ?>"
+              data-url="<?= View::e(Url::current()) ?>">تصدير كصورة 🖼</button>
+    </div>
   </div>
 </div>

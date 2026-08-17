@@ -264,7 +264,7 @@
     });
   }
 
-  // «المشاركة كصورة»: توليد بطاقة دعوة فيها تفاصيل المناسبة وصورة صاحبها
+  // «المشاركة/التصدير كصورة»: توليد بطاقة بهوية الموقع (مناسبة أو وفاة) وتنزيلها أو مشاركتها
   function initShareCard() {
     document.querySelectorAll('[data-share-card]').forEach(function (btn) {
       btn.addEventListener('click', function () {
@@ -278,14 +278,18 @@
           btn.removeAttribute('data-busy');
         }
 
-        buildEventCard(btn.dataset).then(function (blob) {
-          var file = new File([blob], 'event-card.png', { type: 'image/png' });
+        var isObituary = btn.dataset.shareCard === 'obituary';
+        var builder = isObituary ? buildObituaryCard : buildEventCard;
+        var fileName = isObituary ? 'obituary-card.png' : 'event-card.png';
+
+        builder(btn.dataset).then(function (blob) {
+          var file = new File([blob], fileName, { type: 'image/png' });
           if (navigator.canShare && navigator.share && navigator.canShare({ files: [file] })) {
-            return navigator.share({ files: [file], title: btn.dataset.title || '' }).catch(function () {});
+            return navigator.share({ files: [file], title: btn.dataset.title || btn.dataset.name || '' }).catch(function () {});
           }
           var a = document.createElement('a');
           a.href = URL.createObjectURL(blob);
-          a.download = 'event-card.png';
+          a.download = fileName;
           document.body.appendChild(a);
           a.click();
           a.remove();
@@ -387,16 +391,24 @@
     ctx.stroke();
   }
 
+  function cardFont(size, weight) {
+    return (weight || 700) + ' ' + size + 'px Tajawal, "Segoe UI", Tahoma, Arial, sans-serif';
+  }
+
+  function cardThemeColors() {
+    var rootStyle = getComputedStyle(document.documentElement);
+    return {
+      primary: (rootStyle.getPropertyValue('--c-primary') || '').trim() || '#0f6e5e',
+      secondary: (rootStyle.getPropertyValue('--c-secondary') || '').trim() || '#c9a24b',
+    };
+  }
+
   // بطاقة دعوة احترافية بهوية الموقع — بدون البوستر (خلفية مصممة وليست صورة)
   function buildEventCard(d) {
-    var rootStyle = getComputedStyle(document.documentElement);
-    var primary = (rootStyle.getPropertyValue('--c-primary') || '').trim() || '#0f6e5e';
-    var secondary = (rootStyle.getPropertyValue('--c-secondary') || '').trim() || '#c9a24b';
+    var theme = cardThemeColors();
+    var primary = theme.primary;
+    var secondary = theme.secondary;
     var W = 1080;
-
-    function cardFont(size, weight) {
-      return (weight || 700) + ' ' + size + 'px Tajawal, "Segoe UI", Tahoma, Arial, sans-serif';
-    }
 
     var fontsReady = (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve();
 
@@ -594,6 +606,190 @@
       }
 
       // رابط الصفحة داخل كبسولة بيضاء بحد ذهبي
+      var urlText = (d.url || '').replace(/^https?:\/\//, '').replace(/\/$/, '');
+      if (urlText) {
+        ctx.font = cardFont(28, 700);
+        var uw = Math.min(ctx.measureText(urlText).width + 96, W - 280);
+        var uy = H - 168;
+        cardRoundRect(ctx, (W - uw) / 2, uy, uw, 58, 29);
+        ctx.fillStyle = '#ffffff';
+        ctx.fill();
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = secondary;
+        ctx.stroke();
+        ctx.fillStyle = primary;
+        ctx.fillText(urlText, W / 2, uy + 39, uw - 60);
+      }
+
+      return new Promise(function (resolve, reject) {
+        canvas.toBlob(function (blob) {
+          if (blob) resolve(blob); else reject(new Error('canvas'));
+        }, 'image/png');
+      });
+    });
+  }
+
+  // بطاقة تعزية بهوية الموقع: يمامة، «انتقل إلى رحمة الله»، اسم المتوفى، والآية
+  function buildObituaryCard(d) {
+    var theme = cardThemeColors();
+    var primary = theme.primary;
+    var secondary = theme.secondary;
+    var W = 1080;
+    var verse = 'يَا أَيَّتُهَا النَّفْسُ الْمُطْمَئِنَّةُ ارْجِعِي إِلَىٰ رَبِّكِ رَاضِيَةً مَّرْضِيَّةً';
+
+    var fontsReady = (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve();
+
+    return fontsReady.then(function () {
+      var rows = [];
+      if (d.date) rows.push('🗓  ' + d.date);
+      if (d.city) rows.push('🏙  ' + d.city);
+      if (d.venue) rows.push('📍  ' + d.venue);
+
+      var nameLineH = 78;
+      var verseLineH = 52;
+      var dividerBlock = 72;
+      var rowH = 80;
+      var panelBlock = rows.length ? rows.length * rowH + 48 : 0;
+
+      var scratch = document.createElement('canvas').getContext('2d');
+      scratch.font = cardFont(56, 800);
+      var nameLines = wrapCardText(scratch, d.name, W - 280).slice(0, 2);
+      var nameBlock = nameLines.length * nameLineH + 6;
+      scratch.font = cardFont(34, 700);
+      var verseLines = wrapCardText(scratch, verse, W - 320);
+      var verseBlock = verseLines.length * verseLineH + 40;
+
+      var doveBlock = 130;
+      var eulogyBlock = 78;
+      var total = doveBlock + eulogyBlock + nameBlock + verseBlock + dividerBlock + panelBlock;
+      var contentTop = 216, bottomReserve = 210;
+      var H = 1250;
+      if (total > H - contentTop - bottomReserve) {
+        H = contentTop + bottomReserve + total;
+      }
+
+      var canvas = document.createElement('canvas');
+      canvas.width = W;
+      canvas.height = H;
+      var ctx = canvas.getContext('2d');
+      ctx.textAlign = 'center';
+      try { ctx.direction = 'rtl'; } catch (e) {}
+
+      var bg = ctx.createLinearGradient(0, 0, 0, H);
+      bg.addColorStop(0, '#fdfaf1');
+      bg.addColorStop(1, '#f5eedb');
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, W, H);
+      var glow = ctx.createRadialGradient(W / 2, 0, 60, W / 2, 0, H * 0.55);
+      glow.addColorStop(0, cardHexToRgba(primary, 0.07));
+      glow.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = glow;
+      ctx.fillRect(0, 0, W, H);
+
+      ctx.fillStyle = cardHexToRgba(primary, 0.04);
+      for (var px = 30; px < W; px += 46) {
+        for (var py = 56; py < H - 44; py += 46) {
+          ctx.beginPath();
+          ctx.arc(px, py, 2.2, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
+      cardSaduBand(ctx, W, 0, 30, primary, secondary);
+      cardSaduBand(ctx, W, H - 30, 30, primary, secondary);
+
+      ctx.strokeStyle = secondary;
+      ctx.lineWidth = 3;
+      cardRoundRect(ctx, 48, 76, W - 96, H - 152, 26);
+      ctx.stroke();
+      ctx.lineWidth = 1.2;
+      ctx.strokeStyle = cardHexToRgba(secondary, 0.7);
+      cardRoundRect(ctx, 61, 89, W - 122, H - 178, 18);
+      ctx.stroke();
+
+      ctx.fillStyle = '#fdfaf1';
+      ctx.beginPath();
+      ctx.arc(W / 2, 76, 20, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(W / 2, H - 76, 20, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = secondary;
+      cardDiamond(ctx, W / 2, 76, 11);
+      ctx.fill();
+      cardDiamond(ctx, W / 2, H - 76, 11);
+      ctx.fill();
+
+      ctx.fillStyle = primary;
+      ctx.font = cardFont(38, 800);
+      ctx.fillText(d.site || '', W / 2, 152, W - 280);
+      cardOrnamentDivider(ctx, W / 2, 180, 140, secondary);
+
+      var y = contentTop + Math.max(0, (H - contentTop - bottomReserve - total) / 2);
+
+      ctx.font = cardFont(72, 400);
+      ctx.fillText('🕊', W / 2, y + 70);
+      y += doveBlock;
+
+      ctx.fillStyle = secondary;
+      ctx.font = cardFont(40, 800);
+      ctx.fillText('انتقل إلى رحمة الله', W / 2, y + 34, W - 280);
+      y += eulogyBlock;
+
+      ctx.fillStyle = '#20302a';
+      ctx.font = cardFont(56, 800);
+      nameLines.forEach(function (line) {
+        ctx.fillText(line, W / 2, y + 54, W - 200);
+        y += nameLineH;
+      });
+      y += 6;
+
+      ctx.fillStyle = primary;
+      ctx.font = cardFont(34, 700);
+      verseLines.forEach(function (line) {
+        ctx.fillText(line, W / 2, y + 44, W - 260);
+        y += verseLineH;
+      });
+      y += 40;
+
+      cardOrnamentDivider(ctx, W / 2, y + 30, 170, secondary);
+      y += dividerBlock;
+
+      if (rows.length) {
+        var panelX = 140, panelW = W - 280, panelH = rows.length * rowH + 44;
+        ctx.save();
+        ctx.shadowColor = 'rgba(120,100,50,.10)';
+        ctx.shadowBlur = 18;
+        ctx.shadowOffsetY = 6;
+        cardRoundRect(ctx, panelX, y, panelW, panelH, 22);
+        ctx.fillStyle = 'rgba(255,255,255,.6)';
+        ctx.fill();
+        ctx.restore();
+        ctx.lineWidth = 1.5;
+        ctx.strokeStyle = cardHexToRgba(secondary, 0.55);
+        cardRoundRect(ctx, panelX, y, panelW, panelH, 22);
+        ctx.stroke();
+
+        ctx.fillStyle = '#31413a';
+        ctx.font = cardFont(40, 700);
+        rows.forEach(function (row, i) {
+          var ry = y + 22 + i * rowH;
+          ctx.fillText(row, W / 2, ry + 54, panelW - 70);
+          if (i < rows.length - 1) {
+            ctx.save();
+            ctx.strokeStyle = cardHexToRgba(secondary, 0.45);
+            ctx.setLineDash([2, 8]);
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(panelX + 44, ry + rowH);
+            ctx.lineTo(panelX + panelW - 44, ry + rowH);
+            ctx.stroke();
+            ctx.restore();
+          }
+        });
+        y += panelBlock;
+      }
+
       var urlText = (d.url || '').replace(/^https?:\/\//, '').replace(/\/$/, '');
       if (urlText) {
         ctx.font = cardFont(28, 700);

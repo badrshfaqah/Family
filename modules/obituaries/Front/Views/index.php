@@ -16,7 +16,8 @@ use Core\View;
       <a class="obit-card" href="<?= Url::pretty('obituaries', (int) $r['id'], 'وفاة ' . $r['name']) ?>">
         <span class="obit-icon">🕊</span>
         <span class="obit-body">
-          <b>وفاة <?= View::e($r['name']) ?></b>
+          <span class="obit-eulogy">انتقل إلى رحمة الله</span>
+          <b><?= View::e($r['name']) ?></b>
           <span class="obit-meta">
             <?php if ($r['deceased_on']): ?><span>🗓 <?= View::e(date('Y/m/d', strtotime($r['deceased_on']))) ?></span><?php endif; ?>
             <?php if (!empty($r['condolence_venue'])): ?><span>📍 العزاء: <?= View::e($r['condolence_venue']) ?></span><?php endif; ?>
