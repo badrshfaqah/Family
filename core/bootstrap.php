@@ -64,22 +64,16 @@ if (!is_file($configFile) || !is_file($installLock)) {
         exit;
     }
 
-    // تطبيق ترحيلات قاعدة البيانات المعلّقة تلقائيًا مرة واحدة لكل إصدار،
-    // حتى تتحدّث بنية القاعدة أيضًا عند رفع ملفات النظام يدويًا (FTP/لوحة الاستضافة)
-    // دون المرور بشاشة التحديث الذاتي — فلا تتعطل عمليات الإدخال بسبب أعمدة ناقصة.
-    $migrationMarker = STORAGE_PATH . '/cache/migrated-' . CORE_VERSION . '.lock';
-    if (!is_file($migrationMarker)) {
-        try {
-            \Core\Database\Migrator::migrate();
-            if (!is_dir(dirname($migrationMarker))) {
-                @mkdir(dirname($migrationMarker), 0775, true);
-            }
-            @file_put_contents($migrationMarker, date('Y-m-d H:i:s'));
-        } catch (\Throwable $e) {
-            Logger::exception($e);
-        }
-    }
-
     Session::start();
     Security::sendSecurityHeaders();
+
+    // المزامنة التلقائية بعد أي تحديث للملفات (سحب من GitHub أو رفع يدوي):
+    // ترحيلات النواة + ترحيل الإضافات المثبتة لإصداراتها الجديدة + تثبيت
+    // وتفعيل الإضافات المرفقة الجديدة (حسب الإعداد). تعمل مرة واحدة فقط
+    // بعد كل تغيير فعلي في إصدار النواة أو أي إضافة — انظر Core\SystemSync.
+    try {
+        \Core\SystemSync::autoRun();
+    } catch (\Throwable $e) {
+        Logger::exception($e);
+    }
 }

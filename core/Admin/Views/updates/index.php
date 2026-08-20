@@ -44,6 +44,27 @@ use Core\View;
   </p>
   <button class="btn btn-secondary" type="submit">🗄 تحديث الجداول الآن</button>
 </form>
+
+<form method="post" action="<?= Url::admin('updates/sync-modules') ?>" class="card-box" style="max-width:560px;margin-bottom:18px">
+  <?= Csrf::field() ?>
+  <p style="margin:0 0 6px"><b>🧩 مزامنة الإضافات (أول بأول)</b></p>
+  <p class="form-hint" style="margin:0 0 10px">
+    بعد كل تحديث للملفات (سحب من GitHub أو رفع يدوي) تعمل المزامنة تلقائيًا عند أول زيارة للموقع:
+    تُطبَّق ترحيلات قاعدة البيانات، وتُرحَّل الإضافات المثبتة لإصداراتها الجديدة،
+    وتُثبَّت وتُفعَّل الإضافات المرفقة الجديدة إذا كان الخيار أدناه مفعّلًا — دون أي تدخل يدوي.
+    <?php if (!empty($syncPending)): ?>
+      <br><b style="color:#b45309">بانتظار المزامنة:</b>
+      <?php foreach ($syncPending as $item): ?><br>• <?= View::e($item) ?><?php endforeach; ?>
+    <?php else: ?>
+      <br>✅ قاعدة البيانات والإضافات متزامنة مع النسخة الحالية من الملفات.
+    <?php endif; ?>
+  </p>
+  <label style="display:flex;gap:8px;align-items:flex-start;margin-bottom:12px">
+    <input type="checkbox" name="auto_install" value="1" <?= !empty($autoInstallModules) ? 'checked' : '' ?>>
+    <span>تثبيت وتفعيل الإضافات المرفقة الجديدة تلقائيًا عند وصولها مع التحديث</span>
+  </label>
+  <button class="btn btn-secondary" type="submit">🧩 حفظ وتشغيل المزامنة الآن</button>
+</form>
 <?php if (!$zipAvailable): ?><div class="alert alert-error">امتداد zip غير متوفر على الخادم — التحديث الذاتي يتطلبه لفك الحزمة.</div><?php endif; ?>
 
 <form method="post" action="<?= Url::admin('updates/save-repo') ?>" class="card-box" style="max-width:560px;margin-bottom:18px">

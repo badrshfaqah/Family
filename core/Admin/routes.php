@@ -78,6 +78,7 @@ $router->get('/updates', [\Core\Admin\Controllers\UpdatesController::class, 'ind
 $router->post('/updates/save-repo', [\Core\Admin\Controllers\UpdatesController::class, 'saveRepo']);
 $router->post('/updates/run', [\Core\Admin\Controllers\UpdatesController::class, 'run']);
 $router->post('/updates/migrate', [\Core\Admin\Controllers\UpdatesController::class, 'migrate']);
+$router->post('/updates/sync-modules', [\Core\Admin\Controllers\UpdatesController::class, 'syncModules']);
 
 $router->get('/media', [MediaController::class, 'index']);
 $router->post('/media/upload', [MediaController::class, 'upload']);

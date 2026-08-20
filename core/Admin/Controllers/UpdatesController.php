@@ -44,6 +44,13 @@ final class UpdatesController
             // لا نعطل شاشة التحديث إن تعذر فحص الترحيلات
         }
 
+        $syncPending = [];
+        try {
+            $syncPending = \Core\SystemSync::pending();
+        } catch (\Throwable $e) {
+            // الشاشة تعرض ما تيسر
+        }
+
         echo View::render(CORE_PATH . '/Admin/Views/layouts/admin.php', [
             'pageTitle' => 'تحديث النظام',
             'contentView' => CORE_PATH . '/Admin/Views/updates/index.php',
@@ -54,6 +61,8 @@ final class UpdatesController
             'checkError' => $error,
             'zipAvailable' => class_exists('ZipArchive'),
             'pendingMigrations' => $pendingMigrations,
+            'syncPending' => $syncPending,
+            'autoInstallModules' => Settings::get('update_auto_install_modules', '1') === '1',
         ]);
     }
 
@@ -137,12 +146,13 @@ final class UpdatesController
             Response::redirect(Url::admin('updates'));
         }
 
-        // تطبيق ترحيلات قاعدة البيانات المرافقة للنسخة الجديدة (الملفات استُبدلت للتو)
-        $migrations = [];
+        // مزامنة كاملة مع النسخة الجديدة: ترحيلات النواة + ترحيل الإضافات
+        // المثبتة + تثبيت الإضافات المرفقة الجديدة (حسب الإعداد)
+        $syncLog = [];
         try {
-            $migrations = \Core\Database\Migrator::migrate();
+            $syncLog = \Core\SystemSync::force();
         } catch (\Throwable $e) {
-            Session::flash('error', 'حُدثت الملفات لكن تعذر تطبيق ترحيلات قاعدة البيانات: ' . $e->getMessage());
+            Session::flash('error', 'حُدثت الملفات لكن تعذرت مزامنة قاعدة البيانات والإضافات: ' . $e->getMessage());
             Response::redirect(Url::admin('updates'));
         }
 
@@ -153,9 +163,31 @@ final class UpdatesController
         }
 
         Settings::clearCacheFile();
-        $migrationsNote = $migrations ? ('، وطُبق ' . count($migrations) . ' ترحيل على قاعدة البيانات') : '';
-        ActivityLog::record('system_update', "تحديث النظام من GitHub: {$oldVersion} ← {$newVersion} ({$info['label']}){$migrationsNote}");
-        Session::flash('success', "تم التحديث بنجاح: {$oldVersion} ← {$newVersion}{$migrationsNote}.");
+        $syncNote = $syncLog ? ('، والمزامنة: ' . implode('؛ ', $syncLog)) : '';
+        ActivityLog::record('system_update', "تحديث النظام من GitHub: {$oldVersion} ← {$newVersion} ({$info['label']}){$syncNote}");
+        Session::flash('success', "تم التحديث بنجاح: {$oldVersion} ← {$newVersion}{$syncNote}.");
+        Response::redirect(Url::admin('updates'));
+    }
+
+    /** حفظ خيار التثبيت التلقائي للإضافات الجديدة وتشغيل المزامنة فورًا */
+    public function syncModules(array $params): void
+    {
+        $this->requireSystemAdmin();
+        Csrf::verifyRequestOrFail();
+
+        Settings::set('update_auto_install_modules', Request::post('auto_install') ? '1' : '0');
+
+        try {
+            $log = \Core\SystemSync::force();
+        } catch (\Throwable $e) {
+            Session::flash('error', 'تعذرت المزامنة: ' . $e->getMessage());
+            Response::redirect(Url::admin('updates'));
+            return;
+        }
+
+        Session::flash('success', $log
+            ? 'تمت المزامنة: ' . implode('؛ ', $log)
+            : 'كل شيء محدث — لا توجد ترحيلات أو إضافات معلقة.');
         Response::redirect(Url::admin('updates'));
     }
 
