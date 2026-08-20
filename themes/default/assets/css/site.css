@@ -1016,3 +1016,132 @@ a,button{-webkit-tap-highlight-color:transparent}
 .section-head a{transition:gap .15s;display:inline-flex;align-items:center;gap:4px}
 .section-head a::after{content:"←";font-size:.85em;transition:transform .15s}
 .section-head a:hover::after{transform:translateX(-3px)}
+
+/* ═══════ اقتباس تصميم التطبيق النيتف (iOS) ═══════
+   بنية الرئيسية والمكونات مطابقة لشاشات التطبيق: بطاقات ناعمة بزوايا 16،
+   ظل خفيف بدون حدود ثقيلة، عاجل الوفيات بحاوية بنية، وعدادات بكبسولات ذهبية */
+
+.app-home{display:flex;flex-direction:column;gap:26px;padding-top:20px;padding-bottom:26px}
+
+/* ترويسة الشعار مثل التطبيق: شعار بالوسط وتحته تاريخ اليوم */
+.app-logo-head{text-align:center}
+.app-logo-head img{height:76px;width:auto;max-width:70vw;margin:0 auto;display:block;object-fit:contain}
+.app-logo-name{margin:0;font-size:1.6rem;color:var(--c-primary)}
+.app-today{margin:8px 0 0;font-size:.9rem;color:var(--c-muted)}
+
+/* عناوين الأقسام: أيقونة ذهبية + عنوان غامق (SectionHeader في التطبيق) */
+.app-section{display:flex;flex-direction:column;gap:12px}
+.app-section-head{display:flex;align-items:center;gap:8px}
+.app-section-head h2{margin:0;font-size:1.2rem}
+.ash-icon{font-size:1.15rem;line-height:1}
+.ash-more{margin-inline-start:auto;font-size:.85rem;font-weight:700;color:var(--c-primary)}
+
+/* عاجل الوفيات: حاوية بلون الهوية وبداخلها بطاقات سطح (obituariesUrgentSection) */
+.urgent-band{
+  background:var(--c-primary);border-radius:16px;padding:12px;
+  display:flex;flex-direction:column;gap:10px;
+}
+.urgent-head{color:#fff;font-weight:800;font-size:1.02rem}
+.urgent-card{
+  background:var(--c-surface);border-radius:12px;padding:16px;
+  display:flex;flex-direction:column;gap:8px;text-align:center;
+}
+.urgent-verse{color:var(--c-secondary);font-size:.85rem}
+.urgent-name{font-size:1.15rem;color:var(--c-text)}
+.urgent-rows{display:flex;flex-direction:column;gap:4px;font-size:.9rem;color:var(--c-muted);text-align:right}
+
+/* بطاقة أقرب مناسبة مع كبسولة العداد (nextEntrySection) */
+.next-card{
+  background:var(--c-surface);border-radius:16px;padding:18px;
+  box-shadow:0 2px 6px rgba(0,0,0,.06);
+  display:flex;flex-direction:column;gap:10px;
+  transition:transform .15s,box-shadow .15s;
+}
+.next-card:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(60,44,24,.12)}
+.next-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.next-title{font-size:1.18rem;line-height:1.5}
+.info-row-app{font-size:.93rem;color:var(--c-text)}
+
+.chip{
+  display:inline-block;padding:4px 12px;border-radius:999px;
+  font-size:.78rem;font-weight:700;line-height:1.5;
+}
+.chip-primary{background:rgba(91,67,39,.13);color:var(--c-primary)}
+.chip-gold{background:rgba(201,162,75,.16);color:#8a6a25}
+.countdown-pill{
+  background:var(--c-secondary);color:#fff;border-radius:999px;
+  padding:6px 15px;font-size:.88rem;font-weight:800;flex:none;
+}
+
+/* الأخبار: تمرير أفقي بعرض بطاقة ثابت مثل التطبيق (newsSection) */
+.hscroll{
+  display:flex;gap:12px;overflow-x:auto;padding:2px 2px 10px;
+  scroll-snap-type:x mandatory;scrollbar-width:none;
+}
+.hscroll::-webkit-scrollbar{display:none}
+.hnews-card{
+  flex:0 0 250px;scroll-snap-align:start;
+  background:var(--c-surface);border-radius:16px;overflow:hidden;
+  box-shadow:0 2px 6px rgba(0,0,0,.06);
+  display:flex;flex-direction:column;
+  transition:transform .15s;
+}
+.hnews-card:hover{transform:translateY(-2px)}
+.hnews-img{display:block;height:130px;background:#eee4d2}
+.hnews-img img{width:100%;height:100%;object-fit:cover}
+.hnews-title{padding:12px 14px 4px;font-size:.95rem;line-height:1.55;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.hnews-date{padding:0 14px 12px;font-size:.8rem;color:var(--c-muted)}
+
+/* صفوف المناسبات والجمعات: مربع تاريخ + معلومات (CalendarEntryRow) */
+.app-rows{display:flex;flex-direction:column;gap:10px}
+.entry-row{
+  display:flex;gap:12px;align-items:flex-start;
+  background:var(--c-surface);border-radius:16px;padding:12px;
+  box-shadow:0 2px 6px rgba(0,0,0,.06);
+  transition:transform .15s,box-shadow .15s;
+}
+a.entry-row:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(60,44,24,.12)}
+.date-sq{
+  flex:none;width:54px;padding:9px 4px;text-align:center;
+  background:rgba(91,67,39,.08);border-radius:10px;
+  display:flex;flex-direction:column;gap:1px;
+}
+.date-sq b{font-size:1.25rem;color:var(--c-primary);line-height:1.2}
+.date-sq span{font-size:.72rem;color:var(--c-muted)}
+.date-sq-icon{font-size:1.5rem;justify-content:center;min-height:54px;line-height:1}
+.entry-info{display:flex;flex-direction:column;gap:5px;min-width:0}
+.entry-info>b{font-size:.98rem;line-height:1.5}
+.entry-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.entry-city{font-size:.84rem;color:var(--c-muted)}
+.entry-countdown{font-size:.82rem;font-weight:800;color:var(--c-primary)}
+
+/* الروابط السريعة: بطاقتان بأيقونة دائرية (quickLinksSection) */
+.quick-links{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.quick-card{
+  background:var(--c-surface);border-radius:16px;padding:20px 12px;
+  box-shadow:0 2px 6px rgba(0,0,0,.06);
+  display:flex;flex-direction:column;align-items:center;gap:9px;text-align:center;
+  transition:transform .15s,box-shadow .15s;
+}
+.quick-card:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(60,44,24,.12)}
+.quick-icon{
+  width:58px;height:58px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;font-size:1.6rem;
+}
+.quick-icon-primary{background:var(--c-primary)}
+.quick-icon-gold{background:var(--c-secondary)}
+.quick-card b{font-size:1.02rem}
+.quick-card span:last-child{font-size:.8rem;color:var(--c-muted);line-height:1.5}
+
+/* الشاشات الواسعة: الرئيسية بعمود مريح بعرض التطبيق تقريبًا */
+@media (min-width:960px){
+  .app-home{max-width:720px;margin:0 auto}
+}
+
+/* زر «المزيد» بالشريط السفلي يفتح القائمة الجانبية مثل تبويب التطبيق */
+.bottom-nav button{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;
+  padding:8px 2px 7px;font-size:.68rem;font-weight:700;color:var(--c-muted);
+  background:none;border:0;font-family:var(--font);cursor:pointer;
+}
+.bottom-nav button .bn-icon{font-size:1.3rem;line-height:1}

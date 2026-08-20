@@ -179,14 +179,17 @@
   }
 
   function initMobileNav() {
-    var trigger = document.querySelector('[data-nav-trigger]');
+    // أكثر من مشغل للقائمة: زر الهيدر وتبويب «المزيد» بالشريط السفلي
+    var triggers = document.querySelectorAll('[data-nav-trigger]');
     var nav = document.querySelector('[data-mobile-nav]');
     var closeBtn = document.querySelector('[data-nav-close]');
-    if (!trigger || !nav) return;
+    if (!triggers.length || !nav) return;
 
-    trigger.addEventListener('click', function () {
-      nav.classList.add('open');
-      document.body.style.overflow = 'hidden';
+    triggers.forEach(function (trigger) {
+      trigger.addEventListener('click', function () {
+        nav.classList.add('open');
+        document.body.style.overflow = 'hidden';
+      });
     });
     function close() {
       nav.classList.remove('open');
