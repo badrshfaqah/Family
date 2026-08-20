@@ -396,6 +396,13 @@ final class ApiController
 
     private function gatheringJson(array $r, array $map): array
     {
+        // ترجمة رموز الفترة المحفوظة (مثل after_isha) إلى تسميتها العربية
+        $timePeriod = $r['time_period'];
+        if ($timePeriod && class_exists(\Modules\Gatherings\Support\RecurrenceLabel::class)) {
+            $label = \Modules\Gatherings\Support\RecurrenceLabel::periodLabel($timePeriod);
+            $timePeriod = $label !== '' ? $label : $timePeriod;
+        }
+
         return [
             'id' => (int) $r['id'],
             'title' => $r['title'],
@@ -405,7 +412,7 @@ final class ApiController
             'venue' => $r['venue'],
             'map_url' => $r['map_url'],
             'recurrence_label' => $r['recurrence_label'],
-            'time_period' => $r['time_period'],
+            'time_period' => $timePeriod,
             'start_time' => $r['start_time'],
             'end_time' => $r['end_time'],
             'contact_name' => $r['contact_name'],
