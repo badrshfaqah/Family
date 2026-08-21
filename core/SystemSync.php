@@ -31,14 +31,43 @@ final class SystemSync
         return STORAGE_PATH . '/cache/sync-' . self::fingerprint() . '.lock';
     }
 
-    /** تعمل في كل طلب، وتنفّذ المزامنة فقط عند تغيّر بصمة الملفات */
+    /**
+     * تعمل في كل طلب، وتنفّذ المزامنة فقط عند تغيّر بصمة الملفات.
+     * محمية بقفل ملفي (flock) لأن أول زيارة بعد أي تحديث قد تصل من أكثر
+     * من عملية PHP في نفس اللحظة (أكثر من زائر، أو عدة عمّال PHP-FPM)؛
+     * بدون القفل قد تتسابق العمليات على تنفيذ نفس ترحيلات قاعدة البيانات
+     * في آنٍ واحد وتترك المخطط في حالة غير مكتملة.
+     */
     public static function autoRun(): void
     {
         $marker = self::markerPath();
         if (is_file($marker)) {
             return;
         }
-        self::force();
+
+        $lockPath = STORAGE_PATH . '/cache/sync.lock';
+        if (!is_dir(dirname($lockPath))) {
+            @mkdir(dirname($lockPath), 0775, true);
+        }
+        $handle = @fopen($lockPath, 'c');
+        if (!$handle) {
+            self::force();
+            return;
+        }
+
+        try {
+            if (!flock($handle, LOCK_EX)) {
+                self::force();
+                return;
+            }
+            // عملية أخرى ربما أنهت المزامنة أثناء انتظارنا القفل
+            if (!is_file($marker)) {
+                self::force();
+            }
+        } finally {
+            flock($handle, LOCK_UN);
+            fclose($handle);
+        }
     }
 
     /**
