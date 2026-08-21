@@ -217,7 +217,6 @@ $bottomNav = [
     ['match' => 'news', 'url' => Url::to('news'), 'icon' => '📰', 'label' => 'الأخبار', 'show' => \Core\ModuleManager::isEnabled('news')],
     ['match' => 'calendar', 'url' => Url::to('calendar'), 'icon' => '📅', 'label' => 'الرزنامة', 'show' => \Core\ModuleManager::isEnabled('calendar')],
     ['match' => 'gatherings', 'url' => Url::to('gatherings'), 'icon' => '☕', 'label' => 'الجمعات', 'show' => \Core\ModuleManager::isEnabled('gatherings')],
-    ['match' => 'directory', 'url' => Url::to('directory/register'), 'icon' => '📱', 'label' => 'جوال القبيلة', 'show' => \Core\ModuleManager::isEnabled('directory')],
 ];
 ?>
 <div class="a2hs-bar" data-a2hs hidden>
@@ -238,6 +237,10 @@ $bottomNav = [
     <span><?= \Core\View::e($item['label']) ?></span>
   </a>
   <?php endforeach; ?>
+  <button type="button" data-nav-trigger aria-label="المزيد">
+    <span class="bn-icon">⊕</span>
+    <span>المزيد</span>
+  </button>
 </nav>
 
 <footer class="site-footer">

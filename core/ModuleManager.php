@@ -148,6 +148,61 @@ final class ModuleManager
         }
     }
 
+    /**
+     * يوائم الإضافات مع ملفاتها بعد تحديث الكود (سحب من GitHub أو رفع يدوي):
+     * يرحّل الإضافات المثبتة التي تغيّر إصدارها في module.json، ويثبّت
+     * ويفعّل الإضافات المرفقة الجديدة عند تفعيل الخيار.
+     * @return string[] وصف ما طُبق
+     */
+    public static function syncWithFilesystem(bool $installNew): array
+    {
+        $log = [];
+        $installed = self::installedMap();
+
+        foreach (self::discover() as $slug => $manifest) {
+            $fileVersion = (string) ($manifest['version'] ?? '1.0.0');
+
+            if (!isset($installed[$slug])) {
+                if ($installNew) {
+                    $result = self::install($slug);
+                    $log[] = $result['ok']
+                        ? 'تثبيت إضافة جديدة: ' . ($manifest['name'] ?? $slug) . " ({$fileVersion})"
+                        : "تعذر تثبيت {$slug}: " . $result['message'];
+                }
+                continue;
+            }
+
+            $dbVersion = (string) ($installed[$slug]['version'] ?? '1.0.0');
+            if ($dbVersion === $fileVersion) {
+                continue;
+            }
+
+            try {
+                $module = self::instance($slug);
+                if ($module && version_compare($fileVersion, $dbVersion, '>')) {
+                    $module->migrate($dbVersion, $fileVersion);
+                }
+                Database::update('modules', ['version' => $fileVersion], ['slug' => $slug]);
+
+                // تسجيل أي صلاحيات جديدة أضافها الإصدار الجديد
+                if ($module) {
+                    foreach ($module->permissions() as $key => $label) {
+                        if (!Database::fetchValue('SELECT id FROM ' . Database::table('permissions_extra') . ' WHERE permission_key = ?', [$key])) {
+                            Database::insert('permissions_extra', ['permission_key' => $key, 'label' => $label, 'module_slug' => $slug]);
+                        }
+                    }
+                }
+
+                $log[] = 'ترحيل إضافة ' . ($manifest['name'] ?? $slug) . ": {$dbVersion} ← {$fileVersion}";
+            } catch (\Throwable $e) {
+                \Core\Support\Logger::exception($e);
+                $log[] = "تعذر ترحيل {$slug}: " . $e->getMessage();
+            }
+        }
+
+        return $log;
+    }
+
     public static function setStatus(string $slug, string $status): array
     {
         if (!self::isInstalled($slug)) {

@@ -1,6 +1,5 @@
 <?php
-/** @var string $repo
- *  @var bool $hasToken
+/** @var bool $hasToken
  *  @var string $currentVersion
  *  @var array|null $latest
  *  @var string $checkError
@@ -44,21 +43,38 @@ use Core\View;
   </p>
   <button class="btn btn-secondary" type="submit">🗄 تحديث الجداول الآن</button>
 </form>
+
+<form method="post" action="<?= Url::admin('updates/sync-modules') ?>" class="card-box" style="max-width:560px;margin-bottom:18px">
+  <?= Csrf::field() ?>
+  <p style="margin:0 0 6px"><b>🧩 مزامنة الإضافات (أول بأول)</b></p>
+  <p class="form-hint" style="margin:0 0 10px">
+    بعد كل تحديث للملفات (سحب من GitHub أو رفع يدوي) تعمل المزامنة تلقائيًا عند أول زيارة للموقع:
+    تُطبَّق ترحيلات قاعدة البيانات، وتُرحَّل الإضافات المثبتة لإصداراتها الجديدة،
+    وتُثبَّت وتُفعَّل الإضافات المرفقة الجديدة إذا كان الخيار أدناه مفعّلًا — دون أي تدخل يدوي.
+    <?php if (!empty($syncPending)): ?>
+      <br><b style="color:#b45309">بانتظار المزامنة:</b>
+      <?php foreach ($syncPending as $item): ?><br>• <?= View::e($item) ?><?php endforeach; ?>
+    <?php else: ?>
+      <br>✅ قاعدة البيانات والإضافات متزامنة مع النسخة الحالية من الملفات.
+    <?php endif; ?>
+  </p>
+  <label style="display:flex;gap:8px;align-items:flex-start;margin-bottom:12px">
+    <input type="checkbox" name="auto_install" value="1" <?= !empty($autoInstallModules) ? 'checked' : '' ?>>
+    <span>تثبيت وتفعيل الإضافات المرفقة الجديدة تلقائيًا عند وصولها مع التحديث</span>
+  </label>
+  <button class="btn btn-secondary" type="submit">🧩 حفظ وتشغيل المزامنة الآن</button>
+</form>
 <?php if (!$zipAvailable): ?><div class="alert alert-error">امتداد zip غير متوفر على الخادم — التحديث الذاتي يتطلبه لفك الحزمة.</div><?php endif; ?>
 
 <form method="post" action="<?= Url::admin('updates/save-repo') ?>" class="card-box" style="max-width:560px;margin-bottom:18px">
   <?= Csrf::field() ?>
   <div class="form-group">
-    <label>مستودع GitHub</label>
-    <input class="form-control" dir="ltr" name="repo" value="<?= View::e($repo) ?>" placeholder="owner/repo — مثال: almgrat/family-cms">
-    <div class="form-hint">يقبل الصيغة owner/repo أو رابط GitHub كاملًا. عند وجود Releases يُسحب أحدث إصدار منشور، وإلا فأحدث نسخة من الفرع الرئيسي.</div>
-  </div>
-  <div class="form-group">
     <label>مفتاح وصول GitHub (للمستودعات الخاصة) <?= $hasToken ? '— ✅ محفوظ' : '' ?></label>
     <input class="form-control" dir="ltr" type="password" name="token" autocomplete="off" placeholder="<?= $hasToken ? 'اتركه فارغًا للإبقاء على المفتاح الحالي' : 'github_pat_...' ?>">
     <div class="form-hint">
-      مطلوب فقط إذا كان المستودع خاصًا (Private): أنشئ Fine-grained token من
-      GitHub → Settings → Developer settings، مقصورًا على هذا المستودع بصلاحية
+      النظام يسحب التحديثات من مستودعه الرسمي على GitHub تلقائيًا — لا يحتاج أي إعداد.
+      هذا المفتاح مطلوب فقط إذا كان المستودع خاصًا (Private): أنشئ Fine-grained token من
+      GitHub → Settings → Developer settings، مقصورًا على المستودع بصلاحية
       Contents: Read-only فقط.
     </div>
     <?php if ($hasToken): ?>
@@ -67,10 +83,10 @@ use Core\View;
     </label>
     <?php endif; ?>
   </div>
-  <button class="btn btn-secondary" type="submit">حفظ الإعدادات</button>
+  <button class="btn btn-secondary" type="submit">حفظ المفتاح</button>
 </form>
 
-<?php if ($repo !== '' && $zipAvailable): ?>
+<?php if ($zipAvailable): ?>
 <form method="post" action="<?= Url::admin('updates/run') ?>" class="card-box" style="max-width:560px">
   <?= Csrf::field() ?>
   <p style="margin:0 0 6px"><b>⬆️ تحديث النظام الآن</b></p>

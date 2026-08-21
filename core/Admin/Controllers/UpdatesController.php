@@ -21,20 +21,20 @@ final class UpdatesController
     /** المسارات التي لا تُلمس أبدًا أثناء التحديث */
     private const PRESERVE = ['config.php', 'storage', '.git', '.claude'];
 
+    /** المستودع الرسمي للنظام — يُسحب منه التحديث تلقائيًا دون أي إعداد */
+    private const DEFAULT_REPO = 'badrshfaqah/Family';
+
     public function index(array $params): void
     {
         $this->requireSystemAdmin();
 
-        $repo = (string) Settings::get('update_github_repo', '');
         $latest = null;
         $error = '';
 
-        if ($repo !== '' && $this->validRepo($repo)) {
-            try {
-                $latest = $this->fetchLatestInfo($repo);
-            } catch (\Throwable $e) {
-                $error = $e->getMessage();
-            }
+        try {
+            $latest = $this->fetchLatestInfo($this->repo());
+        } catch (\Throwable $e) {
+            $error = $e->getMessage();
         }
 
         $pendingMigrations = 0;
@@ -44,16 +44,24 @@ final class UpdatesController
             // لا نعطل شاشة التحديث إن تعذر فحص الترحيلات
         }
 
+        $syncPending = [];
+        try {
+            $syncPending = \Core\SystemSync::pending();
+        } catch (\Throwable $e) {
+            // الشاشة تعرض ما تيسر
+        }
+
         echo View::render(CORE_PATH . '/Admin/Views/layouts/admin.php', [
             'pageTitle' => 'تحديث النظام',
             'contentView' => CORE_PATH . '/Admin/Views/updates/index.php',
-            'repo' => $repo,
             'hasToken' => Settings::get('update_github_token', '') !== '',
             'currentVersion' => defined('CORE_VERSION') ? CORE_VERSION : '؟',
             'latest' => $latest,
             'checkError' => $error,
             'zipAvailable' => class_exists('ZipArchive'),
             'pendingMigrations' => $pendingMigrations,
+            'syncPending' => $syncPending,
+            'autoInstallModules' => Settings::get('update_auto_install_modules', '1') === '1',
         ]);
     }
 
@@ -84,28 +92,20 @@ final class UpdatesController
         $this->requireSystemAdmin();
         Csrf::verifyRequestOrFail();
 
-        $repo = trim((string) Request::post('repo', ''));
-        $repo = preg_replace('~^https?://github\.com/~i', '', $repo);
-        $repo = trim((string) $repo, '/');
-
-        if ($repo !== '' && !$this->validRepo($repo)) {
-            Session::flash('error', 'صيغة المستودع غير صحيحة — المطلوب: owner/repo');
-            Response::redirect(Url::admin('updates'));
-        }
-
-        Settings::set('update_github_repo', $repo);
-
         // مفتاح الوصول للمستودعات الخاصة: يُحفظ إن أُدخل، ويُمسح بالخيار الصريح فقط
         if (Request::post('remove_token')) {
             Settings::set('update_github_token', '');
+            Session::flash('success', 'تم حذف مفتاح الوصول المحفوظ.');
         } else {
             $token = trim((string) Request::post('token', ''));
             if ($token !== '' && preg_match('/^[\w.\-]{20,255}$/', $token)) {
                 Settings::set('update_github_token', $token);
+                Session::flash('success', 'تم حفظ مفتاح الوصول بنجاح.');
+            } else {
+                Session::flash('error', $token === '' ? 'أدخل مفتاح الوصول أولًا.' : 'صيغة المفتاح غير صحيحة.');
             }
         }
 
-        Session::flash('success', $repo === '' ? 'تم مسح إعداد المستودع.' : 'تم حفظ إعدادات المستودع: ' . $repo);
         Response::redirect(Url::admin('updates'));
     }
 
@@ -115,11 +115,7 @@ final class UpdatesController
         Csrf::verifyRequestOrFail();
         @set_time_limit(300);
 
-        $repo = (string) Settings::get('update_github_repo', '');
-        if ($repo === '' || !$this->validRepo($repo)) {
-            Session::flash('error', 'اضبط مستودع GitHub أولًا.');
-            Response::redirect(Url::admin('updates'));
-        }
+        $repo = $this->repo();
         if (!class_exists('ZipArchive')) {
             Session::flash('error', 'امتداد zip غير متوفر على الخادم — لا يمكن فك حزمة التحديث.');
             Response::redirect(Url::admin('updates'));
@@ -137,12 +133,13 @@ final class UpdatesController
             Response::redirect(Url::admin('updates'));
         }
 
-        // تطبيق ترحيلات قاعدة البيانات المرافقة للنسخة الجديدة (الملفات استُبدلت للتو)
-        $migrations = [];
+        // مزامنة كاملة مع النسخة الجديدة: ترحيلات النواة + ترحيل الإضافات
+        // المثبتة + تثبيت الإضافات المرفقة الجديدة (حسب الإعداد)
+        $syncLog = [];
         try {
-            $migrations = \Core\Database\Migrator::migrate();
+            $syncLog = \Core\SystemSync::force();
         } catch (\Throwable $e) {
-            Session::flash('error', 'حُدثت الملفات لكن تعذر تطبيق ترحيلات قاعدة البيانات: ' . $e->getMessage());
+            Session::flash('error', 'حُدثت الملفات لكن تعذرت مزامنة قاعدة البيانات والإضافات: ' . $e->getMessage());
             Response::redirect(Url::admin('updates'));
         }
 
@@ -153,9 +150,31 @@ final class UpdatesController
         }
 
         Settings::clearCacheFile();
-        $migrationsNote = $migrations ? ('، وطُبق ' . count($migrations) . ' ترحيل على قاعدة البيانات') : '';
-        ActivityLog::record('system_update', "تحديث النظام من GitHub: {$oldVersion} ← {$newVersion} ({$info['label']}){$migrationsNote}");
-        Session::flash('success', "تم التحديث بنجاح: {$oldVersion} ← {$newVersion}{$migrationsNote}.");
+        $syncNote = $syncLog ? ('، والمزامنة: ' . implode('؛ ', $syncLog)) : '';
+        ActivityLog::record('system_update', "تحديث النظام من GitHub: {$oldVersion} ← {$newVersion} ({$info['label']}){$syncNote}");
+        Session::flash('success', "تم التحديث بنجاح: {$oldVersion} ← {$newVersion}{$syncNote}.");
+        Response::redirect(Url::admin('updates'));
+    }
+
+    /** حفظ خيار التثبيت التلقائي للإضافات الجديدة وتشغيل المزامنة فورًا */
+    public function syncModules(array $params): void
+    {
+        $this->requireSystemAdmin();
+        Csrf::verifyRequestOrFail();
+
+        Settings::set('update_auto_install_modules', Request::post('auto_install') ? '1' : '0');
+
+        try {
+            $log = \Core\SystemSync::force();
+        } catch (\Throwable $e) {
+            Session::flash('error', 'تعذرت المزامنة: ' . $e->getMessage());
+            Response::redirect(Url::admin('updates'));
+            return;
+        }
+
+        Session::flash('success', $log
+            ? 'تمت المزامنة: ' . implode('؛ ', $log)
+            : 'كل شيء محدث — لا توجد ترحيلات أو إضافات معلقة.');
         Response::redirect(Url::admin('updates'));
     }
 
@@ -333,6 +352,13 @@ final class UpdatesController
     private function validRepo(string $repo): bool
     {
         return (bool) preg_match('~^[\w.-]+/[\w.-]+$~', $repo);
+    }
+
+    /** مستودع التحديث: المدمج في النظام، مع إمكانية تجاوزه بإعداد مخفي عند الحاجة */
+    private function repo(): string
+    {
+        $override = (string) Settings::get('update_github_repo', '');
+        return $override !== '' && $this->validRepo($override) ? $override : self::DEFAULT_REPO;
     }
 
     private function requireSystemAdmin(): void
