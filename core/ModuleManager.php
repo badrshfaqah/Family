@@ -164,10 +164,15 @@ final class ModuleManager
 
             if (!isset($installed[$slug])) {
                 if ($installNew) {
-                    $result = self::install($slug);
-                    $log[] = $result['ok']
-                        ? 'تثبيت إضافة جديدة: ' . ($manifest['name'] ?? $slug) . " ({$fileVersion})"
-                        : "تعذر تثبيت {$slug}: " . $result['message'];
+                    try {
+                        $result = self::install($slug);
+                        $log[] = $result['ok']
+                            ? 'تثبيت إضافة جديدة: ' . ($manifest['name'] ?? $slug) . " ({$fileVersion})"
+                            : "تعذر تثبيت {$slug}: " . $result['message'];
+                    } catch (\Throwable $e) {
+                        \Core\Support\Logger::exception($e);
+                        $log[] = "تعذر تثبيت {$slug}: " . $e->getMessage();
+                    }
                 }
                 continue;
             }
