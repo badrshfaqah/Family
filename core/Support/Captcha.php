@@ -24,6 +24,16 @@ final class Captcha
         return ['a' => $a, 'b' => $b];
     }
 
+    /**
+     * نص السؤال بكلمات عربية بدل الأرقام — يصعّب على البوتات قراءته آليًا،
+     * بعكس طباعة "3 + 4" التي تُحل بسطر برمجي واحد.
+     */
+    public static function question(array $captcha): string
+    {
+        $words = [1 => 'واحد', 'اثنين', 'ثلاثة', 'أربعة', 'خمسة', 'ستة', 'سبعة', 'ثمانية', 'تسعة'];
+        return 'كم حاصل جمع ' . $words[$captcha['a']] . ' زائد ' . $words[$captcha['b']] . '؟ (اكتب الناتج رقمًا)';
+    }
+
     public static function verify(?string $answer): bool
     {
         $expected = Session::get(self::SESSION_KEY);

@@ -84,7 +84,7 @@ use Core\View;
     </div>
 
     <div class="form-group">
-      <label>كم يساوي <?= (int) $captcha['a'] ?> + <?= (int) $captcha['b'] ?>؟</label>
+      <label><?= View::e(\Core\Support\Captcha::question($captcha)) ?></label>
       <input class="form-control" type="text" name="captcha_answer" inputmode="numeric" autocomplete="off" required>
     </div>
 

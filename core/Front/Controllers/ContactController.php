@@ -39,11 +39,17 @@ final class ContactController
         }
 
         $throttleKey = 'contact:' . Request::ip();
-        if (RateLimiter::tooManyAttempts($throttleKey, 5, 30)) {
-            Session::flash('contact_error', 'تم إيقاف الإرسال مؤقتًا لكثرة المحاولات — حاول بعد نصف ساعة.');
+        if (RateLimiter::tooManyAttempts($throttleKey, 3, 60)) {
+            Session::flash('contact_error', 'تم إيقاف الإرسال مؤقتًا لكثرة المحاولات — حاول بعد ساعة.');
             Response::redirect($back);
         }
         RateLimiter::hit($throttleKey);
+
+        // فخ البوتات والحد الزمني: نتظاهر بالنجاح كي لا يتعلم البوت من الرفض
+        if (!\Core\Support\SpamGuard::passes('contact')) {
+            Session::flash('contact_success', 'وصلت رسالتك للإدارة بنجاح 🎉 — شكرًا لتواصلك.');
+            Response::redirect($back);
+        }
 
         $errors = [];
         if (!Captcha::verify(Request::post('captcha_answer'))) {
@@ -58,6 +64,12 @@ final class ContactController
         }
         if (mb_strlen($message) > 3000) {
             $errors[] = 'الرسالة أطول من المسموح (3000 حرف).';
+        }
+        if ($message !== '' && \Core\Support\SpamGuard::hasLink($message . ' ' . Request::trimmed('subject'))) {
+            $errors[] = 'يمنع وضع روابط في الرسالة.';
+        }
+        if ($message !== '' && \Core\Support\SpamGuard::lacksArabic($message)) {
+            $errors[] = 'رجاءً اكتب رسالتك باللغة العربية.';
         }
 
         if ($errors) {

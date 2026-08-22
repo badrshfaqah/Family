@@ -145,6 +145,12 @@ final class CalendarFrontController
         }
         \Core\Support\RateLimiter::hit($throttleKey);
 
+        // فخ البوتات والحد الزمني: نتظاهر بالنجاح كي لا يتعلم البوت من الرفض
+        if (!\Core\Support\SpamGuard::passes('calendar_suggest')) {
+            \Core\Support\Session::flash('calendar_suggest_success', 'استلمنا اقتراحك بنجاح 🎉 — سيظهر في الرزنامة فور اعتماده من الإدارة.');
+            \Core\Support\Response::redirect($back);
+        }
+
         $errors = [];
         if (!\Core\Support\Captcha::verify(Request::post('captcha_answer'))) {
             $errors[] = 'إجابة رمز التحقق غير صحيحة.';

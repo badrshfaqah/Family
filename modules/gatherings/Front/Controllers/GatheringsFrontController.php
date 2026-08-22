@@ -123,6 +123,12 @@ final class GatheringsFrontController
         }
         \Core\Support\RateLimiter::hit($throttleKey);
 
+        // فخ البوتات والحد الزمني: نتظاهر بالنجاح كي لا يتعلم البوت من الرفض
+        if (!\Core\Support\SpamGuard::passes('gathering_suggest')) {
+            \Core\Support\Session::flash('gathering_suggest_success', 'استلمنا اقتراح الجمعة بنجاح ☕ — ستظهر في الصفحة فور اعتمادها من الإدارة.');
+            \Core\Support\Response::redirect($back);
+        }
+
         $errors = [];
         if (!\Core\Support\Captcha::verify(\Core\Support\Request::post('captcha_answer'))) {
             $errors[] = 'إجابة رمز التحقق غير صحيحة.';

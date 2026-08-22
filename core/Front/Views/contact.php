@@ -23,6 +23,7 @@ use Core\View;
 
   <form method="post" action="<?= Url::to('contact') ?>" class="reg-card">
     <?= Csrf::field() ?>
+    <?= \Core\Support\SpamGuard::fields('contact') ?>
 
     <div class="form-row cols-2" style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
       <div class="form-group">
@@ -46,7 +47,7 @@ use Core\View;
     </div>
 
     <div class="form-group">
-      <label>كم يساوي <?= (int) $captcha['a'] ?> + <?= (int) $captcha['b'] ?>؟</label>
+      <label><?= View::e(\Core\Support\Captcha::question($captcha)) ?></label>
       <input class="form-control" type="text" name="captcha_answer" inputmode="numeric" autocomplete="off" required>
     </div>
 
